@@ -1,0 +1,27 @@
+<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+    xmlns:local="clr-namespace:SyncfusionWpfSample3"
+    x:Class="SyncfusionWpfSample3.MainWindow"
+        Title="MainWindow" Height="480.392" Width="681.863" Icon="App.ico">
+
+    <Window.DataContext>
+        <local:ViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <syncfusion:DockingManager DockFill="True" HorizontalAlignment="Left" Height="449" VerticalAlignment="Top" Width="674">
+            <syncfusion:SfChart syncfusion:DockingManager.Header="log 1" Header="Chart Header" HorizontalAlignment="Center" Margin="10" VerticalAlignment="Center">
+                <syncfusion:SfChart.PrimaryAxis>
+                    <syncfusion:NumericalAxis FontSize="10" Header="Time (s)" Maximum="5" Minimum="0" ShowGridLines="False"/>
+                </syncfusion:SfChart.PrimaryAxis>
+                <syncfusion:SfChart.SecondaryAxis>
+                    <syncfusion:NumericalAxis FontSize="10" Header="Value" Maximum="80" Minimum="0"/>
+                </syncfusion:SfChart.SecondaryAxis>
+                <syncfusion:LineSeries ItemsSource="{Binding Data}" XBindingPath="Time" YBindingPath="Value"/>
+            </syncfusion:SfChart>
+            <syncfusion:OlapChart syncfusion:DockingManager.Header="log 2" Margin="0,10,0,30" Width="311"/>
+        </syncfusion:DockingManager>
+    </Grid>
+</Window>
