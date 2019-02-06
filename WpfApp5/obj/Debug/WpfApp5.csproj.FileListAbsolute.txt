@@ -1,0 +1,51 @@
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.csprojAssemblyReference.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\App.g.cs
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5_MarkupCompile.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\WpfApp5.exe.config
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\WpfApp5.exe
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\WpfApp5.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\LiveCharts.dll
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\LiveCharts.Wpf.dll
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\LiveCharts.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\LiveCharts.xml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\LiveCharts.Wpf.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\bin\Debug\LiveCharts.Wpf.xml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\MainWindow.g.cs
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5_MarkupCompile.lref
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\MainWindow.baml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.g.resources
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.Properties.Resources.resources
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.csproj.GenerateResource.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.csproj.CoreCompileInputs.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.csproj.CopyComplete
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.exe
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5\WpfApp5\obj\Debug\WpfApp5.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.csprojAssemblyReference.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\MainWindow.g.cs
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\App.g.cs
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5_MarkupCompile.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5_MarkupCompile.lref
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.exe
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\WpfApp5.exe.config
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\WpfApp5.exe
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\WpfApp5.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\ControlzEx.dll
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\LiveCharts.dll
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\LiveCharts.Wpf.dll
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\MahApps.Metro.dll
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\System.Windows.Interactivity.dll
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\ControlzEx.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\LiveCharts.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\LiveCharts.xml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\LiveCharts.Wpf.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\LiveCharts.Wpf.xml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\MahApps.Metro.pdb
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\bin\Debug\MahApps.Metro.xml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\App.baml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\MainWindow.baml
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.g.resources
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.Properties.Resources.resources
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.csproj.GenerateResource.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.csproj.CoreCompileInputs.cache
+D:\my documents\IDrive-Sync\College\Year 4\Spring\Senior Dev\LiveCharts testing\WpfApp5 - Copy\WpfApp5\obj\Debug\WpfApp5.csproj.CopyComplete
