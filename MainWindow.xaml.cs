@@ -88,7 +88,7 @@ namespace SiemensPerformance
                 tab.Header = "Log " + (control.Items.Count).ToString();
                 control.Items.Insert(control.Items.Count - 1, tab);
                 // TODO: Fix to select newly made tab
-                //control.SelectedIndex = control.Items.Count - 1;
+                control.SelectedIndex = control.Items.Count - 2;
             }
         }
     }
