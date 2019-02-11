@@ -18,8 +18,8 @@
                 </MenuItem>
             </Menu>
             <StackPanel></StackPanel>
-            <TabControl Margin="10" BorderBrush="Gainsboro">
-                <TabItem Header="Log 1.log">
+            <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
+                <!--<TabItem Header="Log 1.log">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="51*"/>
@@ -51,8 +51,8 @@
                         </TabItem>
                         <TabItem Header="test2"/>
                     </TabControl>
-                </TabItem>
-                <TabItem Header="+">
+                </TabItem>-->
+                <TabItem x:Name="addTab" Header="+">
                     <Label Content="Code run when going to this tab to open more tabs?"/>
                 </TabItem>
             </TabControl>
