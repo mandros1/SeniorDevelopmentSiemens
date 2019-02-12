@@ -66,9 +66,7 @@ namespace SiemensPerformance
             int numTabs = 3;
             for(int i = 0; i < numTabs; i++)
             {
-                TabItem tab = new TabItem();
-                tab.Header = "Log " + (i + 1).ToString();
-                tab.Content = GenerateTable();
+                TabItem tab = GenerateTabItem(i+1);
                 tabs.Items.Insert(tabs.Items.Count - 1, tab);
             }
         }
@@ -85,10 +83,7 @@ namespace SiemensPerformance
             int currTab = control.SelectedIndex;
             if(currTab == control.Items.Count-1)
             {
-                TabItem tab = new TabItem();
-                tab.Header = "Log " + (control.Items.Count).ToString();
-
-                tab.Content = GenerateTable();
+                TabItem tab = GenerateTabItem(control.Items.Count);
 
                 control.Items.Insert(control.Items.Count - 1, tab);
                 control.SelectedIndex = control.Items.Count - 2;
@@ -112,6 +107,17 @@ namespace SiemensPerformance
 
 
             return grid;
+        }
+
+        //Generates and returns a new TabItem object
+        private TabItem GenerateTabItem(int tabNum)
+        {
+            TabItem tab = new TabItem();
+            tab.Header = "Log " + (tabNum).ToString();
+
+            tab.Content = GenerateTable();
+
+            return tab;
         }
     }
 }
