@@ -68,6 +68,7 @@ namespace SiemensPerformance
             {
                 TabItem tab = new TabItem();
                 tab.Header = "Log " + (i + 1).ToString();
+                tab.Content = GenerateTable();
                 tabs.Items.Insert(tabs.Items.Count - 1, tab);
             }
         }
@@ -86,10 +87,31 @@ namespace SiemensPerformance
             {
                 TabItem tab = new TabItem();
                 tab.Header = "Log " + (control.Items.Count).ToString();
+
+                tab.Content = GenerateTable();
+
                 control.Items.Insert(control.Items.Count - 1, tab);
-                // TODO: Fix to select newly made tab
                 control.SelectedIndex = control.Items.Count - 2;
             }
+        }
+
+        // Generate table for queries
+        private DataGrid GenerateTable()
+        {
+            DataGrid grid = new DataGrid();
+
+            DataGridTextColumn col1 = new DataGridTextColumn();
+            col1.Header = "Field 1";
+            grid.Columns.Add(col1);
+            DataGridTextColumn col2 = new DataGridTextColumn();
+            col2.Header = "Field 2";
+            grid.Columns.Add(col2);
+            DataGridTextColumn co3 = new DataGridTextColumn();
+            co3.Header = "Field 3";
+            grid.Columns.Add(co3);
+
+
+            return grid;
         }
     }
 }
