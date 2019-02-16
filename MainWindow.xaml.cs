@@ -95,15 +95,16 @@ namespace SiemensPerformance
         {
             DataGrid grid = new DataGrid();
 
-            DataGridTextColumn col1 = new DataGridTextColumn();
-            col1.Header = "Field 1";
-            grid.Columns.Add(col1);
-            DataGridTextColumn col2 = new DataGridTextColumn();
-            col2.Header = "Field 2";
-            grid.Columns.Add(col2);
-            DataGridTextColumn co3 = new DataGridTextColumn();
-            co3.Header = "Field 3";
-            grid.Columns.Add(co3);
+            // TODO: replace with backend data
+            int numCols = 3;
+
+            for(int i = 0; i < numCols; i++)
+            {
+                DataGridTextColumn col = new DataGridTextColumn();
+                col.Header = "Field 1";
+                // should be able to bind data to the row
+                grid.Columns.Add(col);
+            }
 
 
             return grid;
