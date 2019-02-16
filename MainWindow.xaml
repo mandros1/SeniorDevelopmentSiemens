@@ -52,6 +52,20 @@
                         <TabItem Header="test2"/>
                     </TabControl>
                 </TabItem>-->
+                <TabItem x:Name="exampleQuery" Header="Example Query">
+                    <Grid HorizontalAlignment="Left" Height="330" Margin="-6,-3,-1,-3" VerticalAlignment="Top" Width="773">
+                        <Label Content="Select:" HorizontalAlignment="Left" Margin="24,10,0,0" VerticalAlignment="Top"/>
+                        <ComboBox HorizontalAlignment="Left" Margin="82,10,0,0" VerticalAlignment="Top" Width="120"/>
+                        <Label Content="Between:" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top"/>
+                        <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp1" Width="120" Margin="82,42,571,262"/>
+                        <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp2" Width="120" Margin="262,43,391,261"/>
+                        <Label Content="and" HorizontalAlignment="Left" Margin="221,42,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,0.538"/>
+                        <Label Content="Where:" HorizontalAlignment="Left" Margin="21,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
+                        <ComboBox HorizontalAlignment="Left" Margin="82,77,0,0" VerticalAlignment="Top" Width="120"/>
+                        <Label Content="equals" HorizontalAlignment="Left" Margin="216,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
+                        <TextBox Height="23" TextWrapping="Wrap" Text="Value" Width="120" Margin="265,77,388,227"/>
+                    </Grid>
+                </TabItem>
                 <TabItem x:Name="addTab" Header="+">
                     <Label Content="Code run when going to this tab to open more tabs?"/>
                 </TabItem>
