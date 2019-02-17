@@ -12,6 +12,7 @@ using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using MahApps.Metro.Controls;
+using Microsoft.Win32;
 
 namespace SiemensPerformance
 {
@@ -23,10 +24,15 @@ namespace SiemensPerformance
     {
 
         public Func<double, string> Formatter { get; set; }
+        private DataGenerator generator;
+        private TabControl tabs;
+
+        private string data;
 
         public MainWindow()
         {
-            
+
+            generator = new DataGenerator();
             InitializeComponent();
 
             // Graph setup
@@ -60,63 +66,86 @@ namespace SiemensPerformance
              RankGraph2.Series = Memory;*/
 
             // Tabs setup
-
-            TabControl tabs = (TabControl)this.FindName("logNav");
-            // TODO: retrieve from backend
-            int numTabs = 3;
+            
+            tabs = (TabControl)this.FindName("logNav");
+            
+            /*
+            int numTabs = 0;
             for(int i = 0; i < numTabs; i++)
             {
-                TabItem tab = GenerateTabItem(i+1);
+                TabItem tab = GenerateTabItem(generator.getProcessVars(), "NEW Name");
                 tabs.Items.Insert(tabs.Items.Count - 1, tab);
             }
+            */
+            
         }
 
+        
         private void Info_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
            
         }
 
-        // Called when a new log tab item is chosen
+            // Called when a new log tab item is chosen
         private void LogNav_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            
             TabControl control = sender as TabControl;
-            int currTab = control.SelectedIndex;
-            if(currTab == control.Items.Count-1)
-            {
-                TabItem tab = GenerateTabItem(control.Items.Count);
 
+            if (control.SelectedIndex == control.Items.Count - 1)
+            {
+                TabItem tab = GenerateTabItem();
                 control.Items.Insert(control.Items.Count - 1, tab);
                 control.SelectedIndex = control.Items.Count - 2;
             }
+
+            //TabItem tab = GenerateTabItem(generator.getProcessVars(), "NEW Name");
+
         }
 
+
         // Generate table for queries
-        private DataGrid GenerateTable()
+        private DataGrid GenerateTable(String[] columns)
         {
             DataGrid grid = new DataGrid();
 
-            // TODO: replace with backend data
-            int numCols = 3;
-
-            for(int i = 0; i < numCols; i++)
+            for(int i = 0; i < columns.Length; i++)
             {
                 DataGridTextColumn col = new DataGridTextColumn();
-                col.Header = "Field 1";
+
+                // TODO: replace with the column name
+                col.Header = columns[i];
                 // should be able to bind data to the row
                 grid.Columns.Add(col);
             }
-
 
             return grid;
         }
 
         //Generates and returns a new TabItem object
-        private TabItem GenerateTabItem(int tabNum)
+        private TabItem GenerateTabItem()
         {
-            TabItem tab = new TabItem();
-            tab.Header = "Log " + (tabNum).ToString();
 
-            tab.Content = GenerateTable();
+            TabItem tab = new TabItem();
+
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.DefaultExt = ".utr";
+            ofd.Filter = "Text files (*.utr)|*.utr";
+
+            if (ofd.ShowDialog() == true)
+            {
+                this.data = generator.getJsonString(ofd);
+            }
+            tab.Header = generator.fileName;
+            
+            tab.Content = GenerateTable(generator.getProcessVars());
+
+            ScrollViewer sv = new ScrollViewer();
+            TextBlock block = new TextBlock();
+            block.Text = this.data;
+            sv.Content = block;
+
+            tab.Content = sv;
 
             return tab;
         }

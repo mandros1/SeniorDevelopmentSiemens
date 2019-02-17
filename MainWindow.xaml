@@ -66,7 +66,7 @@
                         <TextBox Height="23" TextWrapping="Wrap" Text="Value" Width="120" Margin="265,77,388,227"/>
                     </Grid>
                 </TabItem>
-                <TabItem x:Name="addTab" Header="+">
+                <TabItem x:Name="addTab" Header="+" >
                     <Label Content="Code run when going to this tab to open more tabs?"/>
                 </TabItem>
             </TabControl>
