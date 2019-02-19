@@ -10,12 +10,6 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <DockPanel>
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File">
-                    <MenuItem Header="_Save"/>
-                    <MenuItem Header="_Save As..."/>
-                </MenuItem>
-            </Menu>
             <StackPanel></StackPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
                 <!--<TabItem Header="Log 1.log">
