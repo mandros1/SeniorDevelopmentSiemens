@@ -12,7 +12,6 @@
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Import"/>
                     <MenuItem Header="_Save"/>
                     <MenuItem Header="_Save As..."/>
                 </MenuItem>
