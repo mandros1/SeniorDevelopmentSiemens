@@ -13,6 +13,7 @@ using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using MahApps.Metro.Controls;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 
 namespace SiemensPerformance
 {
@@ -141,11 +142,18 @@ namespace SiemensPerformance
             tab.Content = GenerateTable(generator.getProcessVars());
 
             ScrollViewer sv = new ScrollViewer();
-            TextBlock block = new TextBlock();
-            block.Text = this.data;
-            sv.Content = block;
+            //OLD display JSON text
+            //TextBlock block = new TextBlock();
+            //block.Text = this.data;
+            //sv.Content = block;
+            //tab.Content = sv;
 
-            tab.Content = sv;
+            //Convert JSON to DataGrid
+            DataSet dataSet = JsonConvert.DeserializeObject<DataSet>(data);
+            DataTable firstTable = dataSet.Tables[0];
+            DataGrid dataGrid = new DataGrid();
+            dataGrid.ItemsSource = firstTable.DefaultView;
+            tab.Content = dataGrid;
 
             return tab;
         }
