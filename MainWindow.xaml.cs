@@ -229,15 +229,17 @@ namespace SiemensPerformance
 
         private void Close(TabItem tab)
         {
-            /*//TODO - fix this
             if (tab != null)
             {
                 // find the parent tab control
                 TabControl tabControl = tab.Parent as TabControl;
 
                 if (tabControl != null)
-                    tabControl.Items.Remove(tab); // remove tabItem
-            }*/
+                {
+                    tabControl.SelectedIndex = tabControl.Items.IndexOf(tab)-1;  // Selects the tab before the closing tab
+                    tabControl.Items.Remove(tab); // Removes the current tab
+                }
+            }
         }
     }
 }
