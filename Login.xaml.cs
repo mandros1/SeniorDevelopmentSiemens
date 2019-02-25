@@ -37,6 +37,7 @@ namespace SiemensPerformance
                 Server = "localhost",
                 Database = database.Text,
                 UserID = username.Text,
+                SslMode = 0,
                 Password = password.Password
             };
 
