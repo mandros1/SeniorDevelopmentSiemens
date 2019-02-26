@@ -84,12 +84,6 @@ namespace SiemensPerformance
             
         }
 
-        
-        private void Info_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-           
-        }
-
             // Called when a new log tab item is chosen
         private void LogNav_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -147,11 +141,6 @@ namespace SiemensPerformance
             tab.Content = GenerateTable(generator.getProcessVars());
 
             ScrollViewer sv = new ScrollViewer();
-            //OLD display JSON text
-            //TextBlock block = new TextBlock();
-            //block.Text = this.data;
-            //sv.Content = block;
-            //tab.Content = sv;
 
             //Convert JSON to DataGrid
             DataSet dataSet = JsonConvert.DeserializeObject<DataSet>(this.data);
