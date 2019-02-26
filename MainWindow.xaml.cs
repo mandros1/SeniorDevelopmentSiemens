@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using Microsoft.VisualBasic;
 using System.Windows.Interactivity;
 using System.IO;
+using System.Linq;
 
 namespace SiemensPerformance
 {
@@ -148,6 +149,28 @@ namespace SiemensPerformance
             DataGrid dataGrid = new DataGrid();
             dataGrid.ItemsSource = firstTable.DefaultView;
             tab.Content = dataGrid;
+
+            Int64[] CPU = firstTable.AsEnumerable().Select(r => r.Field<Int64>("CPU")).ToArray();
+            /*
+            string[] timeString = firstTable.AsEnumerable().Select(r => r.Field<string>("TimeStamp")).ToArray();
+
+            string testtime = timeString[0];
+            testtime = testtime.Trim();
+            testtime = testtime.Trim(new Char[] { '"' });
+            testtime = testtime.Replace("\"", "");
+            var timeStringTest = DateTime.Parse("2018/05/08 19:07:13");
+            Console.WriteLine(testtime);
+            */
+            CartesianChart ch = new CartesianChart();
+            ch.Series = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Title = "CPU Usgae",
+                    Values = new ChartValues<Int64>(CPU)
+                }
+            };
+            tab.Content = ch;
 
             //Tab dropdown menu
             ContextMenu contextMenu = new ContextMenu();
