@@ -172,11 +172,6 @@ namespace SiemensPerformance
             menuItem2.Header = "Save";
             menuItem2.Click += delegate { Save(tab, this.data); };
 
-            MenuItem menuItem3 = new MenuItem();
-            contextMenu.Items.Add(menuItem3);
-            menuItem3.Header = "Save As...";
-            menuItem3.Click += delegate { SaveAs(tab, this.data); };
-
             MenuItem menuItem4 = new MenuItem();
             contextMenu.Items.Add(menuItem4);
             menuItem4.Header = "Close";
@@ -196,11 +191,6 @@ namespace SiemensPerformance
         }
 
         private void Save(TabItem tab, String json)
-        {
-            Console.WriteLine("Save dialaog");
-        }
-
-        private void SaveAs(TabItem tab, String json)
         {
             //set default file name to tab header
             String defaultName = tab.Header.ToString();
