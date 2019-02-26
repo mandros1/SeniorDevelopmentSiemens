@@ -12,39 +12,6 @@
         <DockPanel>
             <StackPanel></StackPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
-                <!--<TabItem Header="Log 1.log">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="51*"/>
-                            <ColumnDefinition Width="5*"/>
-                            <ColumnDefinition Width="337*"/>
-                        </Grid.ColumnDefinitions>
-                        <lvc:CartesianChart x:Name="RankGraph" Series="{Binding CPU}" Margin="334,40,83,167" Grid.Column="2">
-                            <lvc:CartesianChart.AxisX>
-                                <lvc:Axis LabelFormatter="{Binding Formatter}"></lvc:Axis>
-                            </lvc:CartesianChart.AxisX>
-                        </lvc:CartesianChart>
-                        <lvc:CartesianChart x:Name="RankGraph2" Series="{Binding Memory}" Margin="102,40,427,167" Grid.ColumnSpan="3">
-                            <lvc:CartesianChart.AxisX>
-                                <lvc:Axis LabelFormatter="{Binding Formatter}"></lvc:Axis>
-                            </lvc:CartesianChart.AxisX>
-                        </lvc:CartesianChart>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Log 2.log">
-                    <TabControl TabStripPlacement="Left">
-                        <TabItem Header="test">
-                            <DataGrid Margin="95,15,316,31" Name="Info" AutoGenerateColumns="False" SelectionChanged="Info_SelectionChanged">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Field 1"  Binding="{Binding Field1}"/>
-                                    <DataGridTextColumn Header="Field 2"  Binding="{Binding Field2}"/>
-                                    <DataGridTextColumn Header="Field 3"  Binding="{Binding Field3}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </TabItem>
-                        <TabItem Header="test2"/>
-                    </TabControl>
-                </TabItem>-->
                 <TabItem x:Name="exampleQuery" Header="Example Query">
                     <TabControl VerticalAlignment="Top" Margin="0,0,0,0" HorizontalAlignment="Center" TabStripPlacement="Left">
                         <TabItem Header="Query">
@@ -62,19 +29,8 @@
                             </Grid>
                         </TabItem>
                     </TabControl>
-
                 </TabItem>
-                <TabItem x:Name="addTab" Header="+" >
-                    <Label Content="Code run when going to this tab to open more tabs?"/>
-                </TabItem>
-                <TabControl Height="39" Width="161">
-                    <TabItem Header="TabItem">
-                        <Grid Background="#FFE5E5E5"/>
-                    </TabItem>
-                    <TabItem Header="TabItem">
-                        <Grid Background="#FFE5E5E5"/>
-                    </TabItem>
-                </TabControl>
+                <TabItem x:Name="addTab" Header="+" />
             </TabControl>
         </DockPanel>
     </Grid>
