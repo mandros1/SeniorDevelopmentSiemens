@@ -7,7 +7,8 @@
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        WindowStartupLocation="CenterScreen"
+        Title="Siemens Performance Logs" Height="450" Width="800" MinHeight="250" MinWidth="550">
     <Grid>
         <DockPanel>
             <StackPanel></StackPanel>
