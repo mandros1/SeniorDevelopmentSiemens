@@ -13,7 +13,7 @@
             <StackPanel></StackPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
                 <TabItem x:Name="exampleQuery" Header="Example Query">
-                    <TabControl VerticalAlignment="Top" Margin="0,0,0,0" HorizontalAlignment="Center" TabStripPlacement="Left">
+                    <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
                         <TabItem Header="Query">
                             <Grid HorizontalAlignment="Left" Height="330" Margin="0,0,0,0" VerticalAlignment="Top" Width="681" >
                                 <Label Content="Select:" HorizontalAlignment="Left" Margin="24,10,0,0" VerticalAlignment="Top"/>
