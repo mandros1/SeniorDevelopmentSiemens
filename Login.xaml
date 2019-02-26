@@ -5,32 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SiemensPerformance"
         mc:Ignorable="d"
-        Title="Window1" Height="450" Width="800">
-    <Grid>
-        <TabItem x:Name="Login" Header="Login" Margin="361,53,344,315" HorizontalAlignment="Center" Width="87">
-            <Grid HorizontalAlignment="Left" Height="330" Margin="-6,-3,-1,-3" VerticalAlignment="Top" Width="773">
-                <Label Content="Select:" HorizontalAlignment="Left" Margin="24,10,0,0" VerticalAlignment="Top"/>
-                <ComboBox HorizontalAlignment="Left" Margin="82,10,0,0" VerticalAlignment="Top" Width="120"/>
-                <Label Content="Between:" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top"/>
-                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp1" Width="120" Margin="82,42,571,262"/>
-                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp2" Width="120" Margin="262,43,391,261"/>
-                <Label Content="and" HorizontalAlignment="Left" Margin="221,42,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,0.538"/>
-                <Label Content="Where:" HorizontalAlignment="Left" Margin="21,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
-                <ComboBox HorizontalAlignment="Left" Margin="82,77,0,0" VerticalAlignment="Top" Width="120"/>
-                <Label Content="equals" HorizontalAlignment="Left" Margin="216,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
-                <TextBox Height="23" TextWrapping="Wrap" Text="Value" Width="120" Margin="265,77,388,227"/>
-            </Grid>
-        </TabItem>
-        <Label x:Name="Server_Label" Content="Server " HorizontalAlignment="Left" Margin="303,128,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="server" Height="23" TextWrapping="Wrap" Text="localhost" Width="120" Margin="375,128,297,265" TextChanged="TextBox_TextChanged"/>
-        <Label x:Name="Username_Password" Content="Username" HorizontalAlignment="Left" Margin="286,214,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
-        <TextBox x:Name="username" Height="23" TextWrapping="Wrap" Width="120" Margin="375,214,297,179" TextChanged="TextBox_TextChanged"/>
-        <Label x:Name="PasswordLabel" Content="Password" HorizontalAlignment="Left" Margin="289,264,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
-        <PasswordBox x:Name="password" HorizontalAlignment="Left" Margin="375,264,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.518,-0.621" Width="120"/>
-        <Label x:Name="Database_Label" Content="Database" HorizontalAlignment="Left" Margin="290,169,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="database" Height="23" TextWrapping="Wrap" Text="mri" Width="120" Margin="375,170,297,223" TextChanged="TextBox_TextChanged"/>
-        <Button x:Name="Connect" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="283,302,0,0" Click="Button_Click"/>
-        <Button x:Name="Exit" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="434,302,0,0" RenderTransformOrigin="0.534,-0.342" Click="Cancel_Click"/>
+        Title="Database Login" Height="223.726" Width="241.656" WindowStyle="None">
+    <Grid Margin="0,0,0,0">
+        <Label Content="Login to Database" HorizontalAlignment="Left" Margin="24,10,0,0" VerticalAlignment="Top" Width="175" FontSize="20" FontFamily="Segoe UI Semibold"/>
 
+        <Label x:Name="Server_Label" Content="Server" HorizontalAlignment="Left" Margin="14,49,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="server" HorizontalAlignment="Left" Height="23" Margin="82,49,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text="localhost"/>
+
+        <Label x:Name="Database_Label" Content="Database" HorizontalAlignment="Left" Margin="14,80,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="database" HorizontalAlignment="Left" Height="23" Margin="82,80,0,0" TextWrapping="Wrap" Text="mri" VerticalAlignment="Top" Width="120"/>
+
+        <Label x:Name="Username_Password" Content="Username" HorizontalAlignment="Left" Margin="14,111,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
+        <TextBox x:Name="username" HorizontalAlignment="Left" Height="23" Margin="82,112,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+
+        <Label x:Name="PasswordLabel" Content="Password" HorizontalAlignment="Left" Margin="14,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
+        <PasswordBox x:Name="password" HorizontalAlignment="Left" Margin="82,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.518,-0.621" Width="120" Height="25"/>
+
+        <Button x:Name="Connect" IsDefault="True" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="27,176,0,0" Click="Button_Click" RenderTransformOrigin="0.408,0.387"/>
+        <Button x:Name="Exit" IsCancel="True" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="119,176,0,0" RenderTransformOrigin="0.534,-0.342" Click="Cancel_Click"/>
     </Grid>
 </Window>
