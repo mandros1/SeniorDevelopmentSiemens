@@ -13,15 +13,15 @@
         <DockPanel>
             <StackPanel></StackPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
-                <TabItem x:Name="exampleQuery" Header="Example Query">
+                <TabItem x:Name="Queries" Header="Queries">
                     <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
                         <TabItem Header="Query">
                             <Grid HorizontalAlignment="Left" Height="330" Margin="0,0,0,0" VerticalAlignment="Top" Width="681" >
-                                <Label Content="Select:" HorizontalAlignment="Left" Margin="24,10,0,0" VerticalAlignment="Top"/>
-                                <ComboBox HorizontalAlignment="Left" Margin="82,10,0,0" VerticalAlignment="Top" Width="120"/>
-                                <Label Content="Between:" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top"/>
-                                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp1" Width="120" Margin="82,42,479,262" />
-                                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp2" Width="120" Margin="264,42,297,262"/>
+                                <Label Content="Select:" HorizontalAlignment="Left" Margin="24,15,0,0" VerticalAlignment="Top"/>
+                                <ComboBox HorizontalAlignment="Left" Margin="82,15,0,0" VerticalAlignment="Top" Width="120"/>
+                                <Label Content="Between:" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
+                                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp1" Width="120" Margin="82,46,479,258" />
+                                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp2" Width="120" Margin="264,46,297,258"/>
                                 <Label Content="and" HorizontalAlignment="Left" Margin="221,42,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,0.538"/>
                                 <Label Content="Where:" HorizontalAlignment="Left" Margin="21,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
                                 <ComboBox HorizontalAlignment="Left" Margin="82,77,0,0" VerticalAlignment="Top" Width="120"/>
@@ -31,7 +31,7 @@
                         </TabItem>
                     </TabControl>
                 </TabItem>
-                <TabItem x:Name="addTab" Header="+" />
+                <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" />
             </TabControl>
         </DockPanel>
     </Grid>
