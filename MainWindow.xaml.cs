@@ -36,7 +36,7 @@ namespace SiemensPerformance
         public MainWindow()
         {
 
-            generator = new DataGenerator();
+            
             InitializeComponent();
 
             // Graph setup
@@ -135,6 +135,8 @@ namespace SiemensPerformance
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = ".utr";
             ofd.Filter = "Text files (*.utr)|*.utr";
+
+            generator = new DataGenerator();//Fixes multiple tab bug
 
             if (ofd.ShowDialog() == true)
             {
