@@ -89,6 +89,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DBConnect.cs" />
     <Compile Include="InputBox.cs" />
     <Compile Include="DataGenerator.cs" />
     <Compile Include="Login.xaml.cs">

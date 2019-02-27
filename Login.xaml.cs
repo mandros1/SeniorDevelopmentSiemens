@@ -20,6 +20,7 @@ namespace SiemensPerformance
     /// </summary>
     public partial class Login : Window
     {
+        DBConnect connect;
         public Login()
         {
             InitializeComponent();
@@ -27,34 +28,12 @@ namespace SiemensPerformance
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder
-            {
-                Server = "localhost",
-                Database = database.Text,
-                UserID = username.Text,
-                SslMode = 0,
-                Password = password.Password
-            };
-
-            MySqlConnection conn = new MySqlConnection(builder.ToString());
-            try
-            {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                    conn.Open();
-                MessageBox.Show("Connection Open!");
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
-                this.Close(); 
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-            finally
-            {
-                conn.Close(); 
-            }
+            string db = database.Text;
+            string userID = username.Text;
+            String pwd = password.Password;
+            connect = new DBConnect(db,userID, pwd);
+            //connect.Connect();
+            connect.createDatabase();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
