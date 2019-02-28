@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,8 +18,8 @@ namespace SiemensPerformance
         MySqlConnectionStringBuilder builder;
         MySqlConnection conn;
         MySqlCommand cmd;
-        String query; 
-
+        String query;
+        ServiceController controller;
         public DBConnect(string db, string username, string pwd)
         {
             server = "localhost";
@@ -86,6 +87,23 @@ namespace SiemensPerformance
             finally
             {
                 conn.Close();
+            }
+        }
+        public void startMySQL()
+        {
+            ServiceController[] scServices;
+            scServices = ServiceController.GetServices();
+
+            foreach (ServiceController scTemp in scServices)
+            {
+                if (scTemp.ServiceName.StartsWith("MySQL"))
+                {
+                    controller = new ServiceController(scTemp.ServiceName);
+                    if (controller.Status == ServiceControllerStatus.Running)
+                        MessageBox.Show("Service is already running");
+                    if (controller.Status == ServiceControllerStatus.Stopped)
+                        controller.Start();
+                }
             }
         }
     }

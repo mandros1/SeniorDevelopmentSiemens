@@ -33,7 +33,8 @@ namespace SiemensPerformance
             String pwd = password.Password;
             connect = new DBConnect(db,userID, pwd);
             //connect.Connect();
-            connect.createDatabase();
+            //connect.createDatabase();
+            connect.startMySQL();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
