@@ -40,55 +40,13 @@ namespace SiemensPerformance
             
             InitializeComponent();
 
-            // Graph setup
-            /* SeriesCollection CPU = new SeriesCollection
-             {
-             new LineSeries
-             {
-                 Title = "CPU Usage",
-
-                 Values = new ChartValues<double> { 3, 5, 7, 4 },
-
-                 Fill = Brushes.Transparent,
-
-             },
-         };
-             RankGraph.Series = CPU;
-
-
-             SeriesCollection Memory = new SeriesCollection
-             {
-             new LineSeries
-             {
-                 Title = "Memory Usage",
-
-                 Values = new ChartValues<double> { 30, 5, 20, 4 },
-
-                 Fill = Brushes.Transparent,
-
-             },
-         };
-             RankGraph2.Series = Memory;*/
-
             // Tabs setup
-            
             tabs = (TabControl)this.FindName("logNav");
-            
-            /*
-            int numTabs = 0;
-            for(int i = 0; i < numTabs; i++)
-            {
-                TabItem tab = GenerateTabItem(generator.getProcessVars(), "NEW Name");
-                tabs.Items.Insert(tabs.Items.Count - 1, tab);
-            }
-            */
-            
         }
 
-            // Called when a new log tab item is chosen
+        // Called when a new log tab item is chosen
         private void LogNav_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
             TabControl control = sender as TabControl;
 
             if (control.SelectedIndex == control.Items.Count - 1)
@@ -132,7 +90,6 @@ namespace SiemensPerformance
             {
                 table.Columns.Add(columns[i]);
             }
-
 
             foreach (var array in list)
             {
@@ -181,10 +138,11 @@ namespace SiemensPerformance
             menuItem1.Header = "Rename";
             menuItem1.Click += delegate { Rename(tab); };
 
+            //TODO convert to json to pass to save file?
             MenuItem menuItem2 = new MenuItem();
             contextMenu.Items.Add(menuItem2);
             menuItem2.Header = "Save";
-            menuItem2.Click += delegate { Save(tab, this.data); };
+            menuItem2.Click += delegate { Save(tab, "Not working"); };
 
             MenuItem menuItem4 = new MenuItem();
             contextMenu.Items.Add(menuItem4);
@@ -251,8 +209,6 @@ namespace SiemensPerformance
         //Close Tab
         private void Close(TabItem tab)
         {
-            //TODO - fix this
-            /*
             if (tab != null)
             {
                 // find the parent tab control
@@ -265,7 +221,7 @@ namespace SiemensPerformance
                 }
             }
             SelectionPopulate();
-            */
+            
         }
     }
 }

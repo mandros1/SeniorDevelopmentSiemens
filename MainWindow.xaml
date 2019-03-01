@@ -17,7 +17,7 @@
                     <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
                         <TabItem Header="Query">
                             <Grid HorizontalAlignment="Left" Height="330" Margin="0,0,0,0" VerticalAlignment="Top" Width="681" >
-                                <Label  Content="Select:" HorizontalAlignment="Left" Margin="28,15,0,0" VerticalAlignment="Top"/>
+                                <Label Content="Select:" HorizontalAlignment="Left" Margin="28,15,0,0" VerticalAlignment="Top"/>
                                 <ComboBox x:Name="SelectFile" HorizontalAlignment="Left" Margin="86,15,0,0" VerticalAlignment="Top" Width="120"/>
                                 <Label Content="Between:" HorizontalAlignment="Left" Margin="14,46,0,0" VerticalAlignment="Top"/>
                                 <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp1" Width="120" Margin="86,46,475,258" />
@@ -30,7 +30,6 @@
                                 <Button IsDefault="true" Content="Run" Margin="174,133,425,168"/>
                             </Grid>
                         </TabItem>
-
                     </TabControl>
                 </TabItem>
                 <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" />
