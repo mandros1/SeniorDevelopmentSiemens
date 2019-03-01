@@ -19,7 +19,7 @@ namespace SiemensPerformance
         StackPanel sp1 = new StackPanel();// items container
         string title = "Rename";
         string boxcontent;
-        string defaulttext;
+        string defaulttext = "Some Default text";
         string errormessage = "Name can't be empty";//error messagebox content
         string errortitle = "Error";//error messagebox heading title
         string okbuttontext = "OK";//Ok button content

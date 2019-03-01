@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using Microsoft.VisualBasic;
 using System.Windows.Interactivity;
 using System.IO;
+using System.Collections.Generic;
 
 namespace SiemensPerformance
 {
@@ -126,6 +127,29 @@ namespace SiemensPerformance
             return grid;
         }
 
+        private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
+        {
+            DataTable table = new DataTable();
+
+            // Get max columns.
+            int columnsNum = columns.Length;
+            for(int i=0; i<columnsNum; i++)
+            {
+                table.Columns.Add(columns[i]);
+            }
+
+
+            foreach (var array in list)
+            {
+                if (array.Length == columnsNum)
+                {
+                    table.Rows.Add(array);
+                }
+            }
+
+            return table;
+        }
+
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
@@ -138,22 +162,20 @@ namespace SiemensPerformance
 
             if (ofd.ShowDialog() == true)
             {
-                this.data = generator.getJsonString(ofd);
+
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                generator.getJsonString(ofd);
+                watch.Stop();
+                Console.WriteLine("TIME ELAPSED: " + watch.ElapsedMilliseconds);
             }
             tab.Header = generator.fileName;
             
             tab.Content = GenerateTable(generator.getProcessVars());
 
             ScrollViewer sv = new ScrollViewer();
-            //OLD display JSON text
-            //TextBlock block = new TextBlock();
-            //block.Text = this.data;
-            //sv.Content = block;
-            //tab.Content = sv;
-
-            //Convert JSON to DataGrid
-            DataSet dataSet = JsonConvert.DeserializeObject<DataSet>(this.data);
-            DataTable firstTable = dataSet.Tables[0];
+        
+            
+            DataTable firstTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
             DataGrid dataGrid = new DataGrid();
             dataGrid.ItemsSource = firstTable.DefaultView;
             tab.Content = dataGrid;
@@ -229,7 +251,8 @@ namespace SiemensPerformance
 
         private void Close(TabItem tab)
         {
-            /*//TODO - fix this
+            //TODO - fix this
+            /*
             if (tab != null)
             {
                 // find the parent tab control
