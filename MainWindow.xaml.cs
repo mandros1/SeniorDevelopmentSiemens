@@ -37,7 +37,7 @@ namespace SiemensPerformance
         public MainWindow()
         {
 
-            generator = new DataGenerator();
+            
             InitializeComponent();
 
             // Graph setup
@@ -85,12 +85,6 @@ namespace SiemensPerformance
             
         }
 
-        
-        private void Info_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-           
-        }
-
             // Called when a new log tab item is chosen
         private void LogNav_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -99,9 +93,10 @@ namespace SiemensPerformance
 
             if (control.SelectedIndex == control.Items.Count - 1)
             {
-                TabItem tab = GenerateTabItem();
+                TabItem tab = GenerateTabItem();         
                 control.Items.Insert(control.Items.Count - 1, tab);
                 control.SelectedIndex = control.Items.Count - 2;
+                SelectionPopulate();
             }
 
             //TabItem tab = GenerateTabItem(generator.getProcessVars(), "NEW Name");
@@ -153,12 +148,13 @@ namespace SiemensPerformance
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
-
             TabItem tab = new TabItem();
 
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = ".utr";
             ofd.Filter = "Text files (*.utr)|*.utr";
+
+            generator = new DataGenerator();//Fixes multiple tab bug
 
             if (ofd.ShowDialog() == true)
             {
@@ -173,8 +169,6 @@ namespace SiemensPerformance
             tab.Content = GenerateTable(generator.getProcessVars());
 
             ScrollViewer sv = new ScrollViewer();
-        
-            
             DataTable firstTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
             DataGrid dataGrid = new DataGrid();
             dataGrid.ItemsSource = firstTable.DefaultView;
@@ -192,11 +186,6 @@ namespace SiemensPerformance
             menuItem2.Header = "Save";
             menuItem2.Click += delegate { Save(tab, this.data); };
 
-            MenuItem menuItem3 = new MenuItem();
-            contextMenu.Items.Add(menuItem3);
-            menuItem3.Header = "Save As...";
-            menuItem3.Click += delegate { SaveAs(tab, this.data); };
-
             MenuItem menuItem4 = new MenuItem();
             contextMenu.Items.Add(menuItem4);
             menuItem4.Header = "Close";
@@ -207,20 +196,31 @@ namespace SiemensPerformance
             return tab;
         }
 
+        //Populates the Select combo box for Queries
+        private void SelectionPopulate()
+        {
+            TabControl control = this.FindName("logNav") as TabControl;
+            ComboBox cmbo = this.FindName("SelectFile") as ComboBox;
+            cmbo.Items.Clear();
+            for(int i = 1; i < control.Items.Count-1; i++)
+            {
+                TabItem tab = control.Items.GetItemAt(i) as TabItem;
+                cmbo.Items.Add(tab.Header);
+            }
+        }
+
+        //Renames a Tab
         private void Rename(TabItem tab)
         {
             string name = new InputBox("Name").ShowDialog();
             if(name != "") {
                 tab.Header = name;
             }
+            SelectionPopulate();
         }
 
+        //Saves data from a tab to json file
         private void Save(TabItem tab, String json)
-        {
-            Console.WriteLine("Save dialaog");
-        }
-
-        private void SaveAs(TabItem tab, String json)
         {
             //set default file name to tab header
             String defaultName = tab.Header.ToString();
@@ -246,9 +246,9 @@ namespace SiemensPerformance
                 string filename = dlg.FileName;
                 File.WriteAllText(filename, json);
             }
-
         }
 
+        //Close Tab
         private void Close(TabItem tab)
         {
             //TODO - fix this
@@ -259,8 +259,13 @@ namespace SiemensPerformance
                 TabControl tabControl = tab.Parent as TabControl;
 
                 if (tabControl != null)
-                    tabControl.Items.Remove(tab); // remove tabItem
-            }*/
+                {
+                    tabControl.SelectedIndex = tabControl.Items.IndexOf(tab)-1;  // Selects the tab before the closing tab
+                    tabControl.Items.Remove(tab); // Removes the current tab
+                }
+            }
+            SelectionPopulate();
+            */
         }
     }
 }
