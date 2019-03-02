@@ -32,8 +32,6 @@ namespace SiemensPerformance
         private DataGenerator generator;
         private TabControl tabs;
 
-        private string data;
-
         public MainWindow()
         {
 
@@ -61,7 +59,7 @@ namespace SiemensPerformance
 
         }
 
-
+/*
         // Generate table for queries
         private DataGrid GenerateTable(String[] columns)
         {
@@ -101,12 +99,14 @@ namespace SiemensPerformance
 
             return table;
         }
-
+        */
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
+            TabItem tab = new DataDisplayTab();
+            /*
+            
             TabItem tab = new TabItem();
-
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = ".utr";
             ofd.Filter = "Text files (*.utr)|*.utr";
@@ -126,7 +126,9 @@ namespace SiemensPerformance
             tab.Content = GenerateTable(generator.getProcessVars());
 
             ScrollViewer sv = new ScrollViewer();
-            DataTable firstTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
+            //string[] test = generator.dlist;
+            //DataTable firstTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
+            DataTable firstTable = ConvertListToDataTable(generator.getProcessData("CM.DMMonitoringTaskflow_2feaaba2c07a43d0b41f92319eac8bfe.DMMonitoringTaskBE(29668)"), generator.processVariables);
             DataGrid dataGrid = new DataGrid();
             dataGrid.ItemsSource = firstTable.DefaultView;
             tab.Content = dataGrid;
@@ -150,7 +152,7 @@ namespace SiemensPerformance
             menuItem4.Click += delegate { Close(tab); };
 
             tab.ContextMenu = contextMenu;
-
+            */
             return tab;
         }
 
@@ -166,6 +168,8 @@ namespace SiemensPerformance
                 cmbo.Items.Add(tab.Header);
             }
         }
+
+        /*
 
         //Renames a Tab
         private void Rename(TabItem tab)
@@ -223,5 +227,6 @@ namespace SiemensPerformance
             SelectionPopulate();
             
         }
+        */
     }
 }
