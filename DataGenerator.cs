@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace SiemensPerformance
 {
@@ -11,6 +12,7 @@ namespace SiemensPerformance
     {
 
         public List<string[]> dlist { get; set; }
+        public List<string> processes { get; set; }
         private List<string> singleList { get; set; }
         private string handmadeJSON { get; set; }
         public string fileName { get; set; }
@@ -47,6 +49,36 @@ namespace SiemensPerformance
         {
             return this.gloabalTotalVariables;
         }
+
+        //Gets all unique process names
+        private void findProcesses()
+        {
+            List<string> allProcesses = new List<string>();
+
+            foreach (var array in dlist)
+            {
+                allProcesses.Add(array[1]);
+            }
+
+            IEnumerable<string> distinctNotes = processes.Distinct();
+            processes = new List<string>(distinctNotes);
+        }
+
+        //Gets data for one process
+        public List<string[]> getProcessData(string process)
+        {
+            List<string[]> processData = new List<string[]>();
+
+            foreach (var array in dlist)
+            {
+                if (array[1] == process)
+                {
+                    processData.Add(array);
+                }
+            }
+            return processData;
+        }
+
 
         /*
         public void InitialJSON()
