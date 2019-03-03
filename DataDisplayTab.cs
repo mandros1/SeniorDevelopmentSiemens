@@ -51,17 +51,25 @@ namespace SiemensPerformance
             //"syngo.MR.SaveLogHookMrawp(27696)"
             dataGrid = new DataGrid();
             dataGrid.ItemsSource = dataTable.DefaultView;
+            dataGrid.IsReadOnly = true;
             table.Content = dataGrid;
             
             List<Double> CPU = new List<Double>();
+            List<DateTime> timeStamps = new List<DateTime>();
 
             foreach (var array in generator.getProcessData("syngo.MR.SaveLogHookMrawp(27696)"))
             {
                 try
                 {
                     //Console.WriteLine(array);
-                    CPU.Add(Double.Parse(array[8]));
-                }catch(Exception e)
+                    Double cpuL = Double.Parse(array[8]);
+                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
+                    CPU.Add(cpuL);
+                    timeStamps.Add(timeStamp);
+                    //Console.WriteLine(test);
+                    //timestamps.add
+                }
+                catch(Exception e)
                 {
                     //Console.WriteLine(e);
                 }
