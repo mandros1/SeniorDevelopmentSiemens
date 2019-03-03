@@ -81,6 +81,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DateModel.cs" />
+    <Compile Include="DataDisplayTab.cs" />
     <Compile Include="InputBox.cs" />
     <Compile Include="DataGenerator.cs" />
     <Compile Include="MainWindow.xaml.cs">
