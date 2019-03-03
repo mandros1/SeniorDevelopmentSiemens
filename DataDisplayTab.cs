@@ -22,6 +22,7 @@ namespace SiemensPerformance
         private DataGenerator generator = new DataGenerator();
         private DataGrid dataGrid;
         private DataTable dataTable;
+        private CartesianChart ch;
 
         public DataDisplayTab()
         {
@@ -50,53 +51,32 @@ namespace SiemensPerformance
 
             ScrollViewer sv = new ScrollViewer();
             dataTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
-            //dataTable = ConvertListToDataTable(generator.getProcessData("CM.DMMonitoringTaskflow_2feaaba2c07a43d0b41f92319eac8bfe.DMMonitoringTaskBE(29668)"), generator.processVariables);
-            //dataTable = ConvertListToDataTable(generator.getProcessData("syngo.MR.SaveLogHookMrawp(27696)"), generator.processVariables);
             dataGrid = new DataGrid();
             dataGrid.ItemsSource = dataTable.DefaultView;
             dataGrid.IsReadOnly = true;
             table.Content = dataGrid;
-            
-            //GRAPH
-            ChartValues <DateModel> data = new ChartValues<DateModel>();
-            foreach (var array in generator.getProcessData("syngo.MR.SaveLogHookMrawp(27696)"))
-            {
-                try
-                {
-                    //Console.WriteLine(array);
-                    Double cpuL = Double.Parse(array[8]);
-                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
-                    data.Add(new DateModel
-                    {
-                        DateTime = timeStamp,
-                        Value = cpuL
-                    });
-                }
-                catch (IndexOutOfRangeException t) { }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
 
-            var dayConfig = Mappers.Xy<DateModel>()
-                .X(dayModel => dayModel.DateTime.Ticks)
-                .Y(dayModel => dayModel.Value);
 
             //Create Graph tab
             TabItem graph = new TabItem();
-            CartesianChart ch = new CartesianChart();
-            ch.Series = new SeriesCollection(dayConfig);
+            ch = new CartesianChart();
 
-            LineSeries line = new LineSeries
-            {
-                Values = data
-            };
+            PopulateGraph("syngo.MR.SaveLogHookMrawp", 27696, "CPU");
 
-            ch.Series.Add(line);
             graph.Header = "Graph";
             graph.Content = ch;
 
+            PopulateGraph("Cocos", 26204, "CPU");
+
+            //Graph Dropdown Menu
+            ContextMenu contextMenu2 = new ContextMenu();
+            MenuItem menuItem3 = new MenuItem();
+            contextMenu2.Items.Add(menuItem3);
+            menuItem3.Header = "Select Data";
+            menuItem3.Click += delegate { SelectData(); };
+
+            graph.ContextMenu = contextMenu2;
+            
             //ch.AxisX[0].LabelFormatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");
 
             //Tab dropdown menu
@@ -123,8 +103,9 @@ namespace SiemensPerformance
 
             //TODO - figure out why this is also being applied to child tab elements
             this.ContextMenu = contextMenu;
-            table.ContextMenu = null;//Not working
-            graph.ContextMenu = null;
+            graph.ContextMenu = contextMenu2;
+            table.ContextMenu = new ContextMenu();
+            //graph.ContextMenu = null;
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
             this.Content = tc;
@@ -225,6 +206,55 @@ namespace SiemensPerformance
                     tabControl.Items.Remove(this); // Removes the current tab
                 }
             }
+        }
+
+        private void SelectData()
+        {
+            //TODO - popup that returns processName, process ID, variable
+            //Populate Graph using returned variables
+        }
+
+        private void PopulateGraph(string processName, int processID, string variable)
+        {
+            ChartValues<DateModel> data = new ChartValues<DateModel>();
+
+            string[] variables = generator.getProcessVars();
+            int variableIndex = Array.IndexOf(variables, variable);
+            processName = processName + "(" + processID + ")";
+
+            //Get data
+            foreach (var array in generator.getProcessData(processName))
+            {
+                try
+                {
+                    Double value = Double.Parse(array[variableIndex]);
+                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
+                    data.Add(new DateModel
+                    {
+                        DateTime = timeStamp,
+                        Value = value
+                    });
+                }
+                catch (IndexOutOfRangeException t) { }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+
+            //Add date to Line series
+            LineSeries line = new LineSeries
+            {
+                Name = variable,
+                Values = data
+            };
+
+            //Add line series to graph
+            var dayConfig = Mappers.Xy<DateModel>()
+                .X(dayModel => dayModel.DateTime.Ticks)
+                .Y(dayModel => dayModel.Value);
+            ch.Series = new SeriesCollection(dayConfig);
+            ch.Series.Add(line);
         }
     }
 }
