@@ -24,17 +24,12 @@ namespace SiemensPerformance
         public Login()
         {
             InitializeComponent();
+            connect = new DBConnect();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string db = database.Text;
-            string userID = username.Text;
-            String pwd = password.Password;
-            connect = new DBConnect(db,userID, pwd);
-            //connect.Connect();
-            //connect.createDatabase();
-            connect.startMySQL();
+            connect = new DBConnect(database.Text, username.Text, password.Password);
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

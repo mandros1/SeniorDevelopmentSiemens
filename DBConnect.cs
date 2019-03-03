@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -18,33 +19,50 @@ namespace SiemensPerformance
         MySqlConnectionStringBuilder builder;
         MySqlConnection conn;
         MySqlCommand cmd;
-        String query;
         ServiceController controller;
+
+        public DBConnect()
+        {
+            StartMySQL();
+        }
         public DBConnect(string db, string username, string pwd)
         {
             server = "localhost";
-            database = db;
             uid = username;
             password = pwd;
-
             builder = new MySqlConnectionStringBuilder
             {
                 Server = server,
-                Database = database,
                 UserID = uid,
                 SslMode = 0,
                 Password = password
             };
 
             conn = new MySqlConnection(builder.ToString());
+            try
+            {
+                StartMySQL();
+            }
+
+            finally
+            {
+                Connect();
+            }
         }
+        //Connects to the Server.
         public void Connect()
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                    conn.Open();
-                MessageBox.Show("Connection Open!");
+                //If the mri database doesn't exist, the database will be created by
+                //the createDatabase function.
+                bool mriExists = CheckDatabaseExists();
+                if (mriExists == false)
+                {
+                    createDatabase();
+                }
+                //Shows the Main Window which will allow the user to to analze the
+                //trace files
                 var loginWindow = (Application.Current.MainWindow as Login);
                 if (loginWindow != null)
                 {
@@ -64,47 +82,69 @@ namespace SiemensPerformance
             }
 
         }
-
-        public void dBExists()
+        //Starts the MYSQL Service
+        public void StartMySQL()
         {
+            ServiceController[] scServices;
+            scServices = ServiceController.GetServices();
+            try
+            {
+                foreach (ServiceController scTemp in scServices)
+                {
+                    //By default the MySQL process begins with MySQL
+                    //The numbers after MySQL change depending on the version
+                    //of MySQL. 
+                    if (scTemp.ServiceName.StartsWith("MySQL"))
+                    {
+                        controller = new ServiceController(scTemp.ServiceName);
+                        //Starts the MySQL Proceess
+                        if (controller.Status == ServiceControllerStatus.Stopped)
+                            controller.Start();
+                    }
+                }
+            }
+            finally {}
+        }
+        //Checks if the mri database exists
+        public bool CheckDatabaseExists()
+        {
+            //Gets the count of how many tables are within the mri database 
+            string sqlCreateDBQuery = string.Format("SELECT COUNT(*) FROM information_schema.tables WHERE TABLE_SCHEMA = '{0}'", "mri");
+            try
+            {
+                MySqlDataReader reader;
+                cmd = new MySqlCommand(sqlCreateDBQuery, conn);
+                conn.Open();
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    int count = reader.GetInt32(0);
+                    if (count == 0 )
+                    {
+                        return false;
+                    }
 
+                    else if (count >= 1)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            finally
+            {
+
+                conn.Close();
+            }
         }
 
         public void createDatabase()
         {
-            try
-            {
-                conn.Open();
-                query = "CREATE SCHEMA IF NOT EXISTS `mri`;";
-                cmd = new MySqlCommand(query, conn);
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-            finally
-            {
-                conn.Close();
-            }
-        }
-        public void startMySQL()
-        {
-            ServiceController[] scServices;
-            scServices = ServiceController.GetServices();
-
-            foreach (ServiceController scTemp in scServices)
-            {
-                if (scTemp.ServiceName.StartsWith("MySQL"))
-                {
-                    controller = new ServiceController(scTemp.ServiceName);
-                    if (controller.Status == ServiceControllerStatus.Running)
-                        MessageBox.Show("Service is already running");
-                    if (controller.Status == ServiceControllerStatus.Stopped)
-                        controller.Start();
-                }
-            }
+            //Runs the sql script to create the database
+            MySqlScript script = new MySqlScript(conn, File.ReadAllText("../../createDB.sql"));
+            script.Delimiter = "$$";
+            script.Execute();
         }
     }
 }
