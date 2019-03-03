@@ -79,5 +79,10 @@ namespace SiemensPerformance
                 cmbo.Items.Add(tab.Header);
             }
         }
+
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+           // Should make another option to add another simple clause to the query.
+        }
     }
 }

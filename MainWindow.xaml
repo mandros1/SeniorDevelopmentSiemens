@@ -14,7 +14,7 @@
             <StackPanel></StackPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
                 <TabItem x:Name="Queries" Header="Queries">
-                    <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
+                    <TabControl VerticalAlignment="Top" Margin="0,-15,0,0" TabStripPlacement="Left">
                         <TabItem Header="Query">
                             <Grid HorizontalAlignment="Left" Height="330" Margin="0,0,0,0" VerticalAlignment="Top" Width="681" >
                                 <Label Content="Select:" HorizontalAlignment="Left" Margin="29,15,0,0" VerticalAlignment="Top"/>
@@ -27,7 +27,23 @@
                                 <ComboBox HorizontalAlignment="Left" Margin="86,77,0,0" VerticalAlignment="Top" Width="120"/>
                                 <Label Content="equals" HorizontalAlignment="Left" Margin="217,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
                                 <TextBox Height="23" TextWrapping="Wrap" Text="Value" Width="120" Margin="268,77,293,227"/>
-                                <Button IsDefault="true" Content="Run" Margin="174,133,425,168"/>
+                                <Button IsDefault="true" Content="+" Margin="399,75,251,223" Click="Button_Click"/>
+                                <Grid x:Name="clausesGrid">
+                                    <ComboBox HorizontalAlignment="Left" Margin="10,113,0,0" VerticalAlignment="Top" Width="70">
+                                        <ComboBoxItem>
+                                            AND Where
+                                        </ComboBoxItem>
+                                        <ComboBoxItem>
+                                            OR Where
+                                        </ComboBoxItem>
+                                    </ComboBox>
+                                    <ComboBox HorizontalAlignment="Left" Margin="86,113,0,0" VerticalAlignment="Top" Width="120"/>
+                                    <Label Content="equals" HorizontalAlignment="Left" Margin="217,113,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
+                                    <TextBox Height="23" TextWrapping="Wrap" Text="Value" Width="120" Margin="268,113,293,191"/>
+                                    <Button IsDefault="true" Content="+" Margin="399,111,251,187"/>
+
+                                </Grid>
+                                <Button IsDefault="true" Content="Run" Margin="174,175,425,126"/>
                             </Grid>
                         </TabItem>
                     </TabControl>
