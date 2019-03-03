@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using Newtonsoft.Json;
+using LiveCharts.Wpf;
+using LiveCharts;
 
 namespace SiemensPerformance
 {
@@ -18,32 +20,68 @@ namespace SiemensPerformance
         private DataGrid dataGrid;
         private DataTable dataTable;
 
-        public DataDisplayTab()
+        public void initialize()
         {
-            //TabItem tab = new TabItem();
+            TabControl tc = new TabControl();
+            TabItem table = new TabItem();
+
+            //Open File
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = ".utr";
             ofd.Filter = "Text files (*.utr)|*.utr";
 
+            //Get Data
             if (ofd.ShowDialog() == true)
             {
-
                 var watch = System.Diagnostics.Stopwatch.StartNew();
                 generator.getJsonString(ofd);
                 watch.Stop();
                 Console.WriteLine("TIME ELAPSED: " + watch.ElapsedMilliseconds);
             }
-            this.Header = generator.fileName;
 
-            this.Content = GenerateTable(generator.getProcessVars());
+            //Create table tab
+            this.Header = generator.fileName;
+            table.Header = "Table";
+
+            table.Content = GenerateTable(generator.getProcessVars());
 
             ScrollViewer sv = new ScrollViewer();
-            //string[] test = generator.dlist;
             dataTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
             //dataTable = ConvertListToDataTable(generator.getProcessData("CM.DMMonitoringTaskflow_2feaaba2c07a43d0b41f92319eac8bfe.DMMonitoringTaskBE(29668)"), generator.processVariables);
+            //"syngo.MR.SaveLogHookMrawp(27696)"
             dataGrid = new DataGrid();
             dataGrid.ItemsSource = dataTable.DefaultView;
-            this.Content = dataGrid;
+            table.Content = dataGrid;
+            
+            List<Double> CPU = new List<Double>();
+
+            foreach (var array in generator.getProcessData("syngo.MR.SaveLogHookMrawp(27696)"))
+            {
+                try
+                {
+                    //Console.WriteLine(array);
+                    CPU.Add(Double.Parse(array[8]));
+                }catch(Exception e)
+                {
+                    //Console.WriteLine(e);
+                }
+            }
+            //var CPU = dataTable.AsEnumerable().Select(r => r.Field<Double>("CPU")).ToArray();
+            
+            //Create Graph tab
+            TabItem graph = new TabItem();
+            CartesianChart ch = new CartesianChart();
+            ch.Series = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Title = "CPU Usage",
+                    Values = new ChartValues<Double>(CPU)
+                }
+            };
+            graph.Header = "Graph";
+            graph.Content = ch;
+
 
             //Tab dropdown menu
             //Rename Tab
@@ -60,13 +98,19 @@ namespace SiemensPerformance
             menuItem2.Header = "Save";
             menuItem2.Click += delegate { Save(); };
             */
+
             //Close Tab
-            MenuItem menuItem4 = new MenuItem();
-            contextMenu.Items.Add(menuItem4);
-            menuItem4.Header = "Close";
-            menuItem4.Click += delegate { Close(); };
+            MenuItem menuItem2 = new MenuItem();
+            contextMenu.Items.Add(menuItem2);
+            menuItem2.Header = "Close";
+            menuItem2.Click += delegate { Close(); };
 
             this.ContextMenu = contextMenu;
+            table.ContextMenu = null;
+            graph.ContextMenu = null;
+            tc.Items.Insert(0, table);
+            tc.Items.Insert(1, graph);
+            this.Content = tc;
         }
 
 
@@ -107,7 +151,6 @@ namespace SiemensPerformance
                     table.Rows.Add(array);
                 }
             }
-
             return table;
         }
 
@@ -119,7 +162,6 @@ namespace SiemensPerformance
             {
                 this.Header = name;
             }
-            //SelectionPopulate();
         }
 
         //Saves data from a tab to json file
@@ -167,7 +209,6 @@ namespace SiemensPerformance
                     tabControl.Items.Remove(this); // Removes the current tab
                 }
             }
-            //SelectionPopulate();
         }
     }
 }

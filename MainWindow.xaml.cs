@@ -52,11 +52,13 @@ namespace SiemensPerformance
                 TabItem tab = GenerateTabItem();         
                 control.Items.Insert(control.Items.Count - 1, tab);
                 control.SelectedIndex = control.Items.Count - 2;
-                SelectionPopulate();
             }
 
-            //TabItem tab = GenerateTabItem(generator.getProcessVars(), "NEW Name");
-
+            //Repopulate the Select file query when going to the query tab
+            if (control.SelectedIndex == 0)
+            {
+                SelectionPopulate();
+            }
         }
 
 /*
@@ -103,7 +105,8 @@ namespace SiemensPerformance
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
-            TabItem tab = new DataDisplayTab();
+            DataDisplayTab tab = new DataDisplayTab();
+            tab.initialize();
             /*
             
             TabItem tab = new TabItem();
@@ -170,7 +173,6 @@ namespace SiemensPerformance
         }
 
         /*
-
         //Renames a Tab
         private void Rename(TabItem tab)
         {
