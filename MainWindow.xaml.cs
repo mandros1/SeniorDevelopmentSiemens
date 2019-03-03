@@ -29,7 +29,6 @@ namespace SiemensPerformance
     {
 
         public Func<double, string> Formatter { get; set; }
-        private DataGenerator generator;
         private TabControl tabs;
 
         public MainWindow()
@@ -61,101 +60,10 @@ namespace SiemensPerformance
             }
         }
 
-/*
-        // Generate table for queries
-        private DataGrid GenerateTable(String[] columns)
-        {
-            DataGrid grid = new DataGrid();
-
-            for(int i = 0; i < columns.Length; i++)
-            {
-                DataGridTextColumn col = new DataGridTextColumn();
-
-                // TODO: replace with the column name
-                col.Header = columns[i];
-                // should be able to bind data to the row
-                grid.Columns.Add(col);
-            }
-
-            return grid;
-        }
-
-        private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
-        {
-            DataTable table = new DataTable();
-
-            // Get max columns.
-            int columnsNum = columns.Length;
-            for(int i=0; i<columnsNum; i++)
-            {
-                table.Columns.Add(columns[i]);
-            }
-
-            foreach (var array in list)
-            {
-                if (array.Length == columnsNum)
-                {
-                    table.Rows.Add(array);
-                }
-            }
-
-            return table;
-        }
-        */
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
             DataDisplayTab tab = new DataDisplayTab();
-            tab.initialize();
-            /*
-            
-            TabItem tab = new TabItem();
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.DefaultExt = ".utr";
-            ofd.Filter = "Text files (*.utr)|*.utr";
-
-            generator = new DataGenerator();//Fixes multiple tab bug
-
-            if (ofd.ShowDialog() == true)
-            {
-
-                var watch = System.Diagnostics.Stopwatch.StartNew();
-                generator.getJsonString(ofd);
-                watch.Stop();
-                Console.WriteLine("TIME ELAPSED: " + watch.ElapsedMilliseconds);
-            }
-            tab.Header = generator.fileName;
-            
-            tab.Content = GenerateTable(generator.getProcessVars());
-
-            ScrollViewer sv = new ScrollViewer();
-            //string[] test = generator.dlist;
-            //DataTable firstTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
-            DataTable firstTable = ConvertListToDataTable(generator.getProcessData("CM.DMMonitoringTaskflow_2feaaba2c07a43d0b41f92319eac8bfe.DMMonitoringTaskBE(29668)"), generator.processVariables);
-            DataGrid dataGrid = new DataGrid();
-            dataGrid.ItemsSource = firstTable.DefaultView;
-            tab.Content = dataGrid;
-
-            //Tab dropdown menu
-            ContextMenu contextMenu = new ContextMenu();
-            MenuItem menuItem1 = new MenuItem();
-            contextMenu.Items.Add(menuItem1);
-            menuItem1.Header = "Rename";
-            menuItem1.Click += delegate { Rename(tab); };
-
-            //TODO convert to json to pass to save file?
-            MenuItem menuItem2 = new MenuItem();
-            contextMenu.Items.Add(menuItem2);
-            menuItem2.Header = "Save";
-            menuItem2.Click += delegate { Save(tab, "Not working"); };
-
-            MenuItem menuItem4 = new MenuItem();
-            contextMenu.Items.Add(menuItem4);
-            menuItem4.Header = "Close";
-            menuItem4.Click += delegate { Close(tab); };
-
-            tab.ContextMenu = contextMenu;
-            */
             return tab;
         }
 
@@ -171,64 +79,5 @@ namespace SiemensPerformance
                 cmbo.Items.Add(tab.Header);
             }
         }
-
-        /*
-        //Renames a Tab
-        private void Rename(TabItem tab)
-        {
-            string name = new InputBox("Name").ShowDialog();
-            if(name != "") {
-                tab.Header = name;
-            }
-            SelectionPopulate();
-        }
-
-        //Saves data from a tab to json file
-        private void Save(TabItem tab, String json)
-        {
-            //set default file name to tab header
-            String defaultName = tab.Header.ToString();
-            //Remove .utr extention if present
-            if (defaultName.EndsWith(".utr"))
-            {
-                defaultName = defaultName.Substring(0, defaultName.Length - 4);
-            }
-
-            //Create save dialog
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = defaultName;
-            dlg.DefaultExt = ".json";
-            dlg.Filter = "Json files (.json)|*.json";
-
-            // Show save file dialog box
-            Nullable<bool> result = dlg.ShowDialog();
-
-            // Process save file dialog box results
-            if (result == true)
-            {
-                // Save document
-                string filename = dlg.FileName;
-                File.WriteAllText(filename, json);
-            }
-        }
-
-        //Close Tab
-        private void Close(TabItem tab)
-        {
-            if (tab != null)
-            {
-                // find the parent tab control
-                TabControl tabControl = tab.Parent as TabControl;
-
-                if (tabControl != null)
-                {
-                    tabControl.SelectedIndex = tabControl.Items.IndexOf(tab)-1;  // Selects the tab before the closing tab
-                    tabControl.Items.Remove(tab); // Removes the current tab
-                }
-            }
-            SelectionPopulate();
-            
-        }
-        */
     }
 }

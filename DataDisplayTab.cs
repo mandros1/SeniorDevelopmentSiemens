@@ -11,6 +11,9 @@ using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using LiveCharts.Wpf;
 using LiveCharts;
+using LiveCharts.Configurations;
+using System.Windows.Media;
+using System.Runtime.Serialization;
 
 namespace SiemensPerformance
 {
@@ -20,7 +23,7 @@ namespace SiemensPerformance
         private DataGrid dataGrid;
         private DataTable dataTable;
 
-        public void initialize()
+        public DataDisplayTab()
         {
             TabControl tc = new TabControl();
             TabItem table = new TabItem();
@@ -48,15 +51,14 @@ namespace SiemensPerformance
             ScrollViewer sv = new ScrollViewer();
             dataTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
             //dataTable = ConvertListToDataTable(generator.getProcessData("CM.DMMonitoringTaskflow_2feaaba2c07a43d0b41f92319eac8bfe.DMMonitoringTaskBE(29668)"), generator.processVariables);
-            //"syngo.MR.SaveLogHookMrawp(27696)"
+            //dataTable = ConvertListToDataTable(generator.getProcessData("syngo.MR.SaveLogHookMrawp(27696)"), generator.processVariables);
             dataGrid = new DataGrid();
             dataGrid.ItemsSource = dataTable.DefaultView;
             dataGrid.IsReadOnly = true;
             table.Content = dataGrid;
             
-            List<Double> CPU = new List<Double>();
-            List<DateTime> timeStamps = new List<DateTime>();
-
+            //GRAPH
+            ChartValues <DateModel> data = new ChartValues<DateModel>();
             foreach (var array in generator.getProcessData("syngo.MR.SaveLogHookMrawp(27696)"))
             {
                 try
@@ -64,32 +66,38 @@ namespace SiemensPerformance
                     //Console.WriteLine(array);
                     Double cpuL = Double.Parse(array[8]);
                     DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
-                    CPU.Add(cpuL);
-                    timeStamps.Add(timeStamp);
-                    //Console.WriteLine(test);
-                    //timestamps.add
+                    data.Add(new DateModel
+                    {
+                        DateTime = timeStamp,
+                        Value = cpuL
+                    });
                 }
-                catch(Exception e)
+                catch (IndexOutOfRangeException t) { }
+                catch (Exception e)
                 {
-                    //Console.WriteLine(e);
+                    Console.WriteLine(e);
                 }
             }
-            //var CPU = dataTable.AsEnumerable().Select(r => r.Field<Double>("CPU")).ToArray();
-            
+
+            var dayConfig = Mappers.Xy<DateModel>()
+                .X(dayModel => dayModel.DateTime.Ticks)
+                .Y(dayModel => dayModel.Value);
+
             //Create Graph tab
             TabItem graph = new TabItem();
             CartesianChart ch = new CartesianChart();
-            ch.Series = new SeriesCollection
+            ch.Series = new SeriesCollection(dayConfig);
+
+            LineSeries line = new LineSeries
             {
-                new LineSeries
-                {
-                    Title = "CPU Usage",
-                    Values = new ChartValues<Double>(CPU)
-                }
+                Values = data
             };
+
+            ch.Series.Add(line);
             graph.Header = "Graph";
             graph.Content = ch;
 
+            //ch.AxisX[0].LabelFormatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");
 
             //Tab dropdown menu
             //Rename Tab
@@ -99,7 +107,7 @@ namespace SiemensPerformance
             menuItem1.Header = "Rename";
             menuItem1.Click += delegate { Rename(); };
 
-            /*
+            /* TODO Move to only for queries
             //Save data to Json
             MenuItem menuItem2 = new MenuItem();
             contextMenu.Items.Add(menuItem2);
@@ -113,8 +121,9 @@ namespace SiemensPerformance
             menuItem2.Header = "Close";
             menuItem2.Click += delegate { Close(); };
 
+            //TODO - figure out why this is also being applied to child tab elements
             this.ContextMenu = contextMenu;
-            table.ContextMenu = null;
+            table.ContextMenu = null;//Not working
             graph.ContextMenu = null;
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
@@ -136,7 +145,6 @@ namespace SiemensPerformance
                 // should be able to bind data to the row
                 grid.Columns.Add(col);
             }
-
             return grid;
         }
 
