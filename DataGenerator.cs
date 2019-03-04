@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -16,6 +16,7 @@ namespace SiemensPerformance
         private List<string> singleList { get; set; }
         private string handmadeJSON { get; set; }
         public string fileName { get; set; }
+
 
         public string[] processVariables = {"TimeStamp", "Process Name", "WSP", "WSPPeak",
             "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
@@ -95,12 +96,10 @@ namespace SiemensPerformance
                 string[] mainDivision = line.Split('|');
 
                 string processData = mainDivision[4];
-
                 string timeStamp = mainDivision[0];
                 TSList.Add(processData);
                 DataList.Add(processData);
                 /*
-
                 char[] delimiterChars = { ':', ';' };
                 string[] singleDataPoints = processData.Split(delimiterChars);
 
@@ -108,9 +107,7 @@ namespace SiemensPerformance
 
                 counter = 0;
 
-
                 
-
                 if (singleDataPoints[0] == "Process")
                 {
                     handmadeJSON += "\n\t\t{\n\t\t\"TimeStamp\": \"" + mainDivision[0] + "\",";
@@ -132,21 +129,17 @@ namespace SiemensPerformance
                     handmadeJSON += "\n\t\t},";
 
                 }
-
                 
             }
             
-
             handmadeJSON = handmadeJSON.Substring(0, (handmadeJSON.Length - 1));
             
 
             //Console.WriteLine("JSON STRING: " + handmadeJSON);
 
-
             System.Console.ReadLine();
             handmadeJSON += "\n\t]}";
             return handmadeJSON;
-
             
 
             file.Close();
