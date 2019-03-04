@@ -61,7 +61,7 @@ namespace SiemensPerformance
             TabItem graph = new TabItem();
             ch = new CartesianChart();
 
-            PopulateGraph("syngo.MR.SaveLogHookMrawp", 27696, "CPU");
+            //PopulateGraph("syngo.MR.SaveLogHookMrawp", 27696, "CPU");
 
             graph.Header = "Graph";
             graph.Content = ch;
@@ -104,11 +104,15 @@ namespace SiemensPerformance
             //TODO - figure out why this is also being applied to child tab elements
             this.ContextMenu = contextMenu;
             graph.ContextMenu = contextMenu2;
-            table.ContextMenu = new ContextMenu();
-            //graph.ContextMenu = null;
+            table.ContextMenu = new ContextMenu();//Makes a blank dropdown
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
             this.Content = tc;
+
+            SelectionBox sB = new SelectionBox(generator);
+            string selection = sB.ShowSelectionDialog();
+            string[] selectionArr = selection.Split(',');
+            PopulateGraph(selectionArr[0], int.Parse(selectionArr[1]), selectionArr[2]);
         }
 
 
@@ -210,8 +214,10 @@ namespace SiemensPerformance
 
         private void SelectData()
         {
-            //TODO - popup that returns processName, process ID, variable
-            //Populate Graph using returned variables
+            SelectionBox sB = new SelectionBox(generator);
+            string selection = sB.ShowSelectionDialog();
+            string[] selectionArr = selection.Split(',');
+            PopulateGraph(selectionArr[0], int.Parse(selectionArr[1]), selectionArr[2]);
         }
 
         private void PopulateGraph(string processName, int processID, string variable)

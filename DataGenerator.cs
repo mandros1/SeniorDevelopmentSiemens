@@ -8,17 +8,22 @@ using System.Linq;
 
 namespace SiemensPerformance
 {
-    class DataGenerator
+    public class DataGenerator
     {
 
         public List<string[]> dlist { get; set; }
-        public List<string> processes { get; set; }
+        public List<string> processes { get; set; }//Full process names, unique list
+        public List<string> processNames { get; set; }//Processes without Process ID
         private List<string> singleList { get; set; }
         private string handmadeJSON { get; set; }
         public string fileName { get; set; }
-
-
+        
         public string[] processVariables = {"TimeStamp", "Process Name", "WSP", "WSPPeak",
+            "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
+            "GDIC", "GDICPeak", "USRC", "USRCPeak", "PRIV",
+            "PRIVPeak", "VIRT", "VIRTPeak", "PFS", "PFSPeak" };
+
+        public string[] numericProcessVariables = {"WSP", "WSPPeak",
             "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
             "GDIC", "GDICPeak", "USRC", "USRCPeak", "PRIV",
             "PRIVPeak", "VIRT", "VIRTPeak", "PFS", "PFSPeak" };
@@ -38,6 +43,11 @@ namespace SiemensPerformance
         public string[] getProcessVars()
         {
             return this.processVariables;
+        }
+
+        public string[] getNumericProcessVars()
+        {
+            return this.numericProcessVariables;
         }
 
         public string[] getGlobalVars()
@@ -60,8 +70,9 @@ namespace SiemensPerformance
                 allProcesses.Add(array[1]);
             }
 
-            IEnumerable<string> distinctNotes = processes.Distinct();
+            IEnumerable<string> distinctNotes = allProcesses.Distinct();
             processes = new List<string>(distinctNotes);
+            getProcessNames();
         }
 
         //Gets data for one process
@@ -79,6 +90,34 @@ namespace SiemensPerformance
             return processData;
         }
 
+        private void getProcessNames()
+        {
+            processNames = new List<string>();
+            foreach (string name in processes)
+            {
+                String[] split = name.Split('(');
+                processNames.Add(split[0]);
+            }
+            IEnumerable<string> distinctNotes = processNames.Distinct();
+            processNames = new List<string>(distinctNotes);
+        }
+
+        public List<int> getProcessIDs(string processName)
+        {
+            //findProcesses();
+            string[] value = Array.FindAll(processes.ToArray(), element => element.StartsWith(processName,StringComparison.Ordinal));
+            List<int> ids = new List<int>();
+            foreach (string name in value)
+            {
+                try { 
+                    String[] split = name.Split('(');
+                    ids.Add(int.Parse(split[1].TrimEnd(')')));
+                }catch(Exception e) { }
+            }
+
+            return ids;
+        }
+        
 
         /*
         public void InitialJSON()
@@ -184,6 +223,7 @@ namespace SiemensPerformance
             {
                 //sw.Close();
                 file.Close();
+                findProcesses();
             }
 
         }

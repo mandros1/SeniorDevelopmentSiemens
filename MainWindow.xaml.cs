@@ -33,8 +33,6 @@ namespace SiemensPerformance
 
         public MainWindow()
         {
-
-            
             InitializeComponent();
 
             // Tabs setup
