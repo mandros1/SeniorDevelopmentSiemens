@@ -94,11 +94,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DBConnect.cs" />
-    <Compile Include="Login.xaml.cs">
-      <Compile Include="DateModel.cs" />
+    <Compile Include="DateModel.cs" />
     <Compile Include="DataDisplayTab.cs" />
     <Compile Include="InputBox.cs" />
     <Compile Include="DataGenerator.cs" />
+	<Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
