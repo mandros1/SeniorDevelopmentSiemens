@@ -48,9 +48,11 @@ namespace SiemensPerformance
 
             if (control.SelectedIndex == control.Items.Count - 1)
             {
-                TabItem tab = GenerateTabItem();         
-                control.Items.Insert(control.Items.Count - 1, tab);
-                control.SelectedIndex = control.Items.Count - 2;
+                TabItem tab = GenerateTabItem();    
+                if(tab != null) { 
+                    control.Items.Insert(control.Items.Count - 1, tab);
+                    control.SelectedIndex = control.Items.Count - 2;
+                }
             }
 
             //Repopulate the Select file query when going to the query tab
@@ -64,7 +66,8 @@ namespace SiemensPerformance
         private TabItem GenerateTabItem()
         {
             DataDisplayTab tab = new DataDisplayTab();
-            return tab;
+            if(tab.displayable) return tab;
+            return null;
         }
 
         //Populates the Select combo box for Queries

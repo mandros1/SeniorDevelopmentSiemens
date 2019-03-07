@@ -3,17 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using LiveCharts.Wpf;
 using LiveCharts;
 using LiveCharts.Configurations;
-using System.Windows.Media;
-using System.Runtime.Serialization;
 
 namespace SiemensPerformance
 {
@@ -23,12 +17,14 @@ namespace SiemensPerformance
         private DataGrid dataGrid;
         private DataTable dataTable;
         private CartesianChart ch;
+        public Boolean displayable {get; set;}
+        private ComboBox box;
+        private ComboBox id_box;
+        
+
 
         public DataDisplayTab()
         {
-            TabControl tc = new TabControl();
-            TabItem table = new TabItem();
-
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = ".utr";
@@ -37,17 +33,24 @@ namespace SiemensPerformance
             //Get Data
             if (ofd.ShowDialog() == true)
             {
-                var watch = System.Diagnostics.Stopwatch.StartNew();
                 generator.getJsonString(ofd);
-                watch.Stop();
-                Console.WriteLine("TIME ELAPSED: " + watch.ElapsedMilliseconds);
+                displayable = true;
             }
+            else
+            {
+                displayable = false;
+                return;
+            }
+
+
+            TabControl tc = new TabControl();
+            TabItem table = new TabItem();
 
             //Create table tab
             this.Header = generator.fileName;
             table.Header = "Table";
 
-            table.Content = GenerateTable(generator.getProcessVars());
+            table.Content = GenerateTable(generator.processVariables);
 
             ScrollViewer sv = new ScrollViewer();
             dataTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
@@ -56,17 +59,131 @@ namespace SiemensPerformance
             dataGrid.IsReadOnly = true;
             table.Content = dataGrid;
 
+            
+            //Create query tab
+            TabItem query = new TabItem();
+
+            Grid queryGrid = new Grid();
+            queryGrid.Height = 330;
+            queryGrid.Width = 681;
+            queryGrid.Margin = new System.Windows.Thickness(0, 0, 0, 0);
+            queryGrid.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            queryGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+
+            Label label = new Label();
+            label.Content = "Select:";
+            label.Margin = new System.Windows.Thickness(29, 15, 0, 0);
+            label.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            queryGrid.Children.Add(label);
+
+            box = new ComboBox();
+            box.ItemsSource = generator.getDistinctProcessNames();
+            box.Name = "procName";
+            box.Margin = new System.Windows.Thickness(86, 15, 0, 0);
+            box.Width = 120;
+            box.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            box.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            box.SelectionChanged += procName_SelectionChanged;
+            queryGrid.Children.Add(box);
+
+            id_box = new ComboBox();
+            id_box.ItemsSource = generator.getDistinctProcessIDs(null);
+            id_box.Name = "procID";
+            id_box.Margin = new System.Windows.Thickness(268, 15, 0, 0);
+            id_box.Width = 120;
+            id_box.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            id_box.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            queryGrid.Children.Add(id_box);
+            
+            Label label2 = new Label();
+            label2.Content = "Between:";
+            label2.Margin = new System.Windows.Thickness(15, 46, 0, 0);
+            label2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label2.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            label2.Width = 120;
+            queryGrid.Children.Add(label2);
+
+            TextBox txtBox = new TextBox();
+            txtBox.Height = 23;
+            txtBox.TextWrapping = System.Windows.TextWrapping.Wrap;
+            txtBox.Text = "Starting time";
+            txtBox.Width = 120;
+            txtBox.Margin = new System.Windows.Thickness(86, 46, 475, 258);
+            queryGrid.Children.Add(txtBox);
+               
+
+            TextBox txtBox1 = new TextBox();
+            txtBox1.Height = 23;
+            txtBox1.TextWrapping = System.Windows.TextWrapping.Wrap;
+            txtBox1.Text = "Ending time";
+            txtBox1.Width = 120;
+            txtBox1.Margin = new System.Windows.Thickness(268, 46, 293, 258);
+            queryGrid.Children.Add(txtBox1);
+
+            Label label3 = new Label();
+            label3.Content = "and";
+            label3.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            label3.Margin = new System.Windows.Thickness(224, 46, 0, 0);
+            label3.RenderTransformOrigin = new System.Windows.Point(-0.044, 0.538);
+            queryGrid.Children.Add(label3);
+
+            Label label4 = new Label();
+            label4.Content = "Where";
+            label4.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label4.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            label4.Margin = new System.Windows.Thickness(26, 77, 0, 0);
+            label4.RenderTransformOrigin = new System.Windows.Point(0.477, 2.731);
+            queryGrid.Children.Add(label4);
+            
+
+            ComboBox box2 = new ComboBox();
+            box2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            box2.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            box2.Width = 120;
+            box2.Margin = new System.Windows.Thickness(86, 77, 0, 0);
+            queryGrid.Children.Add(box2);
+
+
+            Label label5 = new Label();
+            label5.Content = "equals";
+            label5.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label5.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            label5.Margin = new System.Windows.Thickness(217, 77, 0, 0);
+            label5.RenderTransformOrigin = new System.Windows.Point(0.477, 2.731);
+            queryGrid.Children.Add(label5);
+            
+
+            TextBox txtBox2 = new TextBox();
+            txtBox2.Height = 23;
+            txtBox2.TextWrapping = System.Windows.TextWrapping.Wrap;
+            txtBox2.Text = "Value";
+            txtBox2.Width = 120;
+            txtBox2.Margin = new System.Windows.Thickness(268, 77, 293, 227);
+            queryGrid.Children.Add(txtBox2);
+
+            Button but = new Button();
+            but.IsDefault = true;
+            but.Content = "Run";
+            but.Margin = new System.Windows.Thickness(174, 133, 425, 168);
+            queryGrid.Children.Add(but);
+
+            query.Header = "Query";
+            query.Content = queryGrid;
+
 
             //Create Graph tab
-            TabItem graph = new TabItem();
+            TabItem graph = new TabItem(); 
+
             ch = new CartesianChart();
 
-            PopulateGraph("syngo.MR.SaveLogHookMrawp", 27696, "CPU");
+           // PopulateGraph("syngo.MR.SaveLogHookMrawp", 27696, "CPU");
 
             graph.Header = "Graph";
             graph.Content = ch;
 
-            PopulateGraph("Cocos", 26204, "CPU");
+            PopulateGraph("Cocos", "26204", "CPU");
 
             //Graph Dropdown Menu
             ContextMenu contextMenu2 = new ContextMenu();
@@ -108,9 +225,16 @@ namespace SiemensPerformance
             //graph.ContextMenu = null;
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
+            tc.Items.Insert(2, query);
             this.Content = tc;
         }
 
+        private void procName_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox combo = (ComboBox)sender;
+            string procName = (string) combo.SelectedItem;
+            id_box.ItemsSource = generator.getDistinctProcessIDs(procName);
+        } 
 
         //Generate DataGrid from data
         private DataGrid GenerateTable(String[] columns)
@@ -214,16 +338,15 @@ namespace SiemensPerformance
             //Populate Graph using returned variables
         }
 
-        private void PopulateGraph(string processName, int processID, string variable)
+        private void PopulateGraph(string processName, string processID, string variable)
         {
             ChartValues<DateModel> data = new ChartValues<DateModel>();
-
-            string[] variables = generator.getProcessVars();
-            int variableIndex = Array.IndexOf(variables, variable);
-            processName = processName + "(" + processID + ")";
+            
+            int variableIndex = Array.IndexOf(generator.processVariables, variable);
+            
 
             //Get data
-            foreach (var array in generator.getProcessData(processName))
+            foreach (var array in generator.getProcessData(processName, processID))
             {
                 try
                 {

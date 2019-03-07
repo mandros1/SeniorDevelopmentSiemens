@@ -1,8 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 
@@ -14,140 +12,70 @@ namespace SiemensPerformance
         public List<string[]> dlist { get; set; }
         public List<string> processes { get; set; }
         private List<string> singleList { get; set; }
-        private string handmadeJSON { get; set; }
         public string fileName { get; set; }
+        private List<string> processNamesList;
+        private List<string[]> processData2DList;
 
 
-        public string[] processVariables = {"TimeStamp", "Process Name", "WSP", "WSPPeak",
+        public string[] processVariables = {"TimeStamp", "Process Name", "Process ID", "WSP", "WSPPeak",
             "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
             "GDIC", "GDICPeak", "USRC", "USRCPeak", "PRIV",
             "PRIVPeak", "VIRT", "VIRTPeak", "PFS", "PFSPeak" };
 
-        private string[] globalVariables = { "GCPU0", "GCPU0Peak",
+        public string[] globalVariables = { "TimeStamp", "GCPU0", "GCPU0Peak",
             "GCPU1", "GCPU1Peak", "GCPU2", "GCPU2Peak", "GCPU3", "GCPU3Peak", "GCPU4", "GCPU4Peak", "GCPU5", "GCPU5Peak",
             "GCPU6", "GCPU6Peak", "GCPU7", "GCPU7Peak", "GCPU8", "GCPU8Peak",
             "GCPU9", "GCPU9Peak", "GCPU10", "GCPU10Peak", "GCPU11", "GCPU12Peak",
             "GCPU13", "GCPU13Peak", "GCPU14", "GCPU14Peak", "GCPU15", "GCPU15Peak"};
 
-        private string[] gloabalTotalVariables = { "GCPU", "GCPUPeak",
+        public string[] gloabalTotalVariables = {"TimeStamp", "GCPU", "GCPUPeak",
             "GMA", "GMAPeak", "GPC", "GPCPeak", "GHC", "GHCPeak",
             "GHPF", "GCPUP", "GCPUPPeak", "GMF", "GMFPeak",
             "GMFPeak", "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
             "GPFC", "GPFCPeak", "GMC", "GMCPeak"};
 
-        public string[] getProcessVars()
-        {
-            return this.processVariables;
-        }
-
-        public string[] getGlobalVars()
-        {
-            return this.globalVariables;
-        }
-
-        public string[] getTotalGlobalVars()
-        {
-            return this.gloabalTotalVariables;
-        }
 
         //Gets all unique process names
-        private void findProcesses()
+        public List<string> getDistinctProcessNames()
         {
-            List<string> allProcesses = new List<string>();
+            processNamesList = dlist.Select(list => list[1]).ToList();
+            IEnumerable<string> distinctNotes = processNamesList.Distinct();
+            return new List<string>(distinctNotes);
+        }
 
-            foreach (var array in dlist)
-            {
-                allProcesses.Add(array[1]);
-            }
-
-            IEnumerable<string> distinctNotes = processes.Distinct();
-            processes = new List<string>(distinctNotes);
+        public List<string> getDistinctProcessIDs(string processName)
+        {
+            List<string[]> filteredList = getProcessData(processName, null);
+            processNamesList = filteredList.Select(list => list[2]).ToList();
+            IEnumerable<string> distinctNotes = processNamesList.Distinct();
+            return new List<string>(distinctNotes);
         }
 
         //Gets data for one process
-        public List<string[]> getProcessData(string process)
+        public List<string[]> getProcessData(string processName, string processId)
         {
-            List<string[]> processData = new List<string[]>();
-
-            foreach (var array in dlist)
+            if (processName != null && processId == null)
             {
-                if (array[1] == process)
-                {
-                    processData.Add(array);
-                }
+                processData2DList = dlist.Where(x => x[1] == processName).ToList();
+                Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
+                return processData2DList;
             }
-            return processData;
-        }
-
-
-        /*
-        public void InitialJSON()
-        {
-            this.fileName = dialog.SafeFileName;
-            //handmadeJSON += "{\n\t\"" + this.fileName + "\": [";
-            string line;
-
-            System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
-
-            file.ReadLine(); // skip the firstLine
-
-            while ((line = file.ReadLine()) != null)
+            else if (processName != null && processId != null)
             {
-                string[] mainDivision = line.Split('|');
-
-                string processData = mainDivision[4];
-                string timeStamp = mainDivision[0];
-                TSList.Add(processData);
-                DataList.Add(processData);
+                Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
+                processData2DList = dlist.Where(x => x[1] == processName && x[2] == processId).ToList();
+                return processData2DList;
+            }
+            //else if (processName == null && processId == null)
+            //{
+            return new List<string[]>();
                 /*
-                char[] delimiterChars = { ':', ';' };
-                string[] singleDataPoints = processData.Split(delimiterChars);
-
-                if (singleDataPoints.Length < 19) continue;
-
-                counter = 0;
-
-                
-                if (singleDataPoints[0] == "Process")
-                {
-                    handmadeJSON += "\n\t\t{\n\t\t\"TimeStamp\": \"" + mainDivision[0] + "\",";
-                    handmadeJSON += "\n\t\t\"ProcessName\": \"" + singleDataPoints[1].Trim() + "\",";
-
-                    for (int i = 3; i < singleDataPoints.Length; i += 2)
-                    {
-                        char[] dels = { 'M', 'C', '%' };
-                        string droppedExt = singleDataPoints[i].Split(dels)[0];
-
-                        if (counter != 17)
-                            handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt + ",";
-                        else
-                            handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt;
-                        counter++;
-
-                    }
-
-                    handmadeJSON += "\n\t\t},";
-
-                }
-                
             }
-            
-            handmadeJSON = handmadeJSON.Substring(0, (handmadeJSON.Length - 1));
-            
-
-            //Console.WriteLine("JSON STRING: " + handmadeJSON);
-
-            System.Console.ReadLine();
-            handmadeJSON += "\n\t]}";
-            return handmadeJSON;
-            
-
-            file.Close();
-            return "";
-            //SortedList<String, Object> jsonObj = JsonConvert.DeserializeObject<SortedList<String, Object>>(handmadeJSON);
-            //Console.WriteLine("\nJSON OBJECT: " + jsonObj["MrResourceMonitoring-RIT - Copy.utr"]);
+            Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
+            return dlist;
+            */
         }
-        */
+        
 
         public void getJsonString(OpenFileDialog dialog)
         {
@@ -168,8 +96,10 @@ namespace SiemensPerformance
 
                     foreach (var item in enumerate)
                     {
-                        singleList.Add(item);
-                        //sw.Write(item+",");
+                        if( item != "ErrorLine") { 
+                            singleList.Add(item);
+                            //sw.Write(item+",");
+                        }
                     }
                     //sw.Write("\n");
                     dlist.Add(singleList.ToArray());
@@ -192,8 +122,15 @@ namespace SiemensPerformance
         {
             yield return textData.Substring(0, 26); //timestamp
             string data = textData.Substring(textData.IndexOf(':', 26) + 2);
-            string processName = data.Substring(0, data.IndexOf(":")); // process name
-            yield return processName;
+            string processName = data.Substring(0, data.IndexOf(":")); // process name 
+            
+            int bracketPosition = processName.IndexOf("(");
+            string procName = processName.Substring(0, bracketPosition);
+            string procID = processName.Substring(bracketPosition+1, (processName.Length - bracketPosition-2));
+            
+            //processNames.Add(processName);
+            yield return procName;
+            yield return procID;
             data = data.Substring(data.IndexOf(":") + 2);
 
             int finalLength = data.Length;
@@ -225,163 +162,84 @@ namespace SiemensPerformance
     }
 }
 
-
 /*
- 
-
-    public IEnumerable<string> GetSplitData(string textData)
+        public List<int> getProcessPositions(string process)
         {
-            Boolean initial = true;
-            yield return textData.Substring(0, 26); //timestamp
-            string data = textData.Substring(textData.IndexOf(':', 26) + 2);
-            string processName = data.Substring(0, data.IndexOf(":")); // process name
-            yield return processName;
-            data = data.Substring(data.IndexOf(":") + 2);
+            List<int> positionList = new List<int>();
+            positionList = Enumerable.Range(0, processNames.Count)
+                .Where(i => processNames[i] == process)
+                .ToList();
 
-            int finalLength = data.Length;
-            int i = 0; // position after the found ';' 
-            int j = data.IndexOf(';', 0, finalLength); // position of the initial ';'
-            string line;
-            int colonIndex;
-
-            if (j == -1) // No such substring
-            {
-                yield return "ErrorLine"; // returned by the lines that doesn't have valid data
-            }
-
-
-            // while ';' is found in the string
-            while (j != -1)
-            {
-                if (j - i > 0) // Non empty? 
-                {
-                    line = data.Substring(i, j - i);
-                    colonIndex = line.IndexOf(':');
-                    if (initial)
-                    {
-                        if (processName == "GCPU(0)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else if (processName == "GCPU(_Total)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else
-                        {
-                            yield return line.Substring(0, colonIndex);
-                            yield return line.Substring(colonIndex + 2);
-                        }
-                    }
-                    else
-                    {
-                        line = line.Trim();
-                        string result = Regex.Replace(line, @"[^\d]", "");
-                        yield return result;
-                        yield return line.Substring(0, colonIndex);
-                        yield return line.Substring(colonIndex + 2);
-                    }
-                    
-                }
-
-                i = j + 1;
-                j = data.IndexOf(';', i, finalLength - i);
-                initial = false;
-            }
-            /*
-            if (i < finalLength) // Has remainder?
-            {
-                yield return data.Substring(i, finalLength - i); // Return remaining trail
-            }
+            return positionList;
         }
-    }
+        */
 
-
-
-if (i < finalLength) // Has remainder?
-{
-    dataDict.Add(line.Substring(0, line.IndexOf(":")), line.Substring(line.IndexOf(":") + 1));
-    yield return data.Substring(i, finalLength - i); // Return remaining trail
-}
-
-int len = textData.Length;
-string timeStamp = textData.Substring(0, 26);
-
-int dataStartPos = textData.LastIndexOf('|')+1;
-string data = textData.Substring(dataStartPos, (len-dataStartPos));
-
-int colonPosition = data.IndexOf(":");
-
-string type = data.Substring(0, colonPosition);
-if(type == "Process")
-{
-
-}else if (type == "Global")
-{
-
-}
 /*
-int i = 0, j = s.IndexOf(c, 0, l);
-if (j == -1) // No such substring
+ * Writing a JSON -> might be useful later, don't wanna delete
+public void InitialJSON()
 {
-    yield return s; // Return original and break
-    yield break;
-}
+    this.fileName = dialog.SafeFileName;
+    //handmadeJSON += "{\n\t\"" + this.fileName + "\": [";
+    string line;
 
-while (j != -1)
-{
-    if (j - i > 0) // Non empty? 
+    System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
+
+    file.ReadLine(); // skip the firstLine
+
+    while ((line = file.ReadLine()) != null)
     {
-        yield return s.Substring(i, j - i); // Return non-empty match
-    }
-    i = j + 1;
-    j = s.IndexOf(c, i, l - i);
-}
+        string[] mainDivision = line.Split('|');
 
-if (i < l) // Has remainder?
-{
-    yield return s.Substring(i, l - i); // Return remaining trail
-}
+        string processData = mainDivision[4];
+        string timeStamp = mainDivision[0];
+        TSList.Add(processData);
+        DataList.Add(processData);
+        /*
+        char[] delimiterChars = { ':', ';' };
+        string[] singleDataPoints = processData.Split(delimiterChars);
 
-     /*
-             * 
-            while (j != -1)
+        if (singleDataPoints.Length < 19) continue;
+
+        counter = 0;
+
+
+        if (singleDataPoints[0] == "Process")
+        {
+            handmadeJSON += "\n\t\t{\n\t\t\"TimeStamp\": \"" + mainDivision[0] + "\",";
+            handmadeJSON += "\n\t\t\"ProcessName\": \"" + singleDataPoints[1].Trim() + "\",";
+
+            for (int i = 3; i < singleDataPoints.Length; i += 2)
             {
-                if (j - i > 0) // Non empty? 
-                {
-                    line = data.Substring(i, j - i);
-                    colonIndex = line.IndexOf(':');
-                    if (initial)
-                    {
-                        if (processName == "GCPU(0)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else if (processName == "GCPU(_Total)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else
-                        {
-                            yield return line.Substring(0, colonIndex);
-                            yield return line.Substring(colonIndex + 2);
-                        }
-                    }
-                    else
-                    {
-                        line = line.Trim();
-                        string result = Regex.Replace(line, @"[^\d]", "");
-                        yield return result;
-                        yield return line.Substring(0, colonIndex);
-                        yield return line.Substring(colonIndex + 2);
-                    }
-                }
-                i = j + 1;
-                j = data.IndexOf(';', i, finalLength - i);
-                initial = false;
+                char[] dels = { 'M', 'C', '%' };
+                string droppedExt = singleDataPoints[i].Split(dels)[0];
+
+                if (counter != 17)
+                    handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt + ",";
+                else
+                    handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt;
+                counter++;
+
             }
-            */
+
+            handmadeJSON += "\n\t\t},";
+
+        }
+
+    }
+
+    handmadeJSON = handmadeJSON.Substring(0, (handmadeJSON.Length - 1));
+
+
+    //Console.WriteLine("JSON STRING: " + handmadeJSON);
+
+    System.Console.ReadLine();
+    handmadeJSON += "\n\t]}";
+    return handmadeJSON;
+
+
+    file.Close();
+    return "";
+    //SortedList<String, Object> jsonObj = JsonConvert.DeserializeObject<SortedList<String, Object>>(handmadeJSON);
+    //Console.WriteLine("\nJSON OBJECT: " + jsonObj["MrResourceMonitoring-RIT - Copy.utr"]);
+}
+*/
