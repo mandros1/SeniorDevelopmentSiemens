@@ -73,10 +73,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="DateTime.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+    <Compile Include="ZoomingAndPanning.xaml.cs">
+      <DependentUpon>ZoomingAndPanning.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -87,15 +86,16 @@
     </Compile>
     <Compile Include="DateModel.cs" />
     <Compile Include="DataDisplayTab.cs" />
-    <Compile Include="DateTime.xaml.cs">
-      <DependentUpon>DateTime.xaml</DependentUpon>
-    </Compile>
     <Compile Include="InputBox.cs" />
     <Compile Include="DataGenerator.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ZoomingAndPanning.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

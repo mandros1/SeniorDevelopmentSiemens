@@ -16,7 +16,7 @@ namespace SiemensPerformance
         private DataGenerator generator = new DataGenerator();
         private DataGrid dataGrid;
         private DataTable dataTable;
-        private CartesianChart ch;
+        //private CartesianChart ch;
         public Boolean displayable {get; set;}
         private ComboBox box;
         private ComboBox id_box;
@@ -172,7 +172,7 @@ namespace SiemensPerformance
             //Create Graph tab
             TabItem graph = new TabItem();
 
-            graph.Content = PopulateGraph("Cocos", "26204", "CPU");
+            graph.Content = PopulateGraph("IKM_AT_ATServiceManager", "6700", "HC");
             graph.Header = "Graph";
 
             //Tab dropdown menu
@@ -197,9 +197,7 @@ namespace SiemensPerformance
             menuItem2.Header = "Close";
             menuItem2.Click += delegate { Close(); };
 
-            //TODO - figure out why this is also being applied to child tab elements
             this.ContextMenu = contextMenu;
-            //graph.ContextMenu = contextMenu2;
             graph.ContextMenu = new ContextMenu();
             table.ContextMenu = new ContextMenu();
             query.ContextMenu = new ContextMenu();
@@ -312,12 +310,11 @@ namespace SiemensPerformance
             }
         }
 
-        private Wpf.CartesianChart.Using_DateTime.DateTime PopulateGraph(string processName, string processID, string variable)
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(string processName, string processID, string variable)
         {
             ChartValues<DateModel> data = new ChartValues<DateModel>();
-            
+
             int variableIndex = Array.IndexOf(generator.processVariables, variable);
-            
 
             //Get data
             foreach (var array in generator.getProcessData(processName, processID))
@@ -339,7 +336,7 @@ namespace SiemensPerformance
                 }
             }
 
-            return new Wpf.CartesianChart.Using_DateTime.DateTime(data);
+            return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
         }
     }
 }
