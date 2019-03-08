@@ -178,13 +178,11 @@ namespace SiemensPerformance
 
             ch = new CartesianChart();
 
-           // PopulateGraph("syngo.MR.SaveLogHookMrawp", 27696, "CPU");
-
             graph.Header = "Graph";
             graph.Content = ch;
 
             PopulateGraph("Cocos", "26204", "CPU");
-
+            /*
             //Graph Dropdown Menu
             ContextMenu contextMenu2 = new ContextMenu();
             MenuItem menuItem3 = new MenuItem();
@@ -193,7 +191,8 @@ namespace SiemensPerformance
             menuItem3.Click += delegate { SelectData(); };
 
             graph.ContextMenu = contextMenu2;
-            
+            */
+
             //ch.AxisX[0].LabelFormatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");
 
             //Tab dropdown menu
@@ -204,7 +203,7 @@ namespace SiemensPerformance
             menuItem1.Header = "Rename";
             menuItem1.Click += delegate { Rename(); };
 
-            /* TODO Move to only for queries
+            /* TODO Make this work correctly
             //Save data to Json
             MenuItem menuItem2 = new MenuItem();
             contextMenu.Items.Add(menuItem2);
@@ -220,9 +219,10 @@ namespace SiemensPerformance
 
             //TODO - figure out why this is also being applied to child tab elements
             this.ContextMenu = contextMenu;
-            graph.ContextMenu = contextMenu2;
+            //graph.ContextMenu = contextMenu2;
+            graph.ContextMenu = new ContextMenu();
             table.ContextMenu = new ContextMenu();
-            //graph.ContextMenu = null;
+            query.ContextMenu = new ContextMenu();
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
             tc.Items.Insert(2, query);

@@ -22,9 +22,6 @@ using System.Collections.Generic;
 namespace SiemensPerformance
 {
     
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : MetroWindow
     {
 
@@ -58,7 +55,7 @@ namespace SiemensPerformance
             //Repopulate the Select file query when going to the query tab
             if (control.SelectedIndex == 0)
             {
-                SelectionPopulate();
+                //SelectionPopulate();
             }
         }
 
@@ -69,7 +66,7 @@ namespace SiemensPerformance
             if(tab.displayable) return tab;
             return null;
         }
-
+        /*
         //Populates the Select combo box for Queries
         private void SelectionPopulate()
         {
@@ -82,5 +79,6 @@ namespace SiemensPerformance
                 cmbo.Items.Add(tab.Header);
             }
         }
+        */
     }
 }
