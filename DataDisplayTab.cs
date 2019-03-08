@@ -21,8 +21,6 @@ namespace SiemensPerformance
         private ComboBox box;
         private ComboBox id_box;
         
-
-
         public DataDisplayTab()
         {
             //Open File
@@ -42,7 +40,6 @@ namespace SiemensPerformance
                 return;
             }
 
-
             TabControl tc = new TabControl();
             TabItem table = new TabItem();
 
@@ -58,8 +55,7 @@ namespace SiemensPerformance
             dataGrid.ItemsSource = dataTable.DefaultView;
             dataGrid.IsReadOnly = true;
             table.Content = dataGrid;
-
-            
+   
             //Create query tab
             TabItem query = new TabItem();
 
@@ -174,26 +170,10 @@ namespace SiemensPerformance
 
 
             //Create Graph tab
-            TabItem graph = new TabItem(); 
+            TabItem graph = new TabItem();
 
-            ch = new CartesianChart();
-
+            graph.Content = PopulateGraph("Cocos", "26204", "CPU");
             graph.Header = "Graph";
-            graph.Content = ch;
-
-            PopulateGraph("Cocos", "26204", "CPU");
-            /*
-            //Graph Dropdown Menu
-            ContextMenu contextMenu2 = new ContextMenu();
-            MenuItem menuItem3 = new MenuItem();
-            contextMenu2.Items.Add(menuItem3);
-            menuItem3.Header = "Select Data";
-            menuItem3.Click += delegate { SelectData(); };
-
-            graph.ContextMenu = contextMenu2;
-            */
-
-            //ch.AxisX[0].LabelFormatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");
 
             //Tab dropdown menu
             //Rename Tab
@@ -332,13 +312,7 @@ namespace SiemensPerformance
             }
         }
 
-        private void SelectData()
-        {
-            //TODO - popup that returns processName, process ID, variable
-            //Populate Graph using returned variables
-        }
-
-        private void PopulateGraph(string processName, string processID, string variable)
+        private Wpf.CartesianChart.Using_DateTime.DateTime PopulateGraph(string processName, string processID, string variable)
         {
             ChartValues<DateModel> data = new ChartValues<DateModel>();
             
@@ -365,19 +339,7 @@ namespace SiemensPerformance
                 }
             }
 
-            //Add date to Line series
-            LineSeries line = new LineSeries
-            {
-                Name = variable,
-                Values = data
-            };
-
-            //Add line series to graph
-            var dayConfig = Mappers.Xy<DateModel>()
-                .X(dayModel => dayModel.DateTime.Ticks)
-                .Y(dayModel => dayModel.Value);
-            ch.Series = new SeriesCollection(dayConfig);
-            ch.Series.Add(line);
+            return new Wpf.CartesianChart.Using_DateTime.DateTime(data);
         }
     }
 }
