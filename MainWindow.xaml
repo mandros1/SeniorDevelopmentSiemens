@@ -11,9 +11,9 @@
         Title="Siemens Performance Logs" Height="450" Width="800" MinHeight="250" MinWidth="550">
     <Grid>
         <DockPanel>
-            <StackPanel></StackPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
-                <TabItem x:Name="Queries" Header="Queries">
+                <TabItem x:Name="Welcome" Header="Welcome">
+                    <!-- ^We need a tab here for other functions to work - Should be like instructions or something
                     <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
                         <TabItem Header="Query">
                             <Grid HorizontalAlignment="Left" Height="330" Margin="0,0,0,0" VerticalAlignment="Top" Width="681" >
@@ -30,9 +30,13 @@
                                 <Button IsDefault="true" Content="Run" Margin="174,133,425,168"/>
                             </Grid>
                         </TabItem>
+                        
                     </TabControl>
+                    -->
                 </TabItem>
-                <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" />
+                <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" >
+                    Things
+                </TabItem>
             </TabControl>
         </DockPanel>
     </Grid>

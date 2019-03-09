@@ -16,14 +16,12 @@ namespace SiemensPerformance
         private DataGenerator generator = new DataGenerator();
         private DataGrid dataGrid;
         private DataTable dataTable;
-        private CartesianChart ch;
+        //private CartesianChart ch;
         public Boolean displayable {get; set;}
         private ComboBox box;
         private ComboBox id_box;
         private Label label;
         
-
-
         public DataDisplayTab()
         {
             //Open File
@@ -43,7 +41,6 @@ namespace SiemensPerformance
                 return;
             }
 
-
             TabControl tc = new TabControl();
             TabItem table = new TabItem();
 
@@ -60,10 +57,8 @@ namespace SiemensPerformance
             dataGrid.IsReadOnly = true;
             table.Content = dataGrid;
 
-
             var screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
             var screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
-            
 
             //Create query tab
             TabItem query = new TabItem();
@@ -179,27 +174,10 @@ namespace SiemensPerformance
 
 
             //Create Graph tab
-            TabItem graph = new TabItem(); 
+            TabItem graph = new TabItem();
 
-            ch = new CartesianChart();
-
-           // PopulateGraph("syngo.MR.SaveLogHookMrawp", 27696, "CPU");
-
+            graph.Content = PopulateGraph("IKM_AT_ATServiceManager", "6700", "HC");
             graph.Header = "Graph";
-            graph.Content = ch;
-
-            PopulateGraph("Cocos", "26204", "CPU");
-
-            //Graph Dropdown Menu
-            ContextMenu contextMenu2 = new ContextMenu();
-            MenuItem menuItem3 = new MenuItem();
-            contextMenu2.Items.Add(menuItem3);
-            menuItem3.Header = "Select Data";
-            menuItem3.Click += delegate { SelectData(); };
-
-            graph.ContextMenu = contextMenu2;
-            
-            //ch.AxisX[0].LabelFormatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");
 
             //Tab dropdown menu
             //Rename Tab
@@ -209,7 +187,7 @@ namespace SiemensPerformance
             menuItem1.Header = "Rename";
             menuItem1.Click += delegate { Rename(); };
 
-            /* TODO Move to only for queries
+            /* TODO Make this work correctly
             //Save data to Json
             MenuItem menuItem2 = new MenuItem();
             contextMenu.Items.Add(menuItem2);
@@ -223,11 +201,10 @@ namespace SiemensPerformance
             menuItem2.Header = "Close";
             menuItem2.Click += delegate { Close(); };
 
-            //TODO - figure out why this is also being applied to child tab elements
             this.ContextMenu = contextMenu;
-            graph.ContextMenu = contextMenu2;
+            graph.ContextMenu = new ContextMenu();
             table.ContextMenu = new ContextMenu();
-            //graph.ContextMenu = null;
+            query.ContextMenu = new ContextMenu();
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
             //tc.Items.Insert(2, query);
@@ -338,18 +315,11 @@ namespace SiemensPerformance
             }
         }
 
-        private void SelectData()
-        {
-            //TODO - popup that returns processName, process ID, variable
-            //Populate Graph using returned variables
-        }
-
-        private void PopulateGraph(string processName, string processID, string variable)
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(string processName, string processID, string variable)
         {
             ChartValues<DateModel> data = new ChartValues<DateModel>();
-            
+
             int variableIndex = Array.IndexOf(generator.processVariables, variable);
-            
 
             //Get data
             foreach (var array in generator.getProcessData(processName, processID))
@@ -373,19 +343,7 @@ namespace SiemensPerformance
                 }
             }
 
-            //Add date to Line series
-            LineSeries line = new LineSeries
-            {
-                Name = variable,
-                Values = data
-            };
-
-            //Add line series to graph
-            var dayConfig = Mappers.Xy<DateModel>()
-                .X(dayModel => dayModel.DateTime.Ticks)
-                .Y(dayModel => dayModel.Value);
-            ch.Series = new SeriesCollection(dayConfig);
-            ch.Series.Add(line);
+            return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
         }
 
         private TabItem FileSpecificGraphTabGenerator()

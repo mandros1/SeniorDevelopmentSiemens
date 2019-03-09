@@ -133,15 +133,12 @@ namespace SiemensPerformance
             string data = textData.Substring(textData.IndexOf(':', 26) + 2);
             string processName = data.Substring(0, data.IndexOf(":")); // process name 
 
-            //int bracketPosition = processName.IndexOf("(");
-            //string procName = processName.Substring(0, bracketPosition);
-            //string procID = processName.Substring(bracketPosition+1, (processName.Length - bracketPosition-2));
-
-            //processNames.Add(processName);
-            //yield return procName;
-            //yield return procID;
-            yield return processName;
-            yield return "123";
+            int bracketPosition = processName.IndexOf("(");
+            string procName = processName.Substring(0, bracketPosition);
+            string procID = processName.Substring(bracketPosition+1, (processName.Length - bracketPosition-2));
+            
+            yield return procName;
+            yield return procID;
             data = data.Substring(data.IndexOf(":") + 2);
 
             int finalLength = data.Length;
