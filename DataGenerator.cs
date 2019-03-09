@@ -68,12 +68,12 @@ namespace SiemensPerformance
             }
             //else if (processName == null && processId == null)
             //{
-            return new List<string[]>();
-                /*
-            }
+            //return new List<string[]>();
+                
+            //}
             Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
             return dlist;
-            */
+            
         }
         
 
@@ -84,7 +84,7 @@ namespace SiemensPerformance
             string line;
             //StreamWriter sw = new StreamWriter("D:\\WPF_Applications\\SeniorDevelopmentSiemens\\Data.txt");
             System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
-
+            
             try
             {
                 file.ReadLine(); // skip the firstLine
@@ -102,7 +102,9 @@ namespace SiemensPerformance
                         }
                     }
                     //sw.Write("\n");
-                    dlist.Add(singleList.ToArray());
+                    if (singleList.Count > 0) { 
+                        dlist.Add(singleList.ToArray());
+                    }
                     counter++;
                 }
             }
@@ -120,17 +122,26 @@ namespace SiemensPerformance
 
         public IEnumerable<string> GetSplitData(string textData)
         {
+            int lastPositionOfWall = textData.LastIndexOf('|');
+            string dataType = textData.Substring(lastPositionOfWall+1, 8);
+            if(dataType != "Process:" && dataType != "Global: ")
+            {
+                yield return "ErrorLine";
+                yield break;
+            }
             yield return textData.Substring(0, 26); //timestamp
             string data = textData.Substring(textData.IndexOf(':', 26) + 2);
             string processName = data.Substring(0, data.IndexOf(":")); // process name 
-            
-            int bracketPosition = processName.IndexOf("(");
-            string procName = processName.Substring(0, bracketPosition);
-            string procID = processName.Substring(bracketPosition+1, (processName.Length - bracketPosition-2));
-            
+
+            //int bracketPosition = processName.IndexOf("(");
+            //string procName = processName.Substring(0, bracketPosition);
+            //string procID = processName.Substring(bracketPosition+1, (processName.Length - bracketPosition-2));
+
             //processNames.Add(processName);
-            yield return procName;
-            yield return procID;
+            //yield return procName;
+            //yield return procID;
+            yield return processName;
+            yield return "123";
             data = data.Substring(data.IndexOf(":") + 2);
 
             int finalLength = data.Length;

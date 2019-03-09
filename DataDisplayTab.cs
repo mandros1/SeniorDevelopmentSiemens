@@ -20,6 +20,7 @@ namespace SiemensPerformance
         public Boolean displayable {get; set;}
         private ComboBox box;
         private ComboBox id_box;
+        private Label label;
         
 
 
@@ -59,7 +60,11 @@ namespace SiemensPerformance
             dataGrid.IsReadOnly = true;
             table.Content = dataGrid;
 
+
+            var screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
+            var screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
             
+
             //Create query tab
             TabItem query = new TabItem();
 
@@ -225,7 +230,8 @@ namespace SiemensPerformance
             //graph.ContextMenu = null;
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
-            tc.Items.Insert(2, query);
+            //tc.Items.Insert(2, query);
+            tc.Items.Insert(2, FileSpecificGraphTabGenerator());
             this.Content = tc;
         }
 
@@ -358,7 +364,9 @@ namespace SiemensPerformance
                         Value = value
                     });
                 }
-                catch (IndexOutOfRangeException t) { }
+                catch (IndexOutOfRangeException t) {
+                    Console.WriteLine(t);
+                }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
@@ -378,6 +386,143 @@ namespace SiemensPerformance
                 .Y(dayModel => dayModel.Value);
             ch.Series = new SeriesCollection(dayConfig);
             ch.Series.Add(line);
+        }
+
+        private TabItem FileSpecificGraphTabGenerator()
+        {
+            var screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
+            var screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
+
+            Label label;
+            TextBox textBox;
+            ComboBox comboBox;
+
+            //Create query tab
+            TabItem query = new TabItem();
+
+            Grid queryGrid = new Grid();
+            queryGrid.Height = 330;
+            queryGrid.Width = 681;
+            queryGrid.Margin = new System.Windows.Thickness(0, 0, 0, 0);
+            queryGrid.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            queryGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            
+            label = labelCreator("SELECT",
+                System.Windows.HorizontalAlignment.Left,
+                System.Windows.VerticalAlignment.Top,
+                new System.Windows.Thickness(29, 15, 0, 0),
+                new System.Windows.Point(0, 0));
+            queryGrid.Children.Add(label);
+
+            comboBox = new ComboBox();
+            comboBox.ItemsSource = generator.getDistinctProcessNames();
+            comboBox.Name = "procName";
+            comboBox.Margin = new System.Windows.Thickness(86, 15, 0, 0);
+            comboBox.Width = 120;
+            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            comboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            comboBox.SelectionChanged += procName_SelectionChanged;
+            queryGrid.Children.Add(comboBox);
+
+            comboBox = new ComboBox();
+            comboBox.ItemsSource = generator.getDistinctProcessIDs(null);
+            comboBox.Name = "procID";
+            comboBox.Margin = new System.Windows.Thickness(268, 15, 0, 0);
+            comboBox.Width = 120;
+            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            comboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            queryGrid.Children.Add(comboBox);
+
+
+            label = labelCreator("BETWEEN",
+                System.Windows.HorizontalAlignment.Left,
+                System.Windows.VerticalAlignment.Top,
+                new System.Windows.Thickness(15, 46, 0, 0),
+                new System.Windows.Point(0,0));
+            queryGrid.Children.Add(label);
+
+            textBox = new TextBox();
+            textBox.Height = 23;
+            textBox.TextWrapping = System.Windows.TextWrapping.Wrap;
+            textBox.Text = "Starting time";
+            textBox.Width = 120;
+            textBox.Margin = new System.Windows.Thickness(86, 46, 475, 258);
+            queryGrid.Children.Add(textBox);
+
+
+            textBox = new TextBox();
+            textBox.Height = 23;
+            textBox.TextWrapping = System.Windows.TextWrapping.Wrap;
+            textBox.Text = "Ending time";
+            textBox.Width = 120;
+            textBox.Margin = new System.Windows.Thickness(268, 46, 293, 258);
+            queryGrid.Children.Add(textBox);
+            
+            label = labelCreator("AND",
+                System.Windows.HorizontalAlignment.Left,
+                System.Windows.VerticalAlignment.Top,
+                new System.Windows.Thickness(224, 46, 0, 0),
+                new System.Windows.Point(-0.044, 0.538));
+            queryGrid.Children.Add(label);
+            
+            label = labelCreator("WHERE",
+                System.Windows.HorizontalAlignment.Left,
+                System.Windows.VerticalAlignment.Top,
+                new System.Windows.Thickness(26, 77, 0, 0),
+                new System.Windows.Point(0.477, 2.731));
+            queryGrid.Children.Add(label);
+
+
+            comboBox = new ComboBox();
+            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            comboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            comboBox.Width = 120;
+            comboBox.Margin = new System.Windows.Thickness(86, 77, 0, 0);
+            queryGrid.Children.Add(comboBox);
+
+            
+            label = labelCreator("equals",
+                System.Windows.HorizontalAlignment.Left,
+                System.Windows.VerticalAlignment.Top,
+                new System.Windows.Thickness(217, 77, 0, 0),
+                new System.Windows.Point(0.477, 2.731));
+            queryGrid.Children.Add(label);
+
+
+            textBox = new TextBox();
+            textBox.Height = 23;
+            textBox.TextWrapping = System.Windows.TextWrapping.Wrap;
+            textBox.Text = "Value";
+            textBox.Width = 120;
+            textBox.Margin = new System.Windows.Thickness(268, 77, 293, 227);
+            queryGrid.Children.Add(textBox);
+
+            Button but = new Button();
+            but.IsDefault = true;
+            but.Content = "Run";
+            but.Margin = new System.Windows.Thickness(174, 133, 425, 168);
+            queryGrid.Children.Add(but);
+
+            query.Header = "Query";
+            query.Content = queryGrid;
+
+            return query;
+        }
+
+        private Label labelCreator(
+            string content, 
+            System.Windows.HorizontalAlignment horizontal, 
+            System.Windows.VerticalAlignment vertical,
+            System.Windows.Thickness margin,
+            System.Windows.Point tranformOrigin)
+        {
+            label = new Label();
+            label.Content = content;
+            label.HorizontalAlignment = horizontal;
+            label.VerticalAlignment = vertical;
+            label.Margin = margin;
+            label.RenderTransformOrigin = tranformOrigin;
+            return label;
         }
     }
 }
