@@ -16,12 +16,31 @@ namespace SiemensPerformance
         private DataGenerator generator = new DataGenerator();
         private DataGrid dataGrid;
         private DataTable dataTable;
-        //private CartesianChart ch;
+        private CartesianChart ch;
+        private string[] filterByArray = { "Process", "Global(0)", "Global(_Total)" };
+        private List<ComboBox> parameterNamesComboBox = new List<ComboBox>();
+
         public Boolean displayable {get; set;}
-        private ComboBox box;
-        private ComboBox id_box;
+        private StackPanel mainStackPanel;
+        private StackPanel filterStackPanel;
+        private ComboBox processNameCB;
+        private ComboBox processIdCB;
+        private ComboBox filterCB;
+        private ComboBox selectComboBox;
+        private ComboBox finalSelectCB;
+        private ComboBox finalWhereCB;
+        private ComboBox finalAndCB;
+        private ComboBox finalBetweenCB;
+
+        // reusable components
+        private StackPanel stackPanel;
+        private StackPanel stackPanel2;
         private Label label;
-        
+        private ComboBox comboBox;
+        private DockPanel dockPanel;
+        private TextBox textBox;
+
+
         public DataDisplayTab()
         {
             //Open File
@@ -77,24 +96,24 @@ namespace SiemensPerformance
             label.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             queryGrid.Children.Add(label);
 
-            box = new ComboBox();
-            box.ItemsSource = generator.getDistinctProcessNames();
-            box.Name = "procName";
-            box.Margin = new System.Windows.Thickness(86, 15, 0, 0);
-            box.Width = 120;
-            box.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            box.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            box.SelectionChanged += procName_SelectionChanged;
-            queryGrid.Children.Add(box);
+            processNameCB = new ComboBox();
+            processNameCB.ItemsSource = generator.getDistinctProcessNames();
+            processNameCB.Name = "procName";
+            processNameCB.Margin = new System.Windows.Thickness(86, 15, 0, 0);
+            processNameCB.Width = 120;
+            processNameCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            processNameCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            processNameCB.SelectionChanged += procName_SelectionChanged;
+            queryGrid.Children.Add(processNameCB);
 
-            id_box = new ComboBox();
-            id_box.ItemsSource = generator.getDistinctProcessIDs(null);
-            id_box.Name = "procID";
-            id_box.Margin = new System.Windows.Thickness(268, 15, 0, 0);
-            id_box.Width = 120;
-            id_box.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            id_box.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            queryGrid.Children.Add(id_box);
+            processIdCB = new ComboBox();
+            processIdCB.ItemsSource = generator.getDistinctProcessIDs(null);
+            processIdCB.Name = "procID";
+            processIdCB.Margin = new System.Windows.Thickness(268, 15, 0, 0);
+            processIdCB.Width = 120;
+            processIdCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            processIdCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            queryGrid.Children.Add(processIdCB);
             
             Label label2 = new Label();
             label2.Content = "Between:";
@@ -201,14 +220,18 @@ namespace SiemensPerformance
             menuItem2.Header = "Close";
             menuItem2.Click += delegate { Close(); };
 
+            TabItem query2 = generateQueryTabItem();
+
             this.ContextMenu = contextMenu;
             graph.ContextMenu = new ContextMenu();
             table.ContextMenu = new ContextMenu();
             query.ContextMenu = new ContextMenu();
+            query2.ContextMenu = new ContextMenu();
             tc.Items.Insert(0, table);
             tc.Items.Insert(1, graph);
-            //tc.Items.Insert(2, query);
-            tc.Items.Insert(2, FileSpecificGraphTabGenerator());
+            tc.Items.Insert(2, query);
+            tc.Items.Insert(3, query2);
+            //tc.Items.Insert(2, FileSpecificGraphTabGenerator());
             this.Content = tc;
         }
 
@@ -216,7 +239,7 @@ namespace SiemensPerformance
         {
             ComboBox combo = (ComboBox)sender;
             string procName = (string) combo.SelectedItem;
-            id_box.ItemsSource = generator.getDistinctProcessIDs(procName);
+            processIdCB.ItemsSource = generator.getDistinctProcessIDs(procName);
         } 
 
         //Generate DataGrid from data
@@ -346,141 +369,507 @@ namespace SiemensPerformance
             return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
         }
 
-        private TabItem FileSpecificGraphTabGenerator()
+       
+        ///**
+        // * This creates a StackPanel with a label and combobox generated to be placed inside another StackPanel as a sub-element
+        // * @stackPanel is a StackPanel object
+        // */
+        //private StackPanel  ( string labelText, 
+        //                                                int comboBoxWidth,
+        //                                                System.Windows.Thickness labelMargins,
+        //                                                System.Windows.Thickness comboboxMargins)
+        //{
+        //    stackPanel = new StackPanel();
+        //    stackPanel.Orientation = Orientation.Horizontal;
+
+        //    label = new Label();
+        //    label.Content = labelText;
+        //    label.Margin = labelMargins;
+        //    stackPanel.Children.Add(label);
+
+        //    comboBox = new ComboBox();
+        //    comboBox.Margin = comboboxMargins;
+        //    comboBox.Width = comboBoxWidth;
+            
+        //    stackPanel.Children.Add(comboBox);
+
+        //    return stackPanel;
+        //}
+
+       
+        /**
+         * Main
+         */
+        private TabItem generateQueryTabItem()
         {
-            var screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
-            var screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
+            TabItem tab = new TabItem();
+            tab.Header = "Query2";
 
-            Label label;
-            TextBox textBox;
-            ComboBox comboBox;
-
-            //Create query tab
-            TabItem query = new TabItem();
-
-            Grid queryGrid = new Grid();
-            queryGrid.Height = 330;
-            queryGrid.Width = 681;
-            queryGrid.Margin = new System.Windows.Thickness(0, 0, 0, 0);
-            queryGrid.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            queryGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            dockPanel = baseDockPanel();
             
-            label = labelCreator("SELECT",
-                System.Windows.HorizontalAlignment.Left,
-                System.Windows.VerticalAlignment.Top,
-                new System.Windows.Thickness(29, 15, 0, 0),
-                new System.Windows.Point(0, 0));
-            queryGrid.Children.Add(label);
-
-            comboBox = new ComboBox();
-            comboBox.ItemsSource = generator.getDistinctProcessNames();
-            comboBox.Name = "procName";
-            comboBox.Margin = new System.Windows.Thickness(86, 15, 0, 0);
-            comboBox.Width = 120;
-            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            comboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            comboBox.SelectionChanged += procName_SelectionChanged;
-            queryGrid.Children.Add(comboBox);
-
-            comboBox = new ComboBox();
-            comboBox.ItemsSource = generator.getDistinctProcessIDs(null);
-            comboBox.Name = "procID";
-            comboBox.Margin = new System.Windows.Thickness(268, 15, 0, 0);
-            comboBox.Width = 120;
-            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            comboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            queryGrid.Children.Add(comboBox);
-
-
-            label = labelCreator("BETWEEN",
-                System.Windows.HorizontalAlignment.Left,
-                System.Windows.VerticalAlignment.Top,
-                new System.Windows.Thickness(15, 46, 0, 0),
-                new System.Windows.Point(0,0));
-            queryGrid.Children.Add(label);
-
-            textBox = new TextBox();
-            textBox.Height = 23;
-            textBox.TextWrapping = System.Windows.TextWrapping.Wrap;
-            textBox.Text = "Starting time";
-            textBox.Width = 120;
-            textBox.Margin = new System.Windows.Thickness(86, 46, 475, 258);
-            queryGrid.Children.Add(textBox);
-
-
-            textBox = new TextBox();
-            textBox.Height = 23;
-            textBox.TextWrapping = System.Windows.TextWrapping.Wrap;
-            textBox.Text = "Ending time";
-            textBox.Width = 120;
-            textBox.Margin = new System.Windows.Thickness(268, 46, 293, 258);
-            queryGrid.Children.Add(textBox);
-            
-            label = labelCreator("AND",
-                System.Windows.HorizontalAlignment.Left,
-                System.Windows.VerticalAlignment.Top,
-                new System.Windows.Thickness(224, 46, 0, 0),
-                new System.Windows.Point(-0.044, 0.538));
-            queryGrid.Children.Add(label);
-            
-            label = labelCreator("WHERE",
-                System.Windows.HorizontalAlignment.Left,
-                System.Windows.VerticalAlignment.Top,
-                new System.Windows.Thickness(26, 77, 0, 0),
-                new System.Windows.Point(0.477, 2.731));
-            queryGrid.Children.Add(label);
-
-
-            comboBox = new ComboBox();
-            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            comboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            comboBox.Width = 120;
-            comboBox.Margin = new System.Windows.Thickness(86, 77, 0, 0);
-            queryGrid.Children.Add(comboBox);
-
-            
-            label = labelCreator("equals",
-                System.Windows.HorizontalAlignment.Left,
-                System.Windows.VerticalAlignment.Top,
-                new System.Windows.Thickness(217, 77, 0, 0),
-                new System.Windows.Point(0.477, 2.731));
-            queryGrid.Children.Add(label);
-
-
-            textBox = new TextBox();
-            textBox.Height = 23;
-            textBox.TextWrapping = System.Windows.TextWrapping.Wrap;
-            textBox.Text = "Value";
-            textBox.Width = 120;
-            textBox.Margin = new System.Windows.Thickness(268, 77, 293, 227);
-            queryGrid.Children.Add(textBox);
-
-            Button but = new Button();
-            but.IsDefault = true;
-            but.Content = "Run";
-            but.Margin = new System.Windows.Thickness(174, 133, 425, 168);
-            queryGrid.Children.Add(but);
-
-            query.Header = "Query";
-            query.Content = queryGrid;
-
-            return query;
+            tab.Content = dockPanel;
+            return tab;
         }
 
-        private Label labelCreator(
-            string content, 
-            System.Windows.HorizontalAlignment horizontal, 
-            System.Windows.VerticalAlignment vertical,
-            System.Windows.Thickness margin,
-            System.Windows.Point tranformOrigin)
+        private DockPanel baseDockPanel()
         {
+            dockPanel = new DockPanel();
+
+            filterStackPanel = new StackPanel();
+            filterStackPanel.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            filterStackPanel.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+
+            filterStackPanel.Orientation = Orientation.Horizontal;
             label = new Label();
-            label.Content = content;
-            label.HorizontalAlignment = horizontal;
-            label.VerticalAlignment = vertical;
-            label.Margin = margin;
-            label.RenderTransformOrigin = tranformOrigin;
-            return label;
+            label.Margin = new System.Windows.Thickness(10, 0, 0, 0);
+            label.Content = "Filter By:";
+            label.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            filterStackPanel.Children.Add(label);
+
+            filterCB = new ComboBox();
+            filterCB.Name = "filterComboBox";
+            filterCB.Margin = new System.Windows.Thickness(10, 0, 10, 0);
+            filterCB.Width = 100;
+            filterCB.Height = 30;
+            filterCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            filterCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            filterCB.ItemsSource = filterByArray;
+            filterCB.SelectionChanged += filter_SelectionChanged;
+            filterStackPanel.Children.Add(filterCB);
+
+            DockPanel.SetDock(filterStackPanel, Dock.Top);
+            dockPanel.Children.Add(filterStackPanel);
+
+            mainStackPanel = new StackPanel();
+            mainStackPanel.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            mainStackPanel.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            mainStackPanel.Orientation = Orientation.Horizontal;
+            mainStackPanel.Margin = new System.Windows.Thickness(0, 10, 0, 0);
+
+            dockPanel.Children.Add(mainStackPanel);
+
+            return dockPanel;
         }
+
+        private void filter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            comboBox = (ComboBox)sender;
+
+            // remove all previous existing children
+            while(filterStackPanel.Children.Count > 2)
+            {
+                filterStackPanel.Children.RemoveAt(filterStackPanel.Children.Count - 1);
+            }
+            while (mainStackPanel.Children.Count > 0)
+            {
+                mainStackPanel.Children.RemoveAt(mainStackPanel.Children.Count - 1);
+            }
+
+            string filterValue = (string)comboBox.SelectedItem;
+            
+            if (filterValue == "Process")
+            {
+                stackPanel = processFilterStackPanelGenerator(
+                    new System.Windows.Thickness(20, 0, 0, 0),
+                    new System.Windows.Thickness(10, 0, 0, 0),
+                    new System.Windows.Thickness(20, 0, 0, 0),
+                    120,
+                    new System.Windows.Thickness(20, 0, 0, 0),
+                    new System.Windows.Thickness(10, 0, 0, 0),
+                    100
+                );
+                filterStackPanel.Children.Add(stackPanel);
+
+                StackPanel _stack = new StackPanel();
+                _stack.Orientation = Orientation.Horizontal;
+
+                _stack.Children.Add(selectDockPanelGenerator(new System.Windows.Thickness(0, 10, 0, 0),
+                                                                    50,
+                                                                    new System.Windows.Thickness(10, 0, 0, 0),
+                                                                    100,
+                                                                    new System.Windows.Thickness(15, 0, 0, 0),
+                                                                    100,
+                                                                    new System.Windows.Thickness(0, 0, 10, 0))
+                );
+                mainStackPanel.Children.Add(_stack);
+                selectComboBox.ItemsSource = generator.selectProcessNames;
+            }
+        }
+
+
+        private StackPanel processFilterStackPanelGenerator(System.Windows.Thickness mainStackMargins,
+                                                            System.Windows.Thickness processNameLabelMargins,
+                                                            System.Windows.Thickness processNameCBMargins,
+                                                            int procNameCBWidth,
+                                                            System.Windows.Thickness processIdLabelMargins,
+                                                            System.Windows.Thickness processIdBMargins,
+                                                            int procIdCBWidth)
+        {
+            stackPanel = new StackPanel();
+            stackPanel.Margin = mainStackMargins;
+
+            // First inner stack start
+            stackPanel2 = new StackPanel();
+            stackPanel2.Orientation = Orientation.Horizontal;
+
+            label = new Label();
+            label.Content = "Process name:";
+            label.Margin = processNameLabelMargins;
+            label.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            stackPanel2.Children.Add(label);
+
+            processNameCB = new ComboBox();
+            processNameCB.Margin = processNameCBMargins;
+            processNameCB.Width = procNameCBWidth;
+            processNameCB.ItemsSource = generator.getDistinctProcessNames();
+            processNameCB.SelectedIndex = 0;
+            processNameCB.SelectionChanged += processNameCB_SelectionChanged;
+            processNameCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            processNameCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            stackPanel2.Children.Add(processNameCB);
+            // First inner stack end
+
+            stackPanel.Children.Add(stackPanel2);
+
+
+            // Second inner stack start
+            stackPanel2 = new StackPanel();
+            stackPanel2.Orientation = Orientation.Horizontal;
+
+            label = new Label();
+            label.Content = "Process ID:";
+            label.Margin = processIdLabelMargins;
+            label.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            stackPanel2.Children.Add(label);
+
+            processIdCB = new ComboBox();
+            processIdCB.Margin = processIdBMargins;
+            processIdCB.Width = procIdCBWidth;
+            processIdCB.ItemsSource = generator.getDistinctProcessIDs((string)processNameCB.SelectedItem);
+            processIdCB.SelectedIndex = 0;
+            processIdCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            processIdCB .VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            stackPanel2.Children.Add(processIdCB);
+            // Second inner stack start
+
+            stackPanel.Children.Add(stackPanel2);
+
+            return stackPanel;
+        }
+
+        private void processNameCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox combo = (ComboBox)sender;
+            string procName = (string)combo.SelectedItem;
+            processIdCB.ItemsSource = generator.getDistinctProcessIDs(procName);
+            processIdCB.SelectedIndex = 0;
+        }
+
+        private DockPanel selectDockPanelGenerator(System.Windows.Thickness dockPanelMargins,
+                                                   int labelWidth,
+                                                   System.Windows.Thickness labelMargins,
+                                                   int comboWidth,
+                                                   System.Windows.Thickness comboMargins,
+                                                   int outsideComboWidth,
+                                                   System.Windows.Thickness outsideComboMargins)
+        {
+            dockPanel = new DockPanel();
+            dockPanel.Margin = dockPanelMargins;
+            dockPanel.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            dockPanel.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+
+            stackPanel = new StackPanel();
+            stackPanel.Orientation = Orientation.Horizontal;
+            stackPanel.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            stackPanel.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+
+            label = new Label();
+            label.Width = labelWidth;
+            label.Margin = labelMargins;
+            label.Content = "SELECT";
+            label.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            label.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            stackPanel.Children.Add(label);
+
+            // OnChange of filter we change it's data
+            selectComboBox = new ComboBox();
+            selectComboBox.Width = comboWidth;
+            selectComboBox.Margin = comboMargins;
+            parameterNamesComboBox.Add(selectComboBox);
+            selectComboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            selectComboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            stackPanel.Children.Add(selectComboBox);
+
+            DockPanel.SetDock(stackPanel, Dock.Left);
+            dockPanel.Children.Add(stackPanel);
+
+            finalSelectCB = new ComboBox();
+            finalSelectCB.Width = outsideComboWidth;
+            finalSelectCB.Margin = outsideComboMargins;
+            finalSelectCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            finalSelectCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            // UPGRADE TO BELOW
+            //string[] list = { ";", "WHERE", "BETWEEN" };
+            string[] list = { ";", "WHERE" };
+            finalSelectCB.SelectionChanged += selectFinalCB_SelectionChanged;
+            finalSelectCB.SelectedIndex = 0;
+            finalSelectCB.ItemsSource = list;
+
+            DockPanel.SetDock(finalSelectCB, Dock.Right);
+            dockPanel.Children.Add(finalSelectCB);
+            dockPanel.Children.Add(new Label());
+
+            return dockPanel;
+        }
+
+
+        private void selectFinalCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            comboBox = (ComboBox)sender;
+            // remove all previous existing children
+            Console.WriteLine("Count " + mainStackPanel.Children.Count);
+            Console.WriteLine("Position " + (mainStackPanel.Children.Count - 1));
+            while (mainStackPanel.Children.Count > 1)
+            {
+                mainStackPanel.Children.RemoveAt(1);
+            }
+            
+            if ((string)comboBox.SelectedItem == "WHERE")
+            {
+                string filterValue = (string)filterCB.SelectedItem;
+                if ( filterValue == "Process") { 
+                    StackPanel stak = new StackPanel();
+                    stak.Orientation = Orientation.Horizontal;
+                    stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                    stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                    stak.Children.Add(whereDockPanelGenerator(  new System.Windows.Thickness(0, 10, 0, 0),
+                                                                //new System.Windows.Thickness(10, 0, 0, 0),
+                                                                //50,
+                                                                new System.Windows.Thickness(15, 0, 0, 0),
+                                                                100,
+                                                                new System.Windows.Thickness(40, 0, 0, 0),
+                                                                60,
+                                                                new System.Windows.Thickness(20, 0, 0, 0),
+                                                                new System.Windows.Thickness(10, 0, 0, 0),
+                                                                100,
+                                                                new System.Windows.Thickness(0, 0, 10, 0),
+                                                                50,
+                                                                generator.selectProcessNames));
+                    mainStackPanel.Children.Add(stak);
+                }
+            }
+            
+        }
+
+        
+        private DockPanel whereDockPanelGenerator(  System.Windows.Thickness dockPanelMargins,
+                                                    //System.Windows.Thickness whereLabelMargins,
+                                                    //int whereLabelWidth,
+                                                    System.Windows.Thickness variableComboMargins,
+                                                    int variableComboWidth,
+                                                    System.Windows.Thickness operatorsComboMargins,
+                                                    int operatorsComboWidth,
+                                                    System.Windows.Thickness valueLabelMargins,
+                                                    System.Windows.Thickness txtBoxMargins,
+                                                    int txtBoxWidth,
+                                                    System.Windows.Thickness finalComboboxMargins,
+                                                    int finalComboBoxWidth,
+                                                    string[] cbNames)
+        {
+            dockPanel = new DockPanel();
+            dockPanel.Margin = dockPanelMargins;
+
+            stackPanel = new StackPanel();
+            stackPanel.Orientation = Orientation.Horizontal;
+
+            //label = new Label();
+            //label.Margin = whereLabelMargins;
+            //label.Width = whereLabelWidth;
+            //label.Content = "WHERE";
+            //stackPanel.Children.Add(label);
+
+            comboBox = new ComboBox();
+            comboBox.Margin = variableComboMargins;
+            comboBox.Width = variableComboWidth;
+            comboBox.ItemsSource = cbNames;
+            stackPanel.Children.Add(comboBox);
+
+            comboBox = new ComboBox();
+            comboBox.Margin = operatorsComboMargins;
+            comboBox.Width = operatorsComboWidth;
+            string[] list = { "==", ">", ">=", "<", "<=", "!=" };
+            comboBox.ItemsSource = list;
+            comboBox.SelectedIndex = 0;
+            stackPanel.Children.Add(comboBox);
+
+            label = new Label();
+            label.Margin = valueLabelMargins;
+            label.Content = "Value:";
+            stackPanel.Children.Add(label);
+
+            textBox = new TextBox();
+            textBox.Margin = txtBoxMargins;
+            textBox.Width = txtBoxWidth;
+            stackPanel.Children.Add(textBox);
+
+            dockPanel.Children.Add(stackPanel);
+
+            finalWhereCB = new ComboBox();
+            finalWhereCB.Margin = finalComboboxMargins;
+            finalWhereCB.Width = finalComboBoxWidth;
+            string[] finalList = { ";", "AND" };
+            finalWhereCB.ItemsSource = finalList;
+            finalWhereCB.SelectedIndex = 0;
+
+            DockPanel.SetDock(finalWhereCB, Dock.Right);
+            dockPanel.Children.Add(finalWhereCB);
+            dockPanel.Children.Add(new Label());
+
+            return dockPanel;
+        }
+
+
+        private DockPanel andDockPanelGenerator(System.Windows.Thickness dockPanelMargins,
+                                                System.Windows.Thickness andLabelMargins,
+                                                int andLabelWidth,
+                                                System.Windows.Thickness variableComboMargins,
+                                                int variableComboWidth,
+                                                System.Windows.Thickness operatorsComboMargins,
+                                                int operatorsComboWidth,
+                                                System.Windows.Thickness valueLabelMargins,
+                                                int valueLabelWidth,
+                                                System.Windows.Thickness txtBoxMargins,
+                                                int txtBoxWidth,
+                                                System.Windows.Thickness finalComboboxMargins,
+                                                int finalComboBoxWidth)
+        {
+            dockPanel = new DockPanel();
+            dockPanel.Margin = dockPanelMargins;
+
+            stackPanel = new StackPanel();
+            stackPanel.Orientation = Orientation.Horizontal;
+
+            label = new Label();
+            label.Margin = andLabelMargins;
+            label.Width = andLabelWidth;
+            label.Content = "AND";
+            stackPanel.Children.Add(label);
+
+            comboBox = new ComboBox();
+            comboBox.Margin = variableComboMargins;
+            comboBox.Width = variableComboWidth;
+            parameterNamesComboBox.Add(comboBox);
+            stackPanel.Children.Add(comboBox);
+
+            comboBox = new ComboBox();
+            comboBox.Margin = operatorsComboMargins;
+            comboBox.Width = operatorsComboWidth;
+            string[] list = { "=", ">", ">=", "<", "<=", "!=" };
+            comboBox.ItemsSource = list;
+            stackPanel.Children.Add(comboBox);
+
+            label = new Label();
+            label.Margin = valueLabelMargins;
+            label.Width = valueLabelWidth;
+            label.Content = "Value:";
+            stackPanel.Children.Add(label);
+
+            textBox = new TextBox();
+            textBox.Margin = txtBoxMargins;
+            textBox.Width = txtBoxWidth;
+            stackPanel.Children.Add(textBox);
+
+            dockPanel.Children.Add(stackPanel);
+
+            finalAndCB = new ComboBox();
+            finalAndCB.Margin = finalComboboxMargins;
+            finalAndCB.Width = finalComboBoxWidth;
+            string[] finalList = { ";" };
+            finalAndCB.ItemsSource = finalList;
+
+            DockPanel.SetDock(finalAndCB, Dock.Right);
+            dockPanel.Children.Add(finalAndCB);
+            dockPanel.Children.Add(new Label());
+
+            return dockPanel;
+        }
+        
+
+        /**
+         * TO BE IMPLEMENTED
+         */
+
+        //private DockPanel betweenDockPanelGenerator(System.Windows.Thickness dockPanelMargins,
+        //                                           System.Windows.Thickness whereLabelMargins,
+        //                                           int whereLabelWidth,
+        //                                           System.Windows.Thickness variableComboMargins,
+        //                                           int variableComboWidth,
+        //                                           System.Windows.Thickness betweenLabelMargins,
+        //                                           int betweenLabelWidth,
+        //                                           System.Windows.Thickness startTextMargins,
+        //                                           int startTextWidth,
+        //                                           System.Windows.Thickness andLabelMargins,
+        //                                           int andLabelWidth,
+        //                                           System.Windows.Thickness endTextMargins,
+        //                                           int endTextWidth,
+        //                                           System.Windows.Thickness finalComboboxMargins,
+        //                                           int finalComboBoxWidth)
+        //{
+        //    dockPanel = new DockPanel();
+        //    dockPanel.Margin = dockPanelMargins;
+
+        //    stackPanel = new StackPanel();
+        //    stackPanel.Orientation = Orientation.Horizontal;
+
+        //    label = new Label();
+        //    label.Margin = whereLabelMargins;
+        //    label.Width = whereLabelWidth;
+        //    label.Content = "WHERE";
+        //    stackPanel.Children.Add(label);
+
+        //    comboBox = new ComboBox();
+        //    comboBox.Margin = variableComboMargins;
+        //    comboBox.Width = variableComboWidth;
+        //    parameterNamesComboBox.Add(comboBox);
+        //    stackPanel.Children.Add(comboBox);
+
+        //    label = new Label();
+        //    label.Margin = betweenLabelMargins;
+        //    label.Width = betweenLabelWidth;
+        //    label.Content = "BETWEEN";
+        //    stackPanel.Children.Add(label);
+
+        //    textBox = new TextBox();
+        //    textBox.Margin = startTextMargins;
+        //    textBox.Width = startTextWidth;
+        //    stackPanel.Children.Add(textBox);
+
+        //    label = new Label();
+        //    label.Margin = andLabelMargins;
+        //    label.Width = andLabelWidth;
+        //    label.Content = "AND";
+        //    stackPanel.Children.Add(label);
+
+        //    textBox = new TextBox();
+        //    textBox.Margin = endTextMargins;
+        //    textBox.Width = endTextWidth;
+        //    stackPanel.Children.Add(textBox);
+            
+        //    dockPanel.Children.Add(stackPanel);
+
+        //    comboBox = new ComboBox();
+        //    comboBox.Margin = finalComboboxMargins;
+        //    comboBox.Width = finalComboBoxWidth;
+
+        //    DockPanel.SetDock(comboBox, Dock.Right);
+        //    dockPanel.Children.Add(comboBox);
+        //    dockPanel.Children.Add(new Label());
+
+        //    return dockPanel;
+        //}
+         
     }
 }

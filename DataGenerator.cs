@@ -34,6 +34,23 @@ namespace SiemensPerformance
             "GMFPeak", "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
             "GPFC", "GPFCPeak", "GMC", "GMCPeak"};
 
+        public string[] selectProcessNames = { "WSP", "WSPPeak",
+            "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
+            "GDIC", "GDICPeak", "USRC", "USRCPeak", "PRIV",
+            "PRIVPeak", "VIRT", "VIRTPeak", "PFS", "PFSPeak" };
+
+        public string[] selectGlobalZeroNames = {"GCPU0", "GCPU0Peak",
+            "GCPU1", "GCPU1Peak", "GCPU2", "GCPU2Peak", "GCPU3", "GCPU3Peak", "GCPU4", "GCPU4Peak", "GCPU5", "GCPU5Peak",
+            "GCPU6", "GCPU6Peak", "GCPU7", "GCPU7Peak", "GCPU8", "GCPU8Peak",
+            "GCPU9", "GCPU9Peak", "GCPU10", "GCPU10Peak", "GCPU11", "GCPU12Peak",
+            "GCPU13", "GCPU13Peak", "GCPU14", "GCPU14Peak", "GCPU15", "GCPU15Peak"};
+
+        public string[] selectGlobalTotalNames = { "GCPU", "GCPUPeak",
+            "GMA", "GMAPeak", "GPC", "GPCPeak", "GHC", "GHCPeak",
+            "GHPF", "GCPUP", "GCPUPPeak", "GMF", "GMFPeak",
+            "GMFPeak", "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
+            "GPFC", "GPFCPeak", "GMC", "GMCPeak"};
+
 
         //Gets all unique process names
         public List<string> getDistinctProcessNames()
@@ -54,7 +71,7 @@ namespace SiemensPerformance
         //Gets data for one process
         public List<string[]> getProcessData(string processName, string processId)
         {
-            if (processName != null && processId == null)
+            if (processName != null && processId == null && processName != "None")
             {
                 processData2DList = dlist.Where(x => x[1] == processName).ToList();
                 Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
