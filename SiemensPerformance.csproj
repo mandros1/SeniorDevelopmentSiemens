@@ -93,6 +93,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataInsert.cs" />
     <Compile Include="DBConnect.cs" />
     <Compile Include="DateModel.cs" />
     <Compile Include="DataDisplayTab.cs" />
