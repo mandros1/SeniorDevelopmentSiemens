@@ -18,7 +18,6 @@ namespace SiemensPerformance
         private DataTable dataTable;
         private CartesianChart ch;
         private string[] filterByArray = { "Process", "Global(0)", "Global(_Total)" };
-        private List<ComboBox> parameterNamesComboBox = new List<ComboBox>();
 
         public Boolean displayable {get; set;}
         private StackPanel mainStackPanel;
@@ -31,6 +30,8 @@ namespace SiemensPerformance
         private ComboBox finalWhereCB;
         private ComboBox finalAndCB;
         private ComboBox finalBetweenCB;
+        private Button runButton;
+        private TabItem graphTabItem;
 
         // reusable components
         private StackPanel stackPanel;
@@ -193,10 +194,10 @@ namespace SiemensPerformance
 
 
             //Create Graph tab
-            TabItem graph = new TabItem();
+            graphTabItem = new TabItem();
 
-            graph.Content = PopulateGraph("IKM_AT_ATServiceManager", "6700", "HC");
-            graph.Header = "Graph";
+            //graphTabItem.Content = PopulateGraph("IKM_AT_ATServiceManager", "6700", "HC");
+            graphTabItem.Header = "Graph";
 
             //Tab dropdown menu
             //Rename Tab
@@ -223,12 +224,12 @@ namespace SiemensPerformance
             TabItem query2 = generateQueryTabItem();
 
             this.ContextMenu = contextMenu;
-            graph.ContextMenu = new ContextMenu();
+            graphTabItem.ContextMenu = new ContextMenu();
             table.ContextMenu = new ContextMenu();
             query.ContextMenu = new ContextMenu();
             query2.ContextMenu = new ContextMenu();
             tc.Items.Insert(0, table);
-            tc.Items.Insert(1, graph);
+            tc.Items.Insert(1, graphTabItem);
             tc.Items.Insert(2, query);
             tc.Items.Insert(3, query2);
             //tc.Items.Insert(2, FileSpecificGraphTabGenerator());
@@ -370,33 +371,6 @@ namespace SiemensPerformance
         }
 
        
-        ///**
-        // * This creates a StackPanel with a label and combobox generated to be placed inside another StackPanel as a sub-element
-        // * @stackPanel is a StackPanel object
-        // */
-        //private StackPanel  ( string labelText, 
-        //                                                int comboBoxWidth,
-        //                                                System.Windows.Thickness labelMargins,
-        //                                                System.Windows.Thickness comboboxMargins)
-        //{
-        //    stackPanel = new StackPanel();
-        //    stackPanel.Orientation = Orientation.Horizontal;
-
-        //    label = new Label();
-        //    label.Content = labelText;
-        //    label.Margin = labelMargins;
-        //    stackPanel.Children.Add(label);
-
-        //    comboBox = new ComboBox();
-        //    comboBox.Margin = comboboxMargins;
-        //    comboBox.Width = comboBoxWidth;
-            
-        //    stackPanel.Children.Add(comboBox);
-
-        //    return stackPanel;
-        //}
-
-       
         /**
          * Main
          */
@@ -405,10 +379,37 @@ namespace SiemensPerformance
             TabItem tab = new TabItem();
             tab.Header = "Query2";
 
-            dockPanel = baseDockPanel();
+            stackPanel = new StackPanel();
+            stackPanel.Orientation = Orientation.Horizontal;
             
+            dockPanel = baseDockPanel();
+
+            DockPanel.SetDock(stackPanel, Dock.Top);
+            dockPanel.Children.Add(stackPanel);
+            
+
             tab.Content = dockPanel;
             return tab;
+        }
+
+        private void NewButton_Click(object sender, EventArgs e)
+        {
+            graphTabItem.Content = PopulateGraph(
+                                                (string)processNameCB.SelectedItem, 
+                                                (string)processIdCB.SelectedItem, 
+                                                (string)selectComboBox.SelectedItem); 
+        }
+
+        private Button runButtonGenerator()
+        {
+            runButton = new Button();
+            runButton.Content = "Query Data";
+            runButton.Width = 100;
+            runButton.Height = 50;
+            runButton.Margin = new System.Windows.Thickness(320, 10, 0, 0);
+            runButton.Click += new System.Windows.RoutedEventHandler(NewButton_Click);
+
+            return runButton;
         }
 
         private DockPanel baseDockPanel()
@@ -444,7 +445,6 @@ namespace SiemensPerformance
             mainStackPanel = new StackPanel();
             mainStackPanel.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             mainStackPanel.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            mainStackPanel.Orientation = Orientation.Horizontal;
             mainStackPanel.Margin = new System.Windows.Thickness(0, 10, 0, 0);
 
             dockPanel.Children.Add(mainStackPanel);
@@ -485,15 +485,23 @@ namespace SiemensPerformance
                 _stack.Orientation = Orientation.Horizontal;
 
                 _stack.Children.Add(selectDockPanelGenerator(new System.Windows.Thickness(0, 10, 0, 0),
-                                                                    50,
-                                                                    new System.Windows.Thickness(10, 0, 0, 0),
-                                                                    100,
-                                                                    new System.Windows.Thickness(15, 0, 0, 0),
-                                                                    100,
-                                                                    new System.Windows.Thickness(0, 0, 10, 0))
+                                                             50,
+                                                             new System.Windows.Thickness(10, 0, 0, 0),
+                                                             100,
+                                                             new System.Windows.Thickness(15, 0, 0, 0),
+                                                             100,
+                                                             new System.Windows.Thickness(0, 0, 10, 0))
                 );
+
                 mainStackPanel.Children.Add(_stack);
                 selectComboBox.ItemsSource = generator.selectProcessNames;
+                selectComboBox.SelectedIndex = 0;
+
+                stackPanel = new StackPanel();
+                stackPanel.Orientation = Orientation.Horizontal;
+                stackPanel.Children.Add(runButtonGenerator());
+
+                mainStackPanel.Children.Add(stackPanel);
             }
         }
 
@@ -507,6 +515,7 @@ namespace SiemensPerformance
                                                             int procIdCBWidth)
         {
             stackPanel = new StackPanel();
+            stackPanel.Orientation = Orientation.Horizontal;
             stackPanel.Margin = mainStackMargins;
 
             // First inner stack start
@@ -560,6 +569,7 @@ namespace SiemensPerformance
             return stackPanel;
         }
 
+
         private void processNameCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox combo = (ComboBox)sender;
@@ -567,6 +577,7 @@ namespace SiemensPerformance
             processIdCB.ItemsSource = generator.getDistinctProcessIDs(procName);
             processIdCB.SelectedIndex = 0;
         }
+        
 
         private DockPanel selectDockPanelGenerator(System.Windows.Thickness dockPanelMargins,
                                                    int labelWidth,
@@ -598,7 +609,6 @@ namespace SiemensPerformance
             selectComboBox = new ComboBox();
             selectComboBox.Width = comboWidth;
             selectComboBox.Margin = comboMargins;
-            parameterNamesComboBox.Add(selectComboBox);
             selectComboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             selectComboBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             stackPanel.Children.Add(selectComboBox);
@@ -614,9 +624,9 @@ namespace SiemensPerformance
             // UPGRADE TO BELOW
             //string[] list = { ";", "WHERE", "BETWEEN" };
             string[] list = { ";", "WHERE" };
-            finalSelectCB.SelectionChanged += selectFinalCB_SelectionChanged;
             finalSelectCB.SelectedIndex = 0;
-            finalSelectCB.ItemsSource = list;
+            finalSelectCB.ItemsSource = list; 
+            finalSelectCB.SelectionChanged += selectFinalCB_SelectionChanged;
 
             DockPanel.SetDock(finalSelectCB, Dock.Right);
             dockPanel.Children.Add(finalSelectCB);
@@ -629,19 +639,28 @@ namespace SiemensPerformance
         private void selectFinalCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             comboBox = (ComboBox)sender;
+            StackPanel stak;
             // remove all previous existing children
-            Console.WriteLine("Count " + mainStackPanel.Children.Count);
-            Console.WriteLine("Position " + (mainStackPanel.Children.Count - 1));
             while (mainStackPanel.Children.Count > 1)
             {
                 mainStackPanel.Children.RemoveAt(1);
             }
-            
+
+            if ((string)comboBox.SelectedItem == ";")
+            {
+                stak = new StackPanel();
+                stak.Orientation = Orientation.Horizontal;
+                stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                stak.Children.Add(runButtonGenerator());
+                mainStackPanel.Children.Add(stak);
+            }
+
             if ((string)comboBox.SelectedItem == "WHERE")
             {
                 string filterValue = (string)filterCB.SelectedItem;
                 if ( filterValue == "Process") { 
-                    StackPanel stak = new StackPanel();
+                    stak = new StackPanel();
                     stak.Orientation = Orientation.Horizontal;
                     stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                     stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
@@ -659,9 +678,15 @@ namespace SiemensPerformance
                                                                 50,
                                                                 generator.selectProcessNames));
                     mainStackPanel.Children.Add(stak);
+
+                    stak = new StackPanel();
+                    stak.Orientation = Orientation.Horizontal;
+                    stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                    stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                    stak.Children.Add(runButtonGenerator());
+                    mainStackPanel.Children.Add(stak);
                 }
             }
-            
         }
 
         
@@ -720,7 +745,7 @@ namespace SiemensPerformance
             finalWhereCB = new ComboBox();
             finalWhereCB.Margin = finalComboboxMargins;
             finalWhereCB.Width = finalComboBoxWidth;
-            string[] finalList = { ";", "AND" };
+            string[] finalList = { ";" };
             finalWhereCB.ItemsSource = finalList;
             finalWhereCB.SelectedIndex = 0;
 
@@ -761,7 +786,6 @@ namespace SiemensPerformance
             comboBox = new ComboBox();
             comboBox.Margin = variableComboMargins;
             comboBox.Width = variableComboWidth;
-            parameterNamesComboBox.Add(comboBox);
             stackPanel.Children.Add(comboBox);
 
             comboBox = new ComboBox();

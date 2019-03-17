@@ -10,11 +10,15 @@ namespace SiemensPerformance
     {
 
         public List<string[]> dlist { get; set; }
+        public List<string[]> processes2DList { get; set; }
+        public List<string[]> gloabalZero2DList { get; set; }
+        public List<string[]> globalTotal2DList { get; set; }
         public List<string> processes { get; set; }
         private List<string> singleList { get; set; }
         public string fileName { get; set; }
         private List<string> processNamesList;
         private List<string[]> processData2DList;
+        private List<string> filteredDataList;
 
 
         public string[] processVariables = {"TimeStamp", "Process Name", "Process ID", "WSP", "WSPPeak",
@@ -55,15 +59,23 @@ namespace SiemensPerformance
         //Gets all unique process names
         public List<string> getDistinctProcessNames()
         {
-            processNamesList = dlist.Select(list => list[1]).ToList();
+            //processNamesList = dlist.Select(list => list[1]).ToList();
+            Console.WriteLine(processes2DList[0]);
+            processNamesList = processes2DList.Select(list => list[1]).ToList();
+            processNamesList.Insert(0, "");
             IEnumerable<string> distinctNotes = processNamesList.Distinct();
             return new List<string>(distinctNotes);
         }
 
         public List<string> getDistinctProcessIDs(string processName)
         {
+            if (String.IsNullOrEmpty(processName))
+            {
+                return new List<string>();
+            }
             List<string[]> filteredList = getProcessData(processName, null);
             processNamesList = filteredList.Select(list => list[2]).ToList();
+            processNamesList.Insert(0, "");
             IEnumerable<string> distinctNotes = processNamesList.Distinct();
             return new List<string>(distinctNotes);
         }
@@ -71,32 +83,36 @@ namespace SiemensPerformance
         //Gets data for one process
         public List<string[]> getProcessData(string processName, string processId)
         {
-            if (processName != null && processId == null && processName != "None")
+            if ( !String.IsNullOrEmpty(processName) && String.IsNullOrEmpty(processId) && processName != "None")
             {
-                processData2DList = dlist.Where(x => x[1] == processName).ToList();
+                processData2DList = processes2DList.Where(x => x[1] == processName).ToList();
                 Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
                 return processData2DList;
             }
-            else if (processName != null && processId != null)
+            else if ( !String.IsNullOrEmpty(processName) && !String.IsNullOrEmpty(processId))
             {
                 Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
-                processData2DList = dlist.Where(x => x[1] == processName && x[2] == processId).ToList();
+                processData2DList = processes2DList.Where(x => x[1] == processName && x[2] == processId).ToList();
                 return processData2DList;
             }
-            //else if (processName == null && processId == null)
-            //{
-            //return new List<string[]>();
-                
-            //}
             Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
-            return dlist;
-            
+            return processes2DList;
         }
         
+
+        public List<string> selectDataGenerator(List<string[]> filteredList, string columnName)
+        {
+            int columnIndex = Array.FindIndex(processVariables, x => x.Contains(columnName));
+            filteredDataList = filteredList.Select(list => list[columnIndex]).ToList();
+            return filteredDataList;
+        }
 
         public void getJsonString(OpenFileDialog dialog)
         {
             dlist = new List<string[]>();
+            processes2DList = new List<string[]>();
+            globalTotal2DList = new List<string[]>();
+            gloabalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
             string line;
             //StreamWriter sw = new StreamWriter("D:\\WPF_Applications\\SeniorDevelopmentSiemens\\Data.txt");
@@ -119,7 +135,20 @@ namespace SiemensPerformance
                         }
                     }
                     //sw.Write("\n");
-                    if (singleList.Count > 0) { 
+                    if (singleList.Count == 21)
+                    {
+                        // for processess
+                        processes2DList.Add(singleList.ToArray());
+                        dlist.Add(singleList.ToArray());
+                    } else if (singleList.Count == 35)
+                    {
+                        // for global 0
+                        gloabalZero2DList.Add(singleList.ToArray());
+                        dlist.Add(singleList.ToArray());
+                    } else if (singleList.Count == 24)
+                    {
+                        // for global total
+                        globalTotal2DList.Add(singleList.ToArray());
                         dlist.Add(singleList.ToArray());
                     }
                     counter++;
@@ -186,85 +215,3 @@ namespace SiemensPerformance
         }
     }
 }
-
-/*
-        public List<int> getProcessPositions(string process)
-        {
-            List<int> positionList = new List<int>();
-            positionList = Enumerable.Range(0, processNames.Count)
-                .Where(i => processNames[i] == process)
-                .ToList();
-
-            return positionList;
-        }
-        */
-
-/*
- * Writing a JSON -> might be useful later, don't wanna delete
-public void InitialJSON()
-{
-    this.fileName = dialog.SafeFileName;
-    //handmadeJSON += "{\n\t\"" + this.fileName + "\": [";
-    string line;
-
-    System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
-
-    file.ReadLine(); // skip the firstLine
-
-    while ((line = file.ReadLine()) != null)
-    {
-        string[] mainDivision = line.Split('|');
-
-        string processData = mainDivision[4];
-        string timeStamp = mainDivision[0];
-        TSList.Add(processData);
-        DataList.Add(processData);
-        /*
-        char[] delimiterChars = { ':', ';' };
-        string[] singleDataPoints = processData.Split(delimiterChars);
-
-        if (singleDataPoints.Length < 19) continue;
-
-        counter = 0;
-
-
-        if (singleDataPoints[0] == "Process")
-        {
-            handmadeJSON += "\n\t\t{\n\t\t\"TimeStamp\": \"" + mainDivision[0] + "\",";
-            handmadeJSON += "\n\t\t\"ProcessName\": \"" + singleDataPoints[1].Trim() + "\",";
-
-            for (int i = 3; i < singleDataPoints.Length; i += 2)
-            {
-                char[] dels = { 'M', 'C', '%' };
-                string droppedExt = singleDataPoints[i].Split(dels)[0];
-
-                if (counter != 17)
-                    handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt + ",";
-                else
-                    handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt;
-                counter++;
-
-            }
-
-            handmadeJSON += "\n\t\t},";
-
-        }
-
-    }
-
-    handmadeJSON = handmadeJSON.Substring(0, (handmadeJSON.Length - 1));
-
-
-    //Console.WriteLine("JSON STRING: " + handmadeJSON);
-
-    System.Console.ReadLine();
-    handmadeJSON += "\n\t]}";
-    return handmadeJSON;
-
-
-    file.Close();
-    return "";
-    //SortedList<String, Object> jsonObj = JsonConvert.DeserializeObject<SortedList<String, Object>>(handmadeJSON);
-    //Console.WriteLine("\nJSON OBJECT: " + jsonObj["MrResourceMonitoring-RIT - Copy.utr"]);
-}
-*/
