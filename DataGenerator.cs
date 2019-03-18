@@ -29,13 +29,13 @@ namespace SiemensPerformance
         public string[] globalVariables = { "TimeStamp", "GCPU0", "GCPU0Peak",
             "GCPU1", "GCPU1Peak", "GCPU2", "GCPU2Peak", "GCPU3", "GCPU3Peak", "GCPU4", "GCPU4Peak", "GCPU5", "GCPU5Peak",
             "GCPU6", "GCPU6Peak", "GCPU7", "GCPU7Peak", "GCPU8", "GCPU8Peak",
-            "GCPU9", "GCPU9Peak", "GCPU10", "GCPU10Peak", "GCPU11", "GCPU12Peak",
+            "GCPU9", "GCPU9Peak", "GCPU10", "GCPU10Peak", "GCPU11", "GCPU11Peak", "GCPU12", "GCPU12Peak",
             "GCPU13", "GCPU13Peak", "GCPU14", "GCPU14Peak", "GCPU15", "GCPU15Peak"};
 
-        public string[] gloabalTotalVariables = {"TimeStamp", "GCPU", "GCPUPeak",
+        public string[] globalTotalVariables = {"TimeStamp", "GCPU", "GCPUPeak",
             "GMA", "GMAPeak", "GPC", "GPCPeak", "GHC", "GHCPeak",
             "GHPF", "GCPUP", "GCPUPPeak", "GMF", "GMFPeak",
-            "GMFPeak", "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
+            "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
             "GPFC", "GPFCPeak", "GMC", "GMCPeak"};
 
         public string[] selectProcessNames = { "WSP", "WSPPeak",
@@ -100,12 +100,48 @@ namespace SiemensPerformance
         }
         
 
-        public List<string> selectDataGenerator(List<string[]> filteredList, string columnName)
+        public List<string[]> getWhereProcessData(  List<string[]> processDataFilteredNameAndID, 
+                                                    string whereColumn, 
+                                                    string whereOperator, 
+                                                    string whereValue)
         {
-            int columnIndex = Array.FindIndex(processVariables, x => x.Contains(columnName));
-            filteredDataList = filteredList.Select(list => list[columnIndex]).ToList();
-            return filteredDataList;
+
+            int variableIndex = Array.IndexOf(processVariables, whereColumn);
+
+            // sanitize provided whereValue
+            whereValue = Regex.Replace(whereValue, @"[^0-9.]", "");
+            Double value;
+            try
+            {
+                value = Double.Parse(whereValue.Replace(".", ","));
+                switch (whereOperator)
+                {
+                    case "==":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) == value).ToList();
+                        break;
+                    case ">":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) > value).ToList();
+                        break;
+                    case ">=":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) >= value).ToList();
+                        break;
+                    case "<":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) < value).ToList();
+                        break;
+                    case "<=":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) <= value).ToList();
+                        break;
+                    case "!=":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) != value).ToList();
+                        break;
+                }
+            }
+            catch (IndexOutOfRangeException t) { Console.WriteLine(t); }
+            catch (Exception e) { Console.WriteLine(e); }
+            
+            return processData2DList;
         }
+
 
         public void getJsonString(OpenFileDialog dialog)
         {
@@ -140,12 +176,12 @@ namespace SiemensPerformance
                         // for processess
                         processes2DList.Add(singleList.ToArray());
                         dlist.Add(singleList.ToArray());
-                    } else if (singleList.Count == 35)
+                    } else if (singleList.Count == 33)
                     {
                         // for global 0
                         gloabalZero2DList.Add(singleList.ToArray());
                         dlist.Add(singleList.ToArray());
-                    } else if (singleList.Count == 24)
+                    } else if (singleList.Count == 22)
                     {
                         // for global total
                         globalTotal2DList.Add(singleList.ToArray());
@@ -183,9 +219,11 @@ namespace SiemensPerformance
             string procName = processName.Substring(0, bracketPosition);
             string procID = processName.Substring(bracketPosition+1, (processName.Length - bracketPosition-2));
             
-            yield return procName;
-            yield return procID;
-            data = data.Substring(data.IndexOf(":") + 2);
+            if(procName != "GCPU") { 
+                yield return procName;
+                yield return procID;
+            }
+            data = data.Substring(data.IndexOf(":") + 1);
 
             int finalLength = data.Length;
             int i = 0; // position after the found ';' 

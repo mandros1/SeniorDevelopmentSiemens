@@ -7,31 +7,44 @@ using System.Windows.Controls;
 using Newtonsoft.Json;
 using LiveCharts.Wpf;
 using LiveCharts;
-using LiveCharts.Configurations;
 
 namespace SiemensPerformance
 {
     class DataDisplayTab : TabItem
     {
         private DataGenerator generator = new DataGenerator();
-        private DataGrid dataGrid;
-        private DataTable dataTable;
+        private DataGrid processGrid;
+        private DataGrid globalZeroGrid;
+        private DataGrid globalTotalGrid;
+        private DataTable processTable;
+        private DataTable globalZeroTable;
+        private DataTable globalTotalTable;
         private CartesianChart ch;
         private string[] filterByArray = { "Process", "Global(0)", "Global(_Total)" };
 
         public Boolean displayable {get; set;}
         private StackPanel mainStackPanel;
+        // Filter stack elements
         private StackPanel filterStackPanel;
         private ComboBox processNameCB;
         private ComboBox processIdCB;
         private ComboBox filterCB;
+
+        // Select stack elements
         private ComboBox selectComboBox;
         private ComboBox finalSelectCB;
+
+        // Where stack elements
+        private ComboBox whereSelectName;
+        private TextBox whereValue;
+        private ComboBox whereOperatorsComboBox;
         private ComboBox finalWhereCB;
-        private ComboBox finalAndCB;
-        private ComboBox finalBetweenCB;
+
         private Button runButton;
         private TabItem graphTabItem;
+
+        private ComboBox finalAndCB;
+        private ComboBox finalBetweenCB;
 
         // reusable components
         private StackPanel stackPanel;
@@ -40,6 +53,11 @@ namespace SiemensPerformance
         private ComboBox comboBox;
         private DockPanel dockPanel;
         private TextBox textBox;
+        private TabItem tabItem;
+        private DataGrid dataGrid;
+        private DataTable dataTable;
+        private List<string[]> processData;
+
 
 
         public DataDisplayTab()
@@ -62,142 +80,6 @@ namespace SiemensPerformance
             }
 
             TabControl tc = new TabControl();
-            TabItem table = new TabItem();
-
-            //Create table tab
-            this.Header = generator.fileName;
-            table.Header = "Table";
-
-            table.Content = GenerateTable(generator.processVariables);
-
-            ScrollViewer sv = new ScrollViewer();
-            dataTable = ConvertListToDataTable(generator.dlist, generator.processVariables);
-            dataGrid = new DataGrid();
-            dataGrid.ItemsSource = dataTable.DefaultView;
-            dataGrid.IsReadOnly = true;
-            table.Content = dataGrid;
-
-            var screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
-            var screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
-
-            //Create query tab
-            TabItem query = new TabItem();
-
-            Grid queryGrid = new Grid();
-            queryGrid.Height = 330;
-            queryGrid.Width = 681;
-            queryGrid.Margin = new System.Windows.Thickness(0, 0, 0, 0);
-            queryGrid.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            queryGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-
-            Label label = new Label();
-            label.Content = "Select:";
-            label.Margin = new System.Windows.Thickness(29, 15, 0, 0);
-            label.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            label.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            queryGrid.Children.Add(label);
-
-            processNameCB = new ComboBox();
-            processNameCB.ItemsSource = generator.getDistinctProcessNames();
-            processNameCB.Name = "procName";
-            processNameCB.Margin = new System.Windows.Thickness(86, 15, 0, 0);
-            processNameCB.Width = 120;
-            processNameCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            processNameCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            processNameCB.SelectionChanged += procName_SelectionChanged;
-            queryGrid.Children.Add(processNameCB);
-
-            processIdCB = new ComboBox();
-            processIdCB.ItemsSource = generator.getDistinctProcessIDs(null);
-            processIdCB.Name = "procID";
-            processIdCB.Margin = new System.Windows.Thickness(268, 15, 0, 0);
-            processIdCB.Width = 120;
-            processIdCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            processIdCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            queryGrid.Children.Add(processIdCB);
-            
-            Label label2 = new Label();
-            label2.Content = "Between:";
-            label2.Margin = new System.Windows.Thickness(15, 46, 0, 0);
-            label2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            label2.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            label2.Width = 120;
-            queryGrid.Children.Add(label2);
-
-            TextBox txtBox = new TextBox();
-            txtBox.Height = 23;
-            txtBox.TextWrapping = System.Windows.TextWrapping.Wrap;
-            txtBox.Text = "Starting time";
-            txtBox.Width = 120;
-            txtBox.Margin = new System.Windows.Thickness(86, 46, 475, 258);
-            queryGrid.Children.Add(txtBox);
-               
-
-            TextBox txtBox1 = new TextBox();
-            txtBox1.Height = 23;
-            txtBox1.TextWrapping = System.Windows.TextWrapping.Wrap;
-            txtBox1.Text = "Ending time";
-            txtBox1.Width = 120;
-            txtBox1.Margin = new System.Windows.Thickness(268, 46, 293, 258);
-            queryGrid.Children.Add(txtBox1);
-
-            Label label3 = new Label();
-            label3.Content = "and";
-            label3.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            label3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            label3.Margin = new System.Windows.Thickness(224, 46, 0, 0);
-            label3.RenderTransformOrigin = new System.Windows.Point(-0.044, 0.538);
-            queryGrid.Children.Add(label3);
-
-            Label label4 = new Label();
-            label4.Content = "Where";
-            label4.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            label4.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            label4.Margin = new System.Windows.Thickness(26, 77, 0, 0);
-            label4.RenderTransformOrigin = new System.Windows.Point(0.477, 2.731);
-            queryGrid.Children.Add(label4);
-            
-
-            ComboBox box2 = new ComboBox();
-            box2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            box2.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            box2.Width = 120;
-            box2.Margin = new System.Windows.Thickness(86, 77, 0, 0);
-            queryGrid.Children.Add(box2);
-
-
-            Label label5 = new Label();
-            label5.Content = "equals";
-            label5.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            label5.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            label5.Margin = new System.Windows.Thickness(217, 77, 0, 0);
-            label5.RenderTransformOrigin = new System.Windows.Point(0.477, 2.731);
-            queryGrid.Children.Add(label5);
-            
-
-            TextBox txtBox2 = new TextBox();
-            txtBox2.Height = 23;
-            txtBox2.TextWrapping = System.Windows.TextWrapping.Wrap;
-            txtBox2.Text = "Value";
-            txtBox2.Width = 120;
-            txtBox2.Margin = new System.Windows.Thickness(268, 77, 293, 227);
-            queryGrid.Children.Add(txtBox2);
-
-            Button but = new Button();
-            but.IsDefault = true;
-            but.Content = "Run";
-            but.Margin = new System.Windows.Thickness(174, 133, 425, 168);
-            queryGrid.Children.Add(but);
-
-            query.Header = "Query";
-            query.Content = queryGrid;
-
-
-            //Create Graph tab
-            graphTabItem = new TabItem();
-
-            //graphTabItem.Content = PopulateGraph("IKM_AT_ATServiceManager", "6700", "HC");
-            graphTabItem.Header = "Graph";
 
             //Tab dropdown menu
             //Rename Tab
@@ -220,21 +102,58 @@ namespace SiemensPerformance
             contextMenu.Items.Add(menuItem2);
             menuItem2.Header = "Close";
             menuItem2.Click += delegate { Close(); };
-
-            TabItem query2 = generateQueryTabItem();
-
+            
             this.ContextMenu = contextMenu;
+            
+            // Create process table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Processes";
+            // Pumping content into the table
+            processGrid = dataGridData(generator.processes2DList, generator.processVariables, processTable);
+            tabItem.Content = processGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(0, tabItem);
+
+            // Create global zero table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Global(0)";
+            // Pumping content into the table
+            globalZeroGrid = dataGridData(generator.gloabalZero2DList, generator.globalVariables, globalZeroTable);
+            tabItem.Content = globalZeroGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(1, tabItem);
+            
+
+            // Create global total table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Global(_Total)";
+            // Pumping content into the table
+            globalTotalGrid = dataGridData(generator.globalTotal2DList, generator.globalTotalVariables, globalTotalTable);
+            tabItem.Content = globalTotalGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(2, tabItem);
+
+            
+            // Create Graph tab
+            graphTabItem = new TabItem();
+            graphTabItem.Header = "Graph";
+
             graphTabItem.ContextMenu = new ContextMenu();
-            table.ContextMenu = new ContextMenu();
-            query.ContextMenu = new ContextMenu();
-            query2.ContextMenu = new ContextMenu();
-            tc.Items.Insert(0, table);
-            tc.Items.Insert(1, graphTabItem);
-            tc.Items.Insert(2, query);
-            tc.Items.Insert(3, query2);
-            //tc.Items.Insert(2, FileSpecificGraphTabGenerator());
+            tc.Items.Insert(3, graphTabItem);
+
+            // Create Query tab
+            tabItem = generateQueryTabItem();
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(4, tabItem);
+            
             this.Content = tc;
-        }
+        } 
 
         private void procName_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -243,141 +162,15 @@ namespace SiemensPerformance
             processIdCB.ItemsSource = generator.getDistinctProcessIDs(procName);
         } 
 
-        //Generate DataGrid from data
-        private DataGrid GenerateTable(String[] columns)
-        {
-            DataGrid grid = new DataGrid();
-
-            for (int i = 0; i < columns.Length; i++)
-            {
-                DataGridTextColumn col = new DataGridTextColumn();
-
-                // TODO: replace with the column name
-                col.Header = columns[i];
-                // should be able to bind data to the row
-                grid.Columns.Add(col);
-            }
-            return grid;
-        }
-
-        //Converts list to data table
-        private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
-        {
-            DataTable table = new DataTable();
-
-            // Get max columns.
-            int columnsNum = columns.Length;
-            for (int i = 0; i < columnsNum; i++)
-            {
-                table.Columns.Add(columns[i]);
-            }
-
-            foreach (var array in list)
-            {
-                if (array.Length == columnsNum)
-                {
-                    table.Rows.Add(array);
-                }
-            }
-            return table;
-        }
-
-        //Renames a Tab
-        private void Rename()
-        {
-            string name = new InputBox("Name").ShowDialog();
-            if (name != "")
-            {
-                this.Header = name;
-            }
-        }
-
-        //Saves data from a tab to json file
-        private void Save()
-        {
-            //set default file name to tab header
-            String defaultName = this.Header.ToString();
-            //Remove .utr extention if present
-            if (defaultName.EndsWith(".utr"))
-            {
-                defaultName = defaultName.Substring(0, defaultName.Length - 4);
-            }
-
-            //Create save dialog
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = defaultName;
-            dlg.DefaultExt = ".json";
-            dlg.Filter = "Json files (.json)|*.json";
-
-            // Show save file dialog box
-            Nullable<bool> result = dlg.ShowDialog();
-
-            string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
-
-            // Process save file dialog box results
-            if (result == true)
-            {
-                // Save document
-                string filename = dlg.FileName;
-                File.WriteAllText(filename, json);
-            }
-        }
-
-        //Close Tab
-        private void Close()
-        {
-            if (this != null)
-            {
-                // find the parent tab control
-                TabControl tabControl = this.Parent as TabControl;
-
-                if (tabControl != null)
-                {
-                    tabControl.SelectedIndex = tabControl.Items.IndexOf(this) - 1;  // Selects the tab before the closing tab
-                    tabControl.Items.Remove(this); // Removes the current tab
-                }
-            }
-        }
-
-        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(string processName, string processID, string variable)
-        {
-            ChartValues<DateModel> data = new ChartValues<DateModel>();
-
-            int variableIndex = Array.IndexOf(generator.processVariables, variable);
-
-            //Get data
-            foreach (var array in generator.getProcessData(processName, processID))
-            {
-                try
-                {
-                    Double value = Double.Parse(array[variableIndex]);
-                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
-                    data.Add(new DateModel
-                    {
-                        DateTime = timeStamp,
-                        Value = value
-                    });
-                }
-                catch (IndexOutOfRangeException t) {
-                    Console.WriteLine(t);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-
-            return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
-        }
 
        
         /**
-         * Main
+         * Main method for generating query tab item
          */
         private TabItem generateQueryTabItem()
         {
             TabItem tab = new TabItem();
-            tab.Header = "Query2";
+            tab.Header = "Query";
 
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
@@ -394,10 +187,29 @@ namespace SiemensPerformance
 
         private void NewButton_Click(object sender, EventArgs e)
         {
-            graphTabItem.Content = PopulateGraph(
-                                                (string)processNameCB.SelectedItem, 
-                                                (string)processIdCB.SelectedItem, 
-                                                (string)selectComboBox.SelectedItem); 
+            List<string[]> youGoodMate = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+            // if it is on process filter
+            if (String.Equals((string)finalSelectCB.SelectedItem, ";") 
+                && 
+                String.Equals((string)filterCB.SelectedItem, "Process"))
+            {
+                Console.WriteLine("Just Select");
+                processData = youGoodMate;
+                graphTabItem.Content = PopulateGraph(youGoodMate, (string)selectComboBox.SelectedItem);
+            }
+            else if (   String.Equals((string)finalSelectCB.SelectedItem, "WHERE") 
+                        && 
+                        String.Equals((string)filterCB.SelectedItem, "Process"))
+            {
+                Console.WriteLine("Where Select");
+                string whereColumn = (string)whereSelectName.SelectedItem;
+                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
+                string whereVal = whereValue.Text;
+                processData = generator.getWhereProcessData(youGoodMate, whereColumn, whereOperator, whereVal);
+            }
+
+            processTable = ConvertListToDataTable(processData, generator.processVariables);
+            processGrid.ItemsSource = processTable.DefaultView;
         }
 
         private Button runButtonGenerator()
@@ -431,7 +243,7 @@ namespace SiemensPerformance
             filterCB = new ComboBox();
             filterCB.Name = "filterComboBox";
             filterCB.Margin = new System.Windows.Thickness(10, 0, 10, 0);
-            filterCB.Width = 100;
+            filterCB.Width = 150;
             filterCB.Height = 30;
             filterCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             filterCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
@@ -638,7 +450,6 @@ namespace SiemensPerformance
 
         private void selectFinalCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            comboBox = (ComboBox)sender;
             StackPanel stak;
             // remove all previous existing children
             while (mainStackPanel.Children.Count > 1)
@@ -646,7 +457,7 @@ namespace SiemensPerformance
                 mainStackPanel.Children.RemoveAt(1);
             }
 
-            if ((string)comboBox.SelectedItem == ";")
+            if ((string)finalSelectCB.SelectedItem == ";")
             {
                 stak = new StackPanel();
                 stak.Orientation = Orientation.Horizontal;
@@ -656,7 +467,7 @@ namespace SiemensPerformance
                 mainStackPanel.Children.Add(stak);
             }
 
-            if ((string)comboBox.SelectedItem == "WHERE")
+            if ((string)finalSelectCB.SelectedItem == "WHERE")
             {
                 string filterValue = (string)filterCB.SelectedItem;
                 if ( filterValue == "Process") { 
@@ -665,8 +476,6 @@ namespace SiemensPerformance
                     stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                     stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                     stak.Children.Add(whereDockPanelGenerator(  new System.Windows.Thickness(0, 10, 0, 0),
-                                                                //new System.Windows.Thickness(10, 0, 0, 0),
-                                                                //50,
                                                                 new System.Windows.Thickness(15, 0, 0, 0),
                                                                 100,
                                                                 new System.Windows.Thickness(40, 0, 0, 0),
@@ -691,8 +500,6 @@ namespace SiemensPerformance
 
         
         private DockPanel whereDockPanelGenerator(  System.Windows.Thickness dockPanelMargins,
-                                                    //System.Windows.Thickness whereLabelMargins,
-                                                    //int whereLabelWidth,
                                                     System.Windows.Thickness variableComboMargins,
                                                     int variableComboWidth,
                                                     System.Windows.Thickness operatorsComboMargins,
@@ -710,35 +517,29 @@ namespace SiemensPerformance
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
 
-            //label = new Label();
-            //label.Margin = whereLabelMargins;
-            //label.Width = whereLabelWidth;
-            //label.Content = "WHERE";
-            //stackPanel.Children.Add(label);
+            whereSelectName = new ComboBox();
+            whereSelectName.Margin = variableComboMargins;
+            whereSelectName.Width = variableComboWidth;
+            whereSelectName.ItemsSource = cbNames;
+            stackPanel.Children.Add(whereSelectName);
 
-            comboBox = new ComboBox();
-            comboBox.Margin = variableComboMargins;
-            comboBox.Width = variableComboWidth;
-            comboBox.ItemsSource = cbNames;
-            stackPanel.Children.Add(comboBox);
-
-            comboBox = new ComboBox();
-            comboBox.Margin = operatorsComboMargins;
-            comboBox.Width = operatorsComboWidth;
+            whereOperatorsComboBox = new ComboBox();
+            whereOperatorsComboBox.Margin = operatorsComboMargins;
+            whereOperatorsComboBox.Width = operatorsComboWidth;
             string[] list = { "==", ">", ">=", "<", "<=", "!=" };
-            comboBox.ItemsSource = list;
-            comboBox.SelectedIndex = 0;
-            stackPanel.Children.Add(comboBox);
+            whereOperatorsComboBox.ItemsSource = list;
+            whereOperatorsComboBox.SelectedIndex = 0;
+            stackPanel.Children.Add(whereOperatorsComboBox);
 
             label = new Label();
             label.Margin = valueLabelMargins;
             label.Content = "Value:";
             stackPanel.Children.Add(label);
 
-            textBox = new TextBox();
-            textBox.Margin = txtBoxMargins;
-            textBox.Width = txtBoxWidth;
-            stackPanel.Children.Add(textBox);
+            whereValue = new TextBox();
+            whereValue.Margin = txtBoxMargins;
+            whereValue.Width = txtBoxWidth;
+            stackPanel.Children.Add(whereValue);
 
             dockPanel.Children.Add(stackPanel);
 
@@ -820,7 +621,7 @@ namespace SiemensPerformance
 
             return dockPanel;
         }
-        
+
 
         /**
          * TO BE IMPLEMENTED
@@ -881,7 +682,7 @@ namespace SiemensPerformance
         //    textBox.Margin = endTextMargins;
         //    textBox.Width = endTextWidth;
         //    stackPanel.Children.Add(textBox);
-            
+
         //    dockPanel.Children.Add(stackPanel);
 
         //    comboBox = new ComboBox();
@@ -894,6 +695,146 @@ namespace SiemensPerformance
 
         //    return dockPanel;
         //}
-         
+
+
+
+        //Generate DataGrid from data
+        private DataGrid GenerateTable(String[] columns)
+        {
+            DataGrid grid = new DataGrid();
+
+            for (int i = 0; i < columns.Length; i++)
+            {
+                DataGridTextColumn col = new DataGridTextColumn();
+
+                // TODO: replace with the column name
+                col.Header = columns[i];
+                // should be able to bind data to the row
+                grid.Columns.Add(col);
+            }
+            return grid;
+        }
+
+        //Converts list to data table
+        private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
+        {
+            DataTable table = new DataTable();
+
+            // Get max columns.
+            int columnsNum = columns.Length;
+            for (int i = 0; i < columnsNum; i++)
+            {
+                table.Columns.Add(columns[i]);
+            }
+
+            foreach (var array in list)
+            {
+                if (array.Length == columnsNum)
+                {
+                    table.Rows.Add(array);
+                }
+            }
+            return table;
+        }
+
+
+        private DataGrid dataGridData(List<string[]> data2dList, string[] columns, DataTable whichTable)
+        {
+            whichTable = ConvertListToDataTable(data2dList, columns);
+            dataGrid = new DataGrid();
+            dataGrid.ItemsSource = whichTable.DefaultView;
+            dataGrid.IsReadOnly = true;
+            return dataGrid;
+        }
+
+        //Renames a Tab
+        private void Rename()
+        {
+            string name = new InputBox("Name").ShowDialog();
+            if (name != "")
+            {
+                this.Header = name;
+            }
+        }
+
+        //Saves data from a tab to json file
+        private void Save()
+        {
+            //set default file name to tab header
+            String defaultName = this.Header.ToString();
+            //Remove .utr extention if present
+            if (defaultName.EndsWith(".utr"))
+            {
+                defaultName = defaultName.Substring(0, defaultName.Length - 4);
+            }
+
+            //Create save dialog
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = defaultName;
+            dlg.DefaultExt = ".json";
+            dlg.Filter = "Json files (.json)|*.json";
+
+            // Show save file dialog box
+            Nullable<bool> result = dlg.ShowDialog();
+
+            string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
+
+            // Process save file dialog box results
+            if (result == true)
+            {
+                // Save document
+                string filename = dlg.FileName;
+                File.WriteAllText(filename, json);
+            }
+        }
+
+        //Close Tab
+        private void Close()
+        {
+            if (this != null)
+            {
+                // find the parent tab control
+                TabControl tabControl = this.Parent as TabControl;
+
+                if (tabControl != null)
+                {
+                    tabControl.SelectedIndex = tabControl.Items.IndexOf(this) - 1;  // Selects the tab before the closing tab
+                    tabControl.Items.Remove(this); // Removes the current tab
+                }
+            }
+        }
+
+        
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
+        {
+            ChartValues<DateModel> data = new ChartValues<DateModel>();
+
+            int variableIndex = Array.IndexOf(generator.processVariables, variable);
+
+            //Get data
+            foreach (var array in data2DList)
+            {
+                try
+                {
+                    Double value = Double.Parse(array[variableIndex].Replace(".", ","));
+                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
+                    data.Add(new DateModel
+                    {
+                        DateTime = timeStamp,
+                        Value = value
+                    });
+                }
+                catch (IndexOutOfRangeException t)
+                {
+                    Console.WriteLine(t);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+
+            return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
+        } 
     }
 }
