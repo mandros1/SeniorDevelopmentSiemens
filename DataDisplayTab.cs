@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using Newtonsoft.Json;
 using LiveCharts.Wpf;
 using LiveCharts;
+using System.Linq;
 
 namespace SiemensPerformance
 {
