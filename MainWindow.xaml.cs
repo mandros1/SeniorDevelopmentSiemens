@@ -22,9 +22,6 @@ using System.Collections.Generic;
 namespace SiemensPerformance
 {
     
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : MetroWindow
     {
 
@@ -48,15 +45,17 @@ namespace SiemensPerformance
 
             if (control.SelectedIndex == control.Items.Count - 1)
             {
-                TabItem tab = GenerateTabItem();         
-                control.Items.Insert(control.Items.Count - 1, tab);
-                control.SelectedIndex = control.Items.Count - 2;
+                TabItem tab = GenerateTabItem();    
+                if(tab != null) { 
+                    control.Items.Insert(control.Items.Count - 1, tab);
+                    control.SelectedIndex = control.Items.Count - 2;
+                }
             }
 
             //Repopulate the Select file query when going to the query tab
             if (control.SelectedIndex == 0)
             {
-                SelectionPopulate();
+                //SelectionPopulate();
             }
         }
 
@@ -64,9 +63,10 @@ namespace SiemensPerformance
         private TabItem GenerateTabItem()
         {
             DataDisplayTab tab = new DataDisplayTab();
-            return tab;
+            if(tab.displayable) return tab;
+            return null;
         }
-
+        /*
         //Populates the Select combo box for Queries
         private void SelectionPopulate()
         {
@@ -79,5 +79,6 @@ namespace SiemensPerformance
                 cmbo.Items.Add(tab.Header);
             }
         }
+        */
     }
 }

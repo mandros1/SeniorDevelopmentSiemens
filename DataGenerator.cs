@@ -1,8 +1,6 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 
@@ -12,158 +10,149 @@ namespace SiemensPerformance
     {
 
         public List<string[]> dlist { get; set; }
+        public List<string[]> processes2DList { get; set; }
+        public List<string[]> gloabalZero2DList { get; set; }
+        public List<string[]> globalTotal2DList { get; set; }
         public List<string> processes { get; set; }
         private List<string> singleList { get; set; }
-        private string handmadeJSON { get; set; }
         public string fileName { get; set; }
+        private List<string> processNamesList;
+        private List<string[]> processData2DList;
+        private List<string> filteredDataList;
 
-        public string[] processVariables = {"TimeStamp", "Process Name", "WSP", "WSPPeak",
+        public string[] processVariables = {"TimeStamp", "Process Name", "Process ID", "WSP", "WSPPeak",
             "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
             "GDIC", "GDICPeak", "USRC", "USRCPeak", "PRIV",
             "PRIVPeak", "VIRT", "VIRTPeak", "PFS", "PFSPeak" };
 
-        private string[] globalVariables = { "GCPU0", "GCPU0Peak",
+        public string[] globalVariables = { "TimeStamp", "GCPU0", "GCPU0Peak",
+            "GCPU1", "GCPU1Peak", "GCPU2", "GCPU2Peak", "GCPU3", "GCPU3Peak", "GCPU4", "GCPU4Peak", "GCPU5", "GCPU5Peak",
+            "GCPU6", "GCPU6Peak", "GCPU7", "GCPU7Peak", "GCPU8", "GCPU8Peak",
+            "GCPU9", "GCPU9Peak", "GCPU10", "GCPU10Peak", "GCPU11", "GCPU11Peak", "GCPU12", "GCPU12Peak",
+            "GCPU13", "GCPU13Peak", "GCPU14", "GCPU14Peak", "GCPU15", "GCPU15Peak"};
+
+        public string[] globalTotalVariables = {"TimeStamp", "GCPU", "GCPUPeak",
+            "GMA", "GMAPeak", "GPC", "GPCPeak", "GHC", "GHCPeak",
+            "GHPF", "GCPUP", "GCPUPPeak", "GMF", "GMFPeak",
+            "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
+            "GPFC", "GPFCPeak", "GMC", "GMCPeak"};
+
+        public string[] selectProcessNames = { "WSP", "WSPPeak",
+            "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
+            "GDIC", "GDICPeak", "USRC", "USRCPeak", "PRIV",
+            "PRIVPeak", "VIRT", "VIRTPeak", "PFS", "PFSPeak" };
+
+        public string[] selectGlobalZeroNames = {"GCPU0", "GCPU0Peak",
             "GCPU1", "GCPU1Peak", "GCPU2", "GCPU2Peak", "GCPU3", "GCPU3Peak", "GCPU4", "GCPU4Peak", "GCPU5", "GCPU5Peak",
             "GCPU6", "GCPU6Peak", "GCPU7", "GCPU7Peak", "GCPU8", "GCPU8Peak",
             "GCPU9", "GCPU9Peak", "GCPU10", "GCPU10Peak", "GCPU11", "GCPU12Peak",
             "GCPU13", "GCPU13Peak", "GCPU14", "GCPU14Peak", "GCPU15", "GCPU15Peak"};
 
-        private string[] gloabalTotalVariables = { "GCPU", "GCPUPeak",
+        public string[] selectGlobalTotalNames = { "GCPU", "GCPUPeak",
             "GMA", "GMAPeak", "GPC", "GPCPeak", "GHC", "GHCPeak",
             "GHPF", "GCPUP", "GCPUPPeak", "GMF", "GMFPeak",
             "GMFPeak", "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
             "GPFC", "GPFCPeak", "GMC", "GMCPeak"};
 
-        public string[] getProcessVars()
-        {
-            return this.processVariables;
-        }
-
-        public string[] getGlobalVars()
-        {
-            return this.globalVariables;
-        }
-
-        public string[] getTotalGlobalVars()
-        {
-            return this.gloabalTotalVariables;
-        }
 
         //Gets all unique process names
-        private void findProcesses()
+        public List<string> getDistinctProcessNames()
         {
-            List<string> allProcesses = new List<string>();
+            //processNamesList = dlist.Select(list => list[1]).ToList();
+            Console.WriteLine(processes2DList[0]);
+            processNamesList = processes2DList.Select(list => list[1]).ToList();
+            processNamesList.Insert(0, "");
+            IEnumerable<string> distinctNotes = processNamesList.Distinct();
+            return new List<string>(distinctNotes);
+        }
 
-            foreach (var array in dlist)
+        public List<string> getDistinctProcessIDs(string processName)
+        {
+            if (String.IsNullOrEmpty(processName))
             {
-                allProcesses.Add(array[1]);
+                return new List<string>();
             }
-
-            IEnumerable<string> distinctNotes = processes.Distinct();
-            processes = new List<string>(distinctNotes);
+            List<string[]> filteredList = getProcessData(processName, null);
+            processNamesList = filteredList.Select(list => list[2]).ToList();
+            processNamesList.Insert(0, "");
+            IEnumerable<string> distinctNotes = processNamesList.Distinct();
+            return new List<string>(distinctNotes);
         }
 
         //Gets data for one process
-        public List<string[]> getProcessData(string process)
+        public List<string[]> getProcessData(string processName, string processId)
         {
-            List<string[]> processData = new List<string[]>();
-
-            foreach (var array in dlist)
+            if ( !String.IsNullOrEmpty(processName) && String.IsNullOrEmpty(processId) && processName != "None")
             {
-                if (array[1] == process)
+                processData2DList = processes2DList.Where(x => x[1] == processName).ToList();
+                Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
+                return processData2DList;
+            }
+            else if ( !String.IsNullOrEmpty(processName) && !String.IsNullOrEmpty(processId))
+            {
+                Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
+                processData2DList = processes2DList.Where(x => x[1] == processName && x[2] == processId).ToList();
+                return processData2DList;
+            }
+            Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
+            return processes2DList;
+        }
+        
+
+        public List<string[]> getWhereProcessData(  List<string[]> processDataFilteredNameAndID, 
+                                                    string whereColumn, 
+                                                    string whereOperator, 
+                                                    string whereValue)
+        {
+
+            int variableIndex = Array.IndexOf(processVariables, whereColumn);
+
+            // sanitize provided whereValue
+            whereValue = Regex.Replace(whereValue, @"[^0-9.]", "");
+            Double value;
+            try
+            {
+                value = Double.Parse(whereValue.Replace(".", ","));
+                switch (whereOperator)
                 {
-                    processData.Add(array);
+                    case "==":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) == value).ToList();
+                        break;
+                    case ">":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) > value).ToList();
+                        break;
+                    case ">=":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) >= value).ToList();
+                        break;
+                    case "<":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) < value).ToList();
+                        break;
+                    case "<=":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) <= value).ToList();
+                        break;
+                    case "!=":
+                        processData2DList = processDataFilteredNameAndID.Where(x => Double.Parse(x[variableIndex].Replace(".", ",")) != value).ToList();
+                        break;
                 }
             }
-            return processData;
+            catch (IndexOutOfRangeException t) { Console.WriteLine(t); }
+            catch (Exception e) { Console.WriteLine(e); }
+            
+            return processData2DList;
         }
 
-
-        /*
-        public void InitialJSON()
-        {
-            this.fileName = dialog.SafeFileName;
-            //handmadeJSON += "{\n\t\"" + this.fileName + "\": [";
-            string line;
-
-            System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
-
-            file.ReadLine(); // skip the firstLine
-
-            while ((line = file.ReadLine()) != null)
-            {
-                string[] mainDivision = line.Split('|');
-
-                string processData = mainDivision[4];
-
-                string timeStamp = mainDivision[0];
-                TSList.Add(processData);
-                DataList.Add(processData);
-                /*
-
-                char[] delimiterChars = { ':', ';' };
-                string[] singleDataPoints = processData.Split(delimiterChars);
-
-                if (singleDataPoints.Length < 19) continue;
-
-                counter = 0;
-
-
-                
-
-                if (singleDataPoints[0] == "Process")
-                {
-                    handmadeJSON += "\n\t\t{\n\t\t\"TimeStamp\": \"" + mainDivision[0] + "\",";
-                    handmadeJSON += "\n\t\t\"ProcessName\": \"" + singleDataPoints[1].Trim() + "\",";
-
-                    for (int i = 3; i < singleDataPoints.Length; i += 2)
-                    {
-                        char[] dels = { 'M', 'C', '%' };
-                        string droppedExt = singleDataPoints[i].Split(dels)[0];
-
-                        if (counter != 17)
-                            handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt + ",";
-                        else
-                            handmadeJSON += "\n\t\t\"" + processVariables[counter] + "\":" + droppedExt;
-                        counter++;
-
-                    }
-
-                    handmadeJSON += "\n\t\t},";
-
-                }
-
-                
-            }
-            
-
-            handmadeJSON = handmadeJSON.Substring(0, (handmadeJSON.Length - 1));
-            
-
-            //Console.WriteLine("JSON STRING: " + handmadeJSON);
-
-
-            System.Console.ReadLine();
-            handmadeJSON += "\n\t]}";
-            return handmadeJSON;
-
-            
-
-            file.Close();
-            return "";
-            //SortedList<String, Object> jsonObj = JsonConvert.DeserializeObject<SortedList<String, Object>>(handmadeJSON);
-            //Console.WriteLine("\nJSON OBJECT: " + jsonObj["MrResourceMonitoring-RIT - Copy.utr"]);
-        }
-        */
 
         public void getJsonString(OpenFileDialog dialog)
         {
             dlist = new List<string[]>();
+            processes2DList = new List<string[]>();
+            globalTotal2DList = new List<string[]>();
+            gloabalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
             string line;
             //StreamWriter sw = new StreamWriter("D:\\WPF_Applications\\SeniorDevelopmentSiemens\\Data.txt");
             System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
-
+            
             try
             {
                 file.ReadLine(); // skip the firstLine
@@ -175,11 +164,28 @@ namespace SiemensPerformance
 
                     foreach (var item in enumerate)
                     {
-                        singleList.Add(item);
-                        //sw.Write(item+",");
+                        if( item != "ErrorLine") { 
+                            singleList.Add(item);
+                            //sw.Write(item+",");
+                        }
                     }
                     //sw.Write("\n");
-                    dlist.Add(singleList.ToArray());
+                    if (singleList.Count == 21)
+                    {
+                        // for processess
+                        processes2DList.Add(singleList.ToArray());
+                        dlist.Add(singleList.ToArray());
+                    } else if (singleList.Count == 33)
+                    {
+                        // for global 0
+                        gloabalZero2DList.Add(singleList.ToArray());
+                        dlist.Add(singleList.ToArray());
+                    } else if (singleList.Count == 22)
+                    {
+                        // for global total
+                        globalTotal2DList.Add(singleList.ToArray());
+                        dlist.Add(singleList.ToArray());
+                    }
                     counter++;
                 }
             }
@@ -197,11 +203,26 @@ namespace SiemensPerformance
 
         public IEnumerable<string> GetSplitData(string textData)
         {
+            int lastPositionOfWall = textData.LastIndexOf('|');
+            string dataType = textData.Substring(lastPositionOfWall+1, 8);
+            if(dataType != "Process:" && dataType != "Global: ")
+            {
+                yield return "ErrorLine";
+                yield break;
+            }
             yield return textData.Substring(0, 26); //timestamp
             string data = textData.Substring(textData.IndexOf(':', 26) + 2);
-            string processName = data.Substring(0, data.IndexOf(":")); // process name
-            yield return processName;
-            data = data.Substring(data.IndexOf(":") + 2);
+            string processName = data.Substring(0, data.IndexOf(":")); // process name 
+
+            int bracketPosition = processName.IndexOf("(");
+            string procName = processName.Substring(0, bracketPosition);
+            string procID = processName.Substring(bracketPosition+1, (processName.Length - bracketPosition-2));
+            
+            if(procName != "GCPU") { 
+                yield return procName;
+                yield return procID;
+            }
+            data = data.Substring(data.IndexOf(":") + 1);
 
             int finalLength = data.Length;
             int i = 0; // position after the found ';' 
@@ -231,164 +252,3 @@ namespace SiemensPerformance
         }
     }
 }
-
-
-/*
- 
-
-    public IEnumerable<string> GetSplitData(string textData)
-        {
-            Boolean initial = true;
-            yield return textData.Substring(0, 26); //timestamp
-            string data = textData.Substring(textData.IndexOf(':', 26) + 2);
-            string processName = data.Substring(0, data.IndexOf(":")); // process name
-            yield return processName;
-            data = data.Substring(data.IndexOf(":") + 2);
-
-            int finalLength = data.Length;
-            int i = 0; // position after the found ';' 
-            int j = data.IndexOf(';', 0, finalLength); // position of the initial ';'
-            string line;
-            int colonIndex;
-
-            if (j == -1) // No such substring
-            {
-                yield return "ErrorLine"; // returned by the lines that doesn't have valid data
-            }
-
-
-            // while ';' is found in the string
-            while (j != -1)
-            {
-                if (j - i > 0) // Non empty? 
-                {
-                    line = data.Substring(i, j - i);
-                    colonIndex = line.IndexOf(':');
-                    if (initial)
-                    {
-                        if (processName == "GCPU(0)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else if (processName == "GCPU(_Total)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else
-                        {
-                            yield return line.Substring(0, colonIndex);
-                            yield return line.Substring(colonIndex + 2);
-                        }
-                    }
-                    else
-                    {
-                        line = line.Trim();
-                        string result = Regex.Replace(line, @"[^\d]", "");
-                        yield return result;
-                        yield return line.Substring(0, colonIndex);
-                        yield return line.Substring(colonIndex + 2);
-                    }
-                    
-                }
-
-                i = j + 1;
-                j = data.IndexOf(';', i, finalLength - i);
-                initial = false;
-            }
-            /*
-            if (i < finalLength) // Has remainder?
-            {
-                yield return data.Substring(i, finalLength - i); // Return remaining trail
-            }
-        }
-    }
-
-
-
-if (i < finalLength) // Has remainder?
-{
-    dataDict.Add(line.Substring(0, line.IndexOf(":")), line.Substring(line.IndexOf(":") + 1));
-    yield return data.Substring(i, finalLength - i); // Return remaining trail
-}
-
-int len = textData.Length;
-string timeStamp = textData.Substring(0, 26);
-
-int dataStartPos = textData.LastIndexOf('|')+1;
-string data = textData.Substring(dataStartPos, (len-dataStartPos));
-
-int colonPosition = data.IndexOf(":");
-
-string type = data.Substring(0, colonPosition);
-if(type == "Process")
-{
-
-}else if (type == "Global")
-{
-
-}
-/*
-int i = 0, j = s.IndexOf(c, 0, l);
-if (j == -1) // No such substring
-{
-    yield return s; // Return original and break
-    yield break;
-}
-
-while (j != -1)
-{
-    if (j - i > 0) // Non empty? 
-    {
-        yield return s.Substring(i, j - i); // Return non-empty match
-    }
-    i = j + 1;
-    j = s.IndexOf(c, i, l - i);
-}
-
-if (i < l) // Has remainder?
-{
-    yield return s.Substring(i, l - i); // Return remaining trail
-}
-
-     /*
-             * 
-            while (j != -1)
-            {
-                if (j - i > 0) // Non empty? 
-                {
-                    line = data.Substring(i, j - i);
-                    colonIndex = line.IndexOf(':');
-                    if (initial)
-                    {
-                        if (processName == "GCPU(0)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else if (processName == "GCPU(_Total)")
-                        {
-                            yield return "GCPU(0)";
-                            yield return line;
-                        }
-                        else
-                        {
-                            yield return line.Substring(0, colonIndex);
-                            yield return line.Substring(colonIndex + 2);
-                        }
-                    }
-                    else
-                    {
-                        line = line.Trim();
-                        string result = Regex.Replace(line, @"[^\d]", "");
-                        yield return result;
-                        yield return line.Substring(0, colonIndex);
-                        yield return line.Substring(colonIndex + 2);
-                    }
-                }
-                i = j + 1;
-                j = data.IndexOf(';', i, finalLength - i);
-                initial = false;
-            }
-            */
