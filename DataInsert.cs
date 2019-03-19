@@ -53,8 +53,15 @@ namespace SiemensPerformance
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
-                myCmd.CommandType = CommandType.Text;
-                myCmd.ExecuteNonQuery();
+                try
+                {
+                    myCmd.CommandType = CommandType.Text;
+                    myCmd.ExecuteNonQuery();
+                }
+                catch(Exception e)
+                {
+
+                }
             }
 
             conn.Close();
@@ -120,8 +127,11 @@ namespace SiemensPerformance
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
-                myCmd.CommandType = CommandType.Text;
-                myCmd.ExecuteNonQuery();
+                try
+                {
+                    myCmd.CommandType = CommandType.Text;
+                    myCmd.ExecuteNonQuery();
+                }catch(Exception e) { }
             }
 
             conn.Close();
