@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -19,7 +19,6 @@ namespace SiemensPerformance
         private List<string> processNamesList;
         private List<string[]> processData2DList;
         private List<string> filteredDataList;
-
 
         public string[] processVariables = {"TimeStamp", "Process Name", "Process ID", "WSP", "WSPPeak",
             "HC", "HCPeak", "TC", "TCPeak", "CPU", "CPUPeak",
