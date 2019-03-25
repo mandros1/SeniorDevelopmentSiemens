@@ -21,33 +21,46 @@ namespace SiemensPerformance
         }
 
         //Working
-        public void insertProcess(List<string> process_name)
+        public void insertProcess(List<List<string>> process_name)
         {
             conn = DBConnect.conn;
-            StringBuilder insertCommand = new StringBuilder("INSERT INTO process(process_name) VALUES ");
+            StringBuilder insertCommand = new StringBuilder("INSERT INTO process(process_name, process_name_id) VALUES ");
             List<string> Rows = new List<string>();
 
             //Removes the duplicate processes from the list and stores in a new array
-            String[] new_process_array = process_name.Distinct().ToArray();
-            var dbProcess = new List<string>();
+            //String[,] new_process_array = process_name.Distinct().ToArray();
+            //var dbProcess = new List<string>();
 
             //Writes out processes
             conn.Open();
-            MySqlCommand get_Process_Name = new MySqlCommand("USE mri; SELECT process_name FROM process", conn);
-            var reader = get_Process_Name.ExecuteReader();
-            while (reader.Read())
-            {
-                dbProcess.Add(reader.GetString(0));
-            }
-            reader.Close();
-            conn.Close();
+            //MySqlCommand get_Process_Name = new MySqlCommand("USE mri; SELECT process_name, process_name_id FROM process", conn);
+            //var reader = get_Process_Name.ExecuteReader();
+            //while (reader.Read())
+            //{
+            //var item = reader.GetString(0);
+            //var item2 = reader.GetString(1);
+            //singleList = new List<string>();
+            //singleList.Add(reader.GetString(0));
+            //dbProcess.Add(reader.GetString(0));
+            //}
+            //reader.Close();
+            //conn.Close();
 
-            string[] dbProcess_array = dbProcess.ToArray();
-            var missingProcess = new_process_array.Except(dbProcess_array).ToArray();
-            foreach (var item in missingProcess)
+            //string[] dbProcess_array = dbProcess.ToArray();
+            //var missingProcess = new_process_array.Except(dbProcess_array).ToArray();
+            //foreach (var item in missingProcess)
+            //{
+            //    Rows.Add(string.Format("('{0}')", MySqlHelper.EscapeString(item)));
+            //}
+
+            foreach (List<string> subList in process_name)
             {
-                Rows.Add(string.Format("('{0}')", MySqlHelper.EscapeString(item)));
+                foreach (string item in subList)
+                {
+                    Rows.Add(string.Format("('{0}')", MySqlHelper.EscapeString(item)));
+                }
             }
+
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
             conn.Open();

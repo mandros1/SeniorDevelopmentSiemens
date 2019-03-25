@@ -720,9 +720,6 @@ namespace SiemensPerformance
         private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
         {
             DataTable table = new DataTable();
-            var process_array = new List<string>();
-            var time_array = new List<string>();
-            var mri_data_array = new List<string>();
 
             // Get max columns.
             int columnsNum = columns.Length;
@@ -736,20 +733,9 @@ namespace SiemensPerformance
                 if (array.Length == columnsNum)
                 {
                     table.Rows.Add(array);
-                    process_array.Add(array[1]);
-                    time_array.Add(array[0].Split('.')[0]);
-                    
-                    //Not working. Trace file data needs to be sent to the Data Insert class
-                    string[] mri_data = { array[2],array[3], array[4], array[5], array[6], array[7], array[8], array[9], array[10],array[11], array[12], array[13], array[14], array[15], array[16], array[17], array[18], array[19]};
-                    mri_data_array.AddRange(mri_data.ToList());
                 }
 
             }
-            DataInsert dataInsert = new DataInsert();
-            dataInsert.insertProcess(process_array);
-            dataInsert.insertTime(time_array);
-            //dataInsert.insertMRI_Data(mri_data_array);
-
             return table;
         }
 

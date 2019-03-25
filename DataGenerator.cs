@@ -150,6 +150,10 @@ namespace SiemensPerformance
             gloabalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
             string line;
+            DataInsert dataInsert = new DataInsert();
+            var time_array = new List<string>();
+            List<List<string>> process_array = new List<List<string>>();
+
             //StreamWriter sw = new StreamWriter("D:\\WPF_Applications\\SeniorDevelopmentSiemens\\Data.txt");
             System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
             
@@ -174,13 +178,17 @@ namespace SiemensPerformance
                     {
                         // for processess
                         processes2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        Console.WriteLine("Process Name: " + singleList[1] + " Process Id: " + singleList[2]);
+                        process_array.Add(new List<string> { singleList[1], singleList[2] });
                         dlist.Add(singleList.ToArray());
                     } else if (singleList.Count == 33)
                     {
                         // for global 0
-                        gloabalZero2DList.Add(singleList.ToArray());
+                        gloabalZero2DList.Add(singleList.ToArray());            
                         dlist.Add(singleList.ToArray());
-                    } else if (singleList.Count == 22)
+                    }
+                    else if (singleList.Count == 22)
                     {
                         // for global total
                         globalTotal2DList.Add(singleList.ToArray());
@@ -188,6 +196,8 @@ namespace SiemensPerformance
                     }
                     counter++;
                 }
+                dataInsert.insertTime(time_array);
+                dataInsert.insertProcess(process_array);
             }
             catch (Exception e)
             {
