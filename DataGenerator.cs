@@ -179,7 +179,7 @@ namespace SiemensPerformance
                         // for processess
                         processes2DList.Add(singleList.ToArray());
                         time_array.Add(singleList[0].Split('.')[0]);
-                        Console.WriteLine("Process Name: " + singleList[1] + " Process Id: " + singleList[2]);
+                        //Console.WriteLine("Process Name: " + singleList[1] + " Process Id: " + singleList[2]);
                         process_array.Add(new List<string> { singleList[1], singleList[2] });
                         dlist.Add(singleList.ToArray());
                     } else if (singleList.Count == 33)

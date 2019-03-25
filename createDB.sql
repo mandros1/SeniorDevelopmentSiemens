@@ -94,7 +94,7 @@ CREATE TABLE `process` (
   `process_name` varchar(255) DEFAULT NULL,
   `process_name_id` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`process_id`),
-  UNIQUE KEY `process_name_UNIQUE` (`process_name`)
+  UNIQUE KEY `process_name_UNIQUE` (`process_name`, `process_name_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

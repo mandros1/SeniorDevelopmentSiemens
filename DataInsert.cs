@@ -24,45 +24,61 @@ namespace SiemensPerformance
         public void insertProcess(List<List<string>> process_name)
         {
             conn = DBConnect.conn;
-            StringBuilder insertCommand = new StringBuilder("INSERT INTO process(process_name, process_name_id) VALUES ");
+            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO process(process_name, process_name_id) VALUES ");
             List<string> Rows = new List<string>();
+            var dbProcess = new List<string>();
 
-            //Removes the duplicate processes from the list and stores in a new array
-            //String[,] new_process_array = process_name.Distinct().ToArray();
-            //var dbProcess = new List<string>();
+            //Removes the duplicate process name and ids
+            DataTable processTable = new DataTable();
+            processTable.Columns.Add("Process Name");
+            processTable.Columns.Add("Process Id");
 
-            //Writes out processes
-            conn.Open();
-            //MySqlCommand get_Process_Name = new MySqlCommand("USE mri; SELECT process_name, process_name_id FROM process", conn);
-            //var reader = get_Process_Name.ExecuteReader();
-            //while (reader.Read())
-            //{
-            //var item = reader.GetString(0);
-            //var item2 = reader.GetString(1);
-            //singleList = new List<string>();
-            //singleList.Add(reader.GetString(0));
-            //dbProcess.Add(reader.GetString(0));
-            //}
-            //reader.Close();
-            //conn.Close();
-
-            //string[] dbProcess_array = dbProcess.ToArray();
-            //var missingProcess = new_process_array.Except(dbProcess_array).ToArray();
-            //foreach (var item in missingProcess)
-            //{
-            //    Rows.Add(string.Format("('{0}')", MySqlHelper.EscapeString(item)));
-            //}
-
-            foreach (List<string> subList in process_name)
+            foreach (var process in process_name)
             {
-                foreach (string item in subList)
-                {
-                    Rows.Add(string.Format("('{0}')", MySqlHelper.EscapeString(item)));
-                }
+                DataRow newRow = processTable.NewRow();
+                newRow["Process Name"] = process[0];
+                newRow["Process Id"] = process[1];
+                processTable.Rows.Add(newRow);
             }
 
+            String get_Process_Name = "USE mri; SELECT process_name, process_name_id FROM process";
+            MySqlDataAdapter sda = new MySqlDataAdapter(get_Process_Name, conn);
+
+            DataTable dbProcessTable = new DataTable();
+            try
+            {
+                conn.Open();
+                sda.Fill(dbProcessTable);
+            }
+            catch (MySqlException se)
+            {
+            }
+
+            finally
+            {
+                conn.Close();
+            }
+
+            //Prints out the size of the process data table
+            //Console.WriteLine("Process Count: " +processTable.Rows.Count);
+            DataTable uniqueProcessTable = processTable.DefaultView.ToTable(true, "Process Name", "Process Id");
+            Console.WriteLine("Unique Count: " + uniqueProcessTable.Rows.Count);
+
+            var diff = uniqueProcessTable.AsEnumerable().Except(dbProcessTable.AsEnumerable(), DataRowComparer.Default);
+            DataTable differenceTable = diff.CopyToDataTable<DataRow>();
+            Console.WriteLine("Difference Count: " + differenceTable.Rows.Count);
+
+            //Prints all of the values in the process data table
+            foreach (DataRow dataRow in differenceTable.Rows)
+            {
+                Console.WriteLine("Process Name: " +dataRow[0] + " Process Id: " + dataRow[1]);
+                Rows.Add(string.Format("('{0}','{1}')", MySqlHelper.EscapeString(dataRow[0].ToString()), MySqlHelper.EscapeString(dataRow[1].ToString())));
+            }
+
+            //Queries the database for current process information 
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
+            Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
