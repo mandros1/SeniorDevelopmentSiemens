@@ -18,6 +18,88 @@ USE `mri`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `global0`
+--
+
+DROP TABLE IF EXISTS `global0`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `global0` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `time_fk` timestamp NULL DEFAULT NULL,
+  `GCPU0` double unsigned DEFAULT NULL,
+  `GCPU0Peak` double unsigned DEFAULT NULL,
+  `GCPU1` double unsigned DEFAULT NULL,
+  `GCPU1Peak` double unsigned DEFAULT NULL,
+  `GCPU2` double unsigned DEFAULT NULL,
+  `GCPU2Peak` double unsigned DEFAULT NULL,
+  `GCPU3` double unsigned DEFAULT NULL,
+  `GCPU3Peak` double unsigned DEFAULT NULL,
+  `GCPU4` double unsigned DEFAULT NULL,
+  `GCPU4Peak` double unsigned DEFAULT NULL,
+  `GCPU5` double unsigned DEFAULT NULL,
+  `GCPU5Peak` double unsigned DEFAULT NULL,
+  `GCPU6` double unsigned DEFAULT NULL,
+  `GCPU6Peak` double unsigned DEFAULT NULL,
+  `GCPU7` double unsigned DEFAULT NULL,
+  `GCPU7Peak` double unsigned DEFAULT NULL,
+  `GCPU8` double unsigned DEFAULT NULL,
+  `GCPU8Peak` double unsigned DEFAULT NULL,
+  `GCPU9` double unsigned DEFAULT NULL,
+  `GCPU9Peak` double unsigned DEFAULT NULL,
+  `GCPU10` double unsigned DEFAULT NULL,
+  `GCPU10Peak` double unsigned DEFAULT NULL,
+  `GCPU11` double unsigned DEFAULT NULL,
+  `GCPU11Peak` double unsigned DEFAULT NULL,
+  `GCPU12` double unsigned DEFAULT NULL,
+  `GCPU12Peak` double unsigned DEFAULT NULL,
+  `GCPU13` double unsigned DEFAULT NULL,
+  `GCPU13Peak` double unsigned DEFAULT NULL,
+  `GCPU14` double unsigned DEFAULT NULL,
+  `GCPU14Peak` double unsigned DEFAULT NULL,
+  `GCPU15` double unsigned DEFAULT NULL,
+  `GCPU15Peak` double unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4641 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `globaltotal`
+--
+
+DROP TABLE IF EXISTS `globaltotal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `globaltotal` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `time_fk` timestamp NULL DEFAULT NULL,
+  `GCPU` double unsigned DEFAULT NULL,
+  `GCPUPeak` double unsigned DEFAULT NULL,
+  `GMA` int(11) unsigned DEFAULT NULL,
+  `GMAPeak` int(11) unsigned DEFAULT NULL,
+  `GPC` int(11) unsigned DEFAULT NULL,
+  `GPCPeak` int(11) unsigned DEFAULT NULL,
+  `GHC` int(11) unsigned DEFAULT NULL,
+  `GHCPeak` int(11) unsigned DEFAULT NULL,
+  `GHPF` double unsigned DEFAULT NULL,
+  `GCPUP` double unsigned DEFAULT NULL,
+  `GCPUPPeak` double unsigned DEFAULT NULL,
+  `GMF` double unsigned DEFAULT NULL,
+  `GMFPeak` double unsigned DEFAULT NULL,
+  `GMCOMM` double unsigned DEFAULT NULL,
+  `GMCOMMPeak` double unsigned DEFAULT NULL,
+  `GML` int(11) unsigned DEFAULT NULL,
+  `GMLPeak` int(11) unsigned DEFAULT NULL,
+  `GPFC` double unsigned DEFAULT NULL,
+  `GPFCPeak` double unsigned DEFAULT NULL,
+  `GMC` double unsigned DEFAULT NULL,
+  `GMCPeak` double unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=475 DEFAULT CHARSET=utf8 COMMENT='		';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `mri_data`
 --
 
@@ -26,8 +108,9 @@ DROP TABLE IF EXISTS `mri_data`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `mri_data` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `time_fk` varchar(255) DEFAULT NULL,
-  `process_fk` varchar(255) DEFAULT NULL,
+  `time_fk` timestamp NULL DEFAULT NULL,
+  `Process_Name` varchar(255) DEFAULT NULL,
+  `Process_Id` int(11) unsigned DEFAULT NULL,
   `WSP` double unsigned DEFAULT NULL,
   `WSPPeak` double unsigned DEFAULT NULL,
   `HC` int(11) unsigned DEFAULT NULL,
@@ -41,46 +124,15 @@ CREATE TABLE `mri_data` (
   `USRC` int(11) unsigned DEFAULT NULL,
   `USRCPeak` int(11) unsigned DEFAULT NULL,
   `PRIV` double unsigned DEFAULT NULL,
-  `PRIVPEAK` double unsigned DEFAULT NULL,
+  `PRIVPeak` double unsigned DEFAULT NULL,
   `VIRT` double unsigned DEFAULT NULL,
   `VIRTPeak` double unsigned DEFAULT NULL,
   `PFS` double unsigned DEFAULT NULL,
   `PFSPeak` double unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `time_fk_idx` (`time_fk`),
-  KEY `process_fk_idx` (`process_fk`)
+  KEY `time_fk_idx` (`time_fk`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Temporary view structure for view `mri_view`
---
-
-DROP TABLE IF EXISTS `mri_view`;
-/*!50001 DROP VIEW IF EXISTS `mri_view`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `mri_view` AS SELECT 
- 1 AS `timestamp`,
- 1 AS `process_name`,
- 1 AS `WSPPEAK`,
- 1 AS `HC`,
- 1 AS `HCPEAK`,
- 1 AS `TC`,
- 1 AS `TCPEAK`,
- 1 AS `CPU`,
- 1 AS `CPUPEAK`,
- 1 AS `GDIC`,
- 1 AS `GDICPEAK`,
- 1 AS `USRC`,
- 1 AS `USRCPEAK`,
- 1 AS `PRIV`,
- 1 AS `PRIVPEAK`,
- 1 AS `VIRT`,
- 1 AS `VIRTPEAK`,
- 1 AS `PFS`,
- 1 AS `PFSPEAK`*/;
-SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `process`
@@ -90,12 +142,12 @@ DROP TABLE IF EXISTS `process`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `process` (
-  `process_id` int(100) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `process_id` int(100) unsigned NOT NULL AUTO_INCREMENT,
   `process_name` varchar(255) DEFAULT NULL,
   `process_name_id` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`process_id`),
-  UNIQUE KEY `process_name_UNIQUE` (`process_name`, `process_name_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `process_name_UNIQUE` (`process_name`,`process_name_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=781 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -110,26 +162,12 @@ CREATE TABLE `time` (
   `timeStamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`time_id`),
   UNIQUE KEY `timeStamp_UNIQUE` (`timeStamp`)
-) ENGINE=InnoDB AUTO_INCREMENT=3941 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=35610 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Final view structure for view `mri_view`
+-- Dumping routines for database 'mri'
 --
-
-/*!50001 DROP VIEW IF EXISTS `mri_view`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `mri_view` AS select `t`.`timeStamp` AS `timestamp`,`p`.`process_name` AS `process_name`,`m`.`WSPPeak` AS `WSPPEAK`,`m`.`HC` AS `HC`,`m`.`HCPeak` AS `HCPEAK`,`m`.`TC` AS `TC`,`m`.`TCPeak` AS `TCPEAK`,`m`.`CPU` AS `CPU`,`m`.`CPUPeak` AS `CPUPEAK`,`m`.`GDIC` AS `GDIC`,`m`.`GDICPeak` AS `GDICPEAK`,`m`.`USRC` AS `USRC`,`m`.`USRCPeak` AS `USRCPEAK`,`m`.`PRIV` AS `PRIV`,`m`.`PRIVPEAK` AS `PRIVPEAK`,`m`.`VIRT` AS `VIRT`,`m`.`VIRTPeak` AS `VIRTPEAK`,`m`.`PFS` AS `PFS`,`m`.`PFSPeak` AS `PFSPEAK` from ((`mri_data` `m` join `process` `p` on((`m`.`process_fk` = `p`.`process_id`))) join `time` `t` on((`m`.`time_fk` = `t`.`time_id`))) */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -140,4 +178,4 @@ CREATE TABLE `time` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-07  2:46:35
+-- Dump completed on 2019-03-26  2:27:13

@@ -174,30 +174,35 @@ namespace SiemensPerformance
                         }
                     }
                     //sw.Write("\n");
+                    //
                     if (singleList.Count == 21)
                     {
                         // for processess
                         processes2DList.Add(singleList.ToArray());
                         time_array.Add(singleList[0].Split('.')[0]);
-                        //Console.WriteLine("Process Name: " + singleList[1] + " Process Id: " + singleList[2]);
                         process_array.Add(new List<string> { singleList[1], singleList[2] });
                         dlist.Add(singleList.ToArray());
                     } else if (singleList.Count == 33)
                     {
                         // for global 0
-                        gloabalZero2DList.Add(singleList.ToArray());            
+                        gloabalZero2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
                         dlist.Add(singleList.ToArray());
                     }
                     else if (singleList.Count == 22)
                     {
                         // for global total
                         globalTotal2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
                         dlist.Add(singleList.ToArray());
                     }
                     counter++;
                 }
                 dataInsert.insertTime(time_array);
-                dataInsert.insertProcess(process_array);
+                //dataInsert.insertProcess(process_array);
+                dataInsert.insertMRI_Data(processes2DList);
+                dataInsert.insertGlobal0(gloabalZero2DList);
+                dataInsert.insertGlobalTotal(globalTotal2DList);
             }
             catch (Exception e)
             {
