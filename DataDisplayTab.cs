@@ -699,7 +699,9 @@ namespace SiemensPerformance
 
 
 
-        //Generate DataGrid from data
+        /*
+         * Generate DataGrid from data
+         */
         private DataGrid GenerateTable(String[] columns)
         {
             DataGrid grid = new DataGrid();
@@ -716,7 +718,9 @@ namespace SiemensPerformance
             return grid;
         }
 
-        //Converts list to data table
+        /*
+         * Converts list to data table
+         */
         private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
         {
             DataTable table = new DataTable();
@@ -749,7 +753,9 @@ namespace SiemensPerformance
             return dataGrid;
         }
 
-        //Renames a Tab
+        /*
+         * Opens a popup window to ask for a new name and renames the tab
+         */
         private void Rename()
         {
             string name = new InputBox("Name").ShowDialog();
@@ -759,7 +765,10 @@ namespace SiemensPerformance
             }
         }
 
-        //Saves data from a tab to json file
+        /*
+         * Saves data from a graph to json file
+         * TODO - make this week
+         */
         private void Save()
         {
             //set default file name to tab header
@@ -790,7 +799,9 @@ namespace SiemensPerformance
             }
         }
 
-        //Close Tab
+        /*
+         * Close a tab
+         */
         private void Close()
         {
             if (this != null)
@@ -806,7 +817,9 @@ namespace SiemensPerformance
             }
         }
 
-        
+        /*
+         * Converts data from a list of String arrays [timstamp, data] to a Chartvalues<DateModel> and puts it in the graph
+         */
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
         {
             ChartValues<DateModel> data = new ChartValues<DateModel>();
@@ -835,7 +848,6 @@ namespace SiemensPerformance
                     Console.WriteLine(e);
                 }
             }
-
             return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
         } 
     }

@@ -21,6 +21,10 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
         private LinearGradientBrush gradientBrush;
         private ChartValues<DateModel> data;
 
+        /*
+         * Constructor
+         * Fills graph with initial given data
+         */
         public ZoomingAndPanning(ChartValues<DateModel> dataInput)
         {
             InitializeComponent();
@@ -76,8 +80,8 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
         }
 
         /*
-  * Resets zoom to show the whole graph with the y axis starting at zero
-  */
+         * Resets zoom to show the whole graph with the y axis starting at zero
+         */
         private void Update(object sender, RoutedEventArgs e)
         {
             string startString = startTime.Text;
