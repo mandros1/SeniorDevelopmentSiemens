@@ -198,7 +198,7 @@ namespace SiemensPerformance
                     }
                     counter++;
                 }
-                dataInsert.insertTime(time_array);
+                //dataInsert.insertTime(time_array);
                 //dataInsert.insertProcess(process_array);
                 dataInsert.insertMRI_Data(processes2DList);
                 dataInsert.insertGlobal0(gloabalZero2DList);
