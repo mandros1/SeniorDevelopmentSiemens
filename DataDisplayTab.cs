@@ -41,7 +41,7 @@ namespace SiemensPerformance
         private ComboBox whereOperatorsComboBox;
         private ComboBox finalWhereCB;
 
-        private Button runButton;
+        private Button runButton, saveButton; 
         private TabItem graphTabItem;
 
         private ComboBox finalAndCB;
@@ -213,6 +213,17 @@ namespace SiemensPerformance
             processGrid.ItemsSource = processTable.DefaultView;
         }
 
+        //Save Query into Database
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            //Console.WriteLine("Just Select");
+            Console.WriteLine("Combobox: " + (string)comboBox.SelectedItem);
+            Console.WriteLine("Process Id: "+ (string)processIdCB.SelectedItem);
+            Console.WriteLine((string)finalSelectCB.SelectedItem);
+            Console.WriteLine((string)filterCB.SelectedItem);
+            Console.WriteLine("Value: "+ whereValue.Text);
+        }
+
         private Button runButtonGenerator()
         {
             runButton = new Button();
@@ -224,7 +235,17 @@ namespace SiemensPerformance
 
             return runButton;
         }
+        private Button saveButtonGenerator()
+        {
+            saveButton = new Button();
+            saveButton.Content = "Save Query";
+            saveButton.Width = 100;
+            saveButton.Height = 50;
+            saveButton.Margin = new System.Windows.Thickness(320, 10, 0, 0);
+            saveButton.Click += new System.Windows.RoutedEventHandler(SaveButton_Click);
 
+            return saveButton;
+        }
         private DockPanel baseDockPanel()
         {
             dockPanel = new DockPanel();
@@ -313,6 +334,7 @@ namespace SiemensPerformance
                 stackPanel = new StackPanel();
                 stackPanel.Orientation = Orientation.Horizontal;
                 stackPanel.Children.Add(runButtonGenerator());
+                stackPanel.Children.Add(saveButtonGenerator());
 
                 mainStackPanel.Children.Add(stackPanel);
             }
@@ -465,6 +487,7 @@ namespace SiemensPerformance
                 stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                 stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                 stak.Children.Add(runButtonGenerator());
+                stak.Children.Add(saveButtonGenerator());
                 mainStackPanel.Children.Add(stak);
             }
 
@@ -494,6 +517,7 @@ namespace SiemensPerformance
                     stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                     stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                     stak.Children.Add(runButtonGenerator());
+                    stak.Children.Add(saveButtonGenerator());
                     mainStackPanel.Children.Add(stak);
                 }
             }
