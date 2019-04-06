@@ -1,0 +1,76 @@
+﻿<controls:MetroWindow  x:Class="SiemensPerformance.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SiemensPerformance"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Siemens Performance Logs" Height="450" Width="800" MinHeight="250" MinWidth="550">
+    <Grid>
+        <DockPanel>
+            <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
+                <TabItem x:Name="Welcome" Header="Welcome">
+                    <!-- <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
+                            <TabItem Header="Query">
+                            <StackPanel Margin="0,10,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Margin="10, 0, 0, 0">Filter by:</Label>
+                                    <ComboBox Margin="10, 0, 10, 0" Width="100"></ComboBox>
+                                    <StackPanel Margin="20,0,0,0" Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Process Name:</Label>
+                                            <ComboBox Margin="10,0,0,0" Width="120"></ComboBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Margin="20,0,0,0">Process id:</Label>
+                                            <ComboBox Margin="10,0,10,0" Width="100"></ComboBox>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                                <DockPanel Margin="0,10,0,0">
+                                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                        <Label Width="50" Margin="10,0,0,0">SELECT</Label>
+                                        <ComboBox Width="100" Margin="15,0,0,0"></ComboBox>
+                                    </StackPanel>
+                                    <ComboBox DockPanel.Dock="right" Margin="0,0,10,0" Width="50"></ComboBox>
+                                    <Label></Label>
+                                </DockPanel>
+                                <DockPanel Margin="0,10,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Margin="10,0,0,0" Width="50">WHERE</Label>
+                                        <ComboBox Margin="15,0,0,0" Width="100"></ComboBox>
+                                        <ComboBox Margin="40,0,0,0" Width="60"></ComboBox>
+                                        <Label Margin="20,0,0,0">Value:</Label>
+                                        <TextBox Margin="10,0,0,0" Width="100">Enter a Value</TextBox>
+                                        <ComboBox Margin="40,0,0,0" Width="60"></ComboBox>
+                                    </StackPanel>
+                                    <ComboBox DockPanel.Dock="right" Margin="0,0,10,0" Width="50"></ComboBox>
+                                    <Label></Label>
+                                </DockPanel>
+                                <DockPanel Margin="0,10,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Margin="10,0,0,0" Width="50">WHERE</Label>
+                                        <ComboBox Margin="15,0,0,0" Width="100"></ComboBox>
+                                        <Label Margin="10,0,0,0">BETWEEN</Label>
+                                        <TextBox Margin="10,0,0,0" Width="80">start value</TextBox>
+                                        <Label Margin="10,0,0,0">AND</Label>
+                                        <TextBox Margin="10,0,0,0" Width="80">end value</TextBox>
+                                        <ComboBox Margin="35,0,0,0" Width="60"></ComboBox>
+                                    </StackPanel>
+                                    <ComboBox DockPanel.Dock="right" Margin="0,0,10,0" Width="50"></ComboBox>
+                                    <Label></Label>
+                                </DockPanel>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl> -->
+                    Welcome to the Siemens MRI machine log Visualiser
+                </TabItem>
+                <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" Height="39" VerticalAlignment="Top" >
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Grid>
+</controls:MetroWindow>
