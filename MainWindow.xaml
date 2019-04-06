@@ -66,7 +66,7 @@
                             </StackPanel>
                         </TabItem>
                     </TabControl> -->
-                    Welcome to the Siemens MRI machine log Visualiser
+                    Welcome to the Siemens MRI machine log Visualiser. To get started click the plus button on the tab bar.
                 </TabItem>
                 <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" >
                 </TabItem>

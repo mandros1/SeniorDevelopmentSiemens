@@ -88,8 +88,8 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
             string endString = endTime.Text;
             try
             {
-                DateTime start = DateTime.ParseExact(startString, "yyyy/MM/dd-HH:mm:ss", null);
-                DateTime end = DateTime.ParseExact(endString, "yyyy/MM/dd-HH:mm:ss", null);
+                DateTime start = DateTime.ParseExact(startString, "yyyy-MM-ddTHH:mm:ss", null);
+                DateTime end = DateTime.ParseExact(endString, "yyyy-MM-ddTHH:mm:ss", null);
                 setTimeSpan(start, end);
             }catch (Exception)
             {

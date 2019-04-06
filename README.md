@@ -7,3 +7,5 @@ This is the frontened branch for the project.
 [LiveCharts](https://lvcharts.net/App/examples/v1/wpf/Install) under MIT license for graphs.
 
 [MahApps.Metro](https://mahapps.com/) under MIT license for metro styling.
+
+[Extended WPF Toolkit by Xceed](https://github.com/xceedsoftware/wpftoolkit) for DateTimePicker under Microsoft Public License.
