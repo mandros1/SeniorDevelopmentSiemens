@@ -43,6 +43,7 @@ namespace SiemensPerformance
 
         private Button runButton, saveButton; 
         private TabItem graphTabItem;
+        private ListView queryHistory;
 
         private ComboBox finalAndCB;
         private ComboBox finalBetweenCB;
@@ -50,6 +51,7 @@ namespace SiemensPerformance
         // reusable components
         private StackPanel stackPanel;
         private StackPanel stackPanel2;
+        private StackPanel stackPanel3;
         private Label label;
         private ComboBox comboBox;
         private DockPanel dockPanel;
@@ -246,6 +248,17 @@ namespace SiemensPerformance
 
             return saveButton;
         }
+        private ListView queryHistoryGenerator()
+        {
+            queryHistory = new ListView();
+            queryHistory.Width = 600;
+            queryHistory.Height = 200;
+            saveButton.Margin = new System.Windows.Thickness(320, 10, 0, 0);
+            //queryHistory.Scrollable = true;
+            //queryHistory.View = View.Details;
+
+            return queryHistory;
+        }
         private DockPanel baseDockPanel()
         {
             dockPanel = new DockPanel();
@@ -337,6 +350,11 @@ namespace SiemensPerformance
                 stackPanel.Children.Add(saveButtonGenerator());
 
                 mainStackPanel.Children.Add(stackPanel);
+
+                stackPanel3 = new StackPanel();
+                stackPanel3.Orientation = Orientation.Horizontal;
+                stackPanel3.Children.Add(queryHistoryGenerator());
+                mainStackPanel.Children.Add(stackPanel3);
             }
         }
 
