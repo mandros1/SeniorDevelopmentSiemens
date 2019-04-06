@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `global0`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `global0` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `time_fk` timestamp NULL DEFAULT NULL,
+  `time_fk` timestamp(6) NULL DEFAULT NULL,
   `GCPU0` double unsigned DEFAULT NULL,
   `GCPU0Peak` double unsigned DEFAULT NULL,
   `GCPU1` double unsigned DEFAULT NULL,
@@ -73,7 +73,7 @@ DROP TABLE IF EXISTS `globaltotal`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `globaltotal` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `time_fk` timestamp NULL DEFAULT NULL,
+  `time_fk` timestamp(6) NULL DEFAULT NULL,
   `GCPU` double unsigned DEFAULT NULL,
   `GCPUPeak` double unsigned DEFAULT NULL,
   `GMA` int(11) unsigned DEFAULT NULL,
@@ -108,7 +108,7 @@ DROP TABLE IF EXISTS `mri_data`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `mri_data` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `time_fk` timestamp NULL DEFAULT NULL,
+  `time_fk` timestamp(6) NULL DEFAULT NULL,
   `Process_Name` varchar(255) DEFAULT NULL,
   `Process_Id` int(11) unsigned DEFAULT NULL,
   `WSP` double unsigned DEFAULT NULL,
@@ -159,7 +159,7 @@ DROP TABLE IF EXISTS `time`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `time` (
   `time_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `timeStamp` timestamp NULL DEFAULT NULL,
+  `timeStamp` timestamp(6) NULL DEFAULT NULL,
   PRIMARY KEY (`time_id`),
   UNIQUE KEY `timeStamp_UNIQUE` (`timeStamp`)
 ) ENGINE=InnoDB AUTO_INCREMENT=35610 DEFAULT CHARSET=utf8;

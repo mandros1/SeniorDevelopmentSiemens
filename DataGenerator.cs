@@ -151,8 +151,8 @@ namespace SiemensPerformance
             this.fileName = dialog.SafeFileName;
             string line;
             DataInsert dataInsert = new DataInsert();
-            var time_array = new List<string>();
-            List<List<string>> process_array = new List<List<string>>();
+            //var time_array = new List<string>();
+            //List<List<string>> process_array = new List<List<string>>();
 
             //StreamWriter sw = new StreamWriter("D:\\WPF_Applications\\SeniorDevelopmentSiemens\\Data.txt");
             System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
@@ -179,21 +179,21 @@ namespace SiemensPerformance
                     {
                         // for processess
                         processes2DList.Add(singleList.ToArray());
-                        time_array.Add(singleList[0].Split('.')[0]);
-                        process_array.Add(new List<string> { singleList[1], singleList[2] });
+                        //time_array.Add(singleList[0].Split('.')[0]);
+                        //process_array.Add(new List<string> { singleList[1], singleList[2] });
                         dlist.Add(singleList.ToArray());
                     } else if (singleList.Count == 33)
                     {
                         // for global 0
                         gloabalZero2DList.Add(singleList.ToArray());
-                        time_array.Add(singleList[0].Split('.')[0]);
+                        //time_array.Add(singleList[0].Split('.')[0]);
                         dlist.Add(singleList.ToArray());
                     }
                     else if (singleList.Count == 22)
                     {
                         // for global total
                         globalTotal2DList.Add(singleList.ToArray());
-                        time_array.Add(singleList[0].Split('.')[0]);
+                        //time_array.Add(singleList[0].Split('.')[0]);
                         dlist.Add(singleList.ToArray());
                     }
                     counter++;

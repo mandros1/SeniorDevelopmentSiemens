@@ -11,16 +11,12 @@ namespace SiemensPerformance
     class DataInsert
     {
         MySqlConnection conn;
-        MySqlCommand cmd;
-        MySqlConnectionStringBuilder builder;
-
 
         public DataInsert()
         {
             conn = DBConnect.conn;
         }
 
-        //Working
         public void insertProcess(List<List<string>> process_name)
         {
             conn = DBConnect.conn;
@@ -60,7 +56,6 @@ namespace SiemensPerformance
             }
 
             //Prints out the size of the process data table
-            //Console.WriteLine("Process Count: " +processTable.Rows.Count);
             DataTable uniqueProcessTable = processTable.DefaultView.ToTable(true, "Process Name", "Process Id");
             Console.WriteLine("Unique Count: " + uniqueProcessTable.Rows.Count);
 
@@ -71,14 +66,11 @@ namespace SiemensPerformance
             //Prints all of the values in the process data table
             foreach (DataRow dataRow in differenceTable.Rows)
             {
-                //Console.WriteLine("Process Name: " +dataRow[0] + " Process Id: " + dataRow[1]);
                 Rows.Add(string.Format("('{0}','{1}')", MySqlHelper.EscapeString(dataRow[0].ToString()), MySqlHelper.EscapeString(dataRow[1].ToString())));
             }
 
-            //Queries the database for current process information 
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
@@ -96,19 +88,15 @@ namespace SiemensPerformance
             conn.Close();
         }
 
-        //Working
         public void insertTime(List<string> time_timestamp)
         {
             conn = DBConnect.conn;
             StringBuilder insertCommand = new StringBuilder("INSERT INTO time(timeStamp) VALUES ");
             List<string> Rows = new List<string>();
 
-            //Removes the duplicate processes from the list and stores in a new array
             String[] new_time_array = time_timestamp.Distinct().ToArray();
-            //Console.WriteLine("Amount of Times: " +new_time_array.Length);
             var dbTime = new List<string>();
 
-            //Writes out processes
             conn.Open();
             MySqlCommand get_Process_Name = new MySqlCommand("USE mri;SELECT timeStamp FROM time", conn);
             var reader = get_Process_Name.ExecuteReader();
@@ -127,7 +115,6 @@ namespace SiemensPerformance
             }
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
@@ -141,7 +128,6 @@ namespace SiemensPerformance
             conn.Close();
         }
         
-        //Successful Inserts into Table 
         public void insertGlobal0(List<string[]> global0_data)
         {
             conn = DBConnect.conn;
@@ -172,7 +158,6 @@ namespace SiemensPerformance
 
             foreach (var line  in global0_data)
             {
-                //Console.WriteLine(line);
                 DataRow newRow = global0Table.NewRow();
                 newRow["time_fk"] = line[0];
                 newRow["GCPU0"] = line[1]; newRow["GCPU0Peak"] = line[2];
@@ -198,7 +183,6 @@ namespace SiemensPerformance
             {
                     Rows.Add(string.Format("('{0}',{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32})",
 
-                    //Rows.Add(string.Format("((SELECT time_id FROM time WHERE timeStamp = '{0}'),{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32})", 
                     MySqlHelper.EscapeString(dataRow[0].ToString()),
                     MySqlHelper.EscapeString(dataRow[1].ToString()),
                     MySqlHelper.EscapeString(dataRow[2].ToString()),
@@ -236,7 +220,6 @@ namespace SiemensPerformance
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
             insertCommand.Replace("..", "0");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
@@ -246,7 +229,6 @@ namespace SiemensPerformance
 
             conn.Close();
         }
-        //Working
         public void insertMRI_Data(List<string[]> mri_data)
         {
             conn = DBConnect.conn;
@@ -271,7 +253,6 @@ namespace SiemensPerformance
 
             foreach (var line in mri_data)
             {
-                //Console.WriteLine(line);
                 DataRow newRow = globalTotalTable.NewRow();
                 newRow["time_fk"] = line[0];
                 newRow["Process_Name"] = line[1]; newRow["Process_Id"] = line[2];
@@ -291,7 +272,6 @@ namespace SiemensPerformance
             {
                 Rows.Add(string.Format("('{0}','{1}',{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20})",
 
-                //Rows.Add(string.Format("((SELECT time_id FROM time WHERE timeStamp = '{0}'),{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20})", 
                 MySqlHelper.EscapeString(dataRow[0].ToString()),
                 MySqlHelper.EscapeString(dataRow[1].ToString()),
                 MySqlHelper.EscapeString(dataRow[2].ToString()),
@@ -374,7 +354,6 @@ namespace SiemensPerformance
             {
                 Rows.Add(string.Format("('{0}',{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21})",
 
-                //Rows.Add(string.Format("((SELECT time_id FROM time WHERE timeStamp = '{0}'),{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21})", 
                 MySqlHelper.EscapeString(dataRow[0].ToString()),
                 MySqlHelper.EscapeString(dataRow[1].ToString()),
                 MySqlHelper.EscapeString(dataRow[2].ToString()),
@@ -402,7 +381,6 @@ namespace SiemensPerformance
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
             insertCommand.Replace("..", "0");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
