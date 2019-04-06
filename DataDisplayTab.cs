@@ -66,14 +66,20 @@ namespace SiemensPerformance
             dbConnection = dbInt;
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.DefaultExt = ".utr";
-            ofd.Filter = "Text files (*.utr)|*.utr";
+            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
 
             //Get Data
             if (ofd.ShowDialog() == true)
             {
-                generator.getJsonString(ofd);
-                displayable = true;
+                if (ofd.FileName.EndsWith(".utr"))
+                {
+                    generator.getJsonString(ofd);
+                    displayable = true;
+                }
+                else
+                {
+                    return;
+                }
             }
             else
             {
@@ -161,14 +167,19 @@ namespace SiemensPerformance
         {
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.DefaultExt = ".utr";
-            ofd.Filter = "Text files (*.utr)|*.utr";
+            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
 
             //Get Data
             if (ofd.ShowDialog() == true)
             {
-                generator.getJsonString(ofd);
-                displayable = true;
+                if (ofd.FileName.EndsWith(".utr")) {
+                    generator.getJsonString(ofd);
+                    displayable = true;
+                }
+                else
+                {
+                    return;
+                }
             }
             else
             {
@@ -891,8 +902,8 @@ namespace SiemensPerformance
             //Create save dialog
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.FileName = defaultName;
-            dlg.DefaultExt = ".json";
-            dlg.Filter = "Json files (.json)|*.json";
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text files (.txt)|*.txt";
 
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
