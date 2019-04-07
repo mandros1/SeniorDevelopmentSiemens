@@ -305,7 +305,7 @@ namespace SiemensPerformance
             }
             else
             {
-                List<string[]> test = generator.getDataFromDb((string)processNameCB.SelectedItem);
+                List<string[]> test = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
                 processData = test;
             }
             // if it is on process filter
@@ -942,6 +942,8 @@ namespace SiemensPerformance
          */
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
         {
+            
+
             ChartValues<DateModel> data = new ChartValues<DateModel>();
 
             int variableIndex = Array.IndexOf(generator.processVariables, variable);

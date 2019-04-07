@@ -105,8 +105,8 @@ namespace SiemensPerformance
         /// </summary>
         /// <param name="processName"></param>
         /// <returns></returns>
-        public List<string[]> getDataFromDb(string processName) {
-           
+        public List<string[]> getDataFromDb(string processName, string processId) {
+            Console.WriteLine(processName);
             List<string[]> all = new List<string[]>();
 
             try
@@ -114,7 +114,7 @@ namespace SiemensPerformance
                 Console.WriteLine("Connecting to MySQL...");
                 conn.Open();
 
-                string sql = "SELECT  *, DATE_FORMAT(time_fk, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "'";
+                string sql = "SELECT  *, DATE_FORMAT(time_fk, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "' AND process_Id = '" + processId + "';";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -128,7 +128,7 @@ namespace SiemensPerformance
                         if (i == 1)
                         {
                             a += rdr[22].ToString() + ";";
-                           // Console.WriteLine(a);
+                            //Console.WriteLine(a);
                         }
                         else if (i == 22) {
                             //Console.WriteLine("Didnt write to array "+ rdr[i]); 
@@ -142,8 +142,11 @@ namespace SiemensPerformance
                         if (i+1 == rdr.FieldCount)
                         {
                             //Console.WriteLine(a);
+                            
                             string[] everything = a.Split(';');
-                           
+                            //Remove first and last element from array
+                            everything = everything.Skip(1).ToArray();
+                            everything = everything.Take(everything.Count() - 1).ToArray();
                             all.Add(everything);
                         }
         
@@ -158,8 +161,8 @@ namespace SiemensPerformance
             }
 
             conn.Close();
-           
-            processData2DList = all.Where(x => x[1] == processName).ToList();
+
+            processData2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
             Console.WriteLine("Done.");
             return processData2DList;
 
