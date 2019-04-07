@@ -14,7 +14,7 @@
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
                 <TabItem x:Name="Welcome" Header="Welcome">
                     <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
-                           <TabItem Header="Query">
+                        <TabItem Header="Query">
                             <StackPanel Margin="0,10,0,0">
                                 <StackPanel Orientation="Horizontal">
                                     <Label Margin="10, 0, 0, 0">Filter by:</Label>

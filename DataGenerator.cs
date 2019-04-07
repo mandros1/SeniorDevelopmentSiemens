@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.IO;
+using System.Windows.Controls;
+
 
 namespace SiemensPerformance
 {
@@ -20,17 +23,7 @@ namespace SiemensPerformance
             "GCPU6", "GCPU6Peak", "GCPU7", "GCPU7Peak", "GCPU8", "GCPU8Peak",
             "GCPU9", "GCPU9Peak", "GCPU10", "GCPU10Peak", "GCPU11", "GCPU11Peak", "GCPU12", "GCPU12Peak",
             "GCPU13", "GCPU13Peak", "GCPU14", "GCPU14Peak", "GCPU15", "GCPU15Peak"};
-
-        /*
-         * public string[] globalVariables = { "TimeStamp", "GCPU(0)", "GCPUPeak(0,10)",
-            "GCPU(1)", "GCPUPeak(1,10)", "GCPU(2)", "GCPUPeak(2,10)", "GCPU(3)",
-            "GCPUPeak(3,10)", "GCPU(4)", "GCPUPeak(4,10)", "GCPU(5)", "GCPUPeak(5,10)",
-            "GCPU(6)", "GCPUPeak(6,10)", "GCPU(7)", "GCPUPeak(7,10)", "GCPU(8)",
-            "GCPUPeak(8,10)", "GCPU(9)", "GCPUPeak(9,10)", "GCPU(10)", "GCPUPeak(10,10)",
-            "GCPU(11)", "GCPUPeak(11,10)", "GCPU(12)", "GCPUPeak(12,10)", "GCPU(13)",
-            "GCPUPeak(13,10)", "GCPU(14)", "GCPUPeak(14,10)", "GCPU(15)", "GCPUPeak(15,10)"};
-         */
-
+        
         public string[] globalTotalVariables = {"TimeStamp", "GCPU", "GCPUPeak",
             "GMA", "GMAPeak", "GPC", "GPCPeak", "GHC", "GHCPeak",
             "GHPF", "GCPUP", "GCPUPPeak", "GMF", "GMFPeak",
@@ -147,28 +140,6 @@ namespace SiemensPerformance
             return processes2DList;
         }
 
-        /*
-         * This method accepts processName and processId and generates the 2d list of data for those specific parameters
-         */
-        public List<string[]> getGlobalZeroData(string processName, string processId)
-        {
-            if (!String.IsNullOrEmpty(processName) && String.IsNullOrEmpty(processId) && processName != "None")
-            {
-                processData2DList = processes2DList.Where(x => x[1] == processName).ToList();
-                Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
-                return processData2DList;
-            }
-            else if (!String.IsNullOrEmpty(processName) && !String.IsNullOrEmpty(processId))
-            {
-                Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
-                processData2DList = processes2DList.Where(x => x[1] == processName && x[2] == processId).ToList();
-                return processData2DList;
-            }
-            Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
-            return processes2DList;
-        }
-
-
         public List<string[]> getWhereProcessData(List<string[]> processDataFilteredNameAndID,
                                                     string whereColumn,
                                                     string whereOperator,
@@ -205,8 +176,8 @@ namespace SiemensPerformance
         /*
          * ########################################################################################################
          */
+         
 
-            
         /*
          * Method that accepts the file selected from the dialog window and reads through it storing them into an appropriate 2DList
          */
@@ -217,6 +188,8 @@ namespace SiemensPerformance
             globalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
             file = new System.IO.StreamReader(dialog.FileName);
+
+            //int lineCount = File.ReadAllLines(dialog.FileName).Length;
             
             try
             {
@@ -247,6 +220,8 @@ namespace SiemensPerformance
                         globalTotal2DList.Add(singleList.Skip(1).ToArray());
                     }
                     counter++;
+                    //double calc = ((double)counter / (double)lineCount);
+                    //pbar.Value = Math.Ceiling(calc * 100);
                 }
             }
             catch (Exception e)
@@ -306,6 +281,7 @@ namespace SiemensPerformance
                     line = dataString.Substring(i, j - i);
                     colonIndex = line.IndexOf(':');
                     subbedLine = line.Substring(colonIndex + 2);
+                    if (subbedLine.Contains("n.a.")) subbedLine = "0.0";
                     yield return Regex.Replace(subbedLine, @"[^0-9.]", "");
                 }
 
