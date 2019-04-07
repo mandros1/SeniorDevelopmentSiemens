@@ -56,6 +56,7 @@ namespace SiemensPerformance
         private DataGrid dataGrid;
         private DataTable dataTable;
         private List<string[]> processData;
+        private string[] columnNames;
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning cartesianChart;
         private ChartValues<DateModel> data;
         private List<DateModel> dateModelData;
@@ -124,7 +125,7 @@ namespace SiemensPerformance
             this.Header = generator.fileName;
             tabItem.Header = "Global(0)";
             // Pumping content into the table
-            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalVariables, globalZeroTable);
+            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalZeroVariables, globalZeroTable);
             tabItem.Content = globalZeroGrid;
 
             tabItem.ContextMenu = new ContextMenu();
@@ -190,26 +191,68 @@ namespace SiemensPerformance
 
         private void NewButton_Click(object sender, EventArgs e)
         {
-            if (String.Equals((string)filterCB.SelectedItem, "Process")) { 
+            if (String.Equals((string)filterCB.SelectedItem, "Process"))
+            {
+                processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                
+            }
+            if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
+            {
+                processData = generator.globalZero2DList;
+                columnNames = generator.globalZeroVariables;
+            }
+            if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
+            {
+                processData = generator.globalTotal2DList;
+                columnNames = generator.globalTotalVariables;
+            }
+
+
+            if (String.Equals((string)finalSelectCB.SelectedItem, ";"))
+            {
+                dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+                graphTabItem.Content = PopulateGraph(dateModelData);
+                processTable = ConvertListToDataTable(processData, generator.processVariables);
+                processGrid.ItemsSource = processTable.DefaultView;
+            }
+            else if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
+            {
+                string whereColumn = (string)whereSelectName.SelectedItem;
+                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
+                string whereVal = whereValue.Text;
+                processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
+
+
+                
+                Console.WriteLine(whereColumn);
+                dateModelData = generator.getDateModelList(processData, whereColumn, columnNames);
+                graphTabItem.Content = PopulateGraph(dateModelData);
+
+                if (String.Equals((string)filterCB.SelectedItem, "Process"))
+                {
+                    processTable = ConvertListToDataTable(processData, generator.processVariables);
+                    processGrid.ItemsSource = processTable.DefaultView;
+                }
+                else if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
+                {
+                    globalZeroTable = ConvertListToDataTable(processData, generator.globalZeroVariables);
+                    globalZeroGrid.ItemsSource = globalZeroTable.DefaultView;
+                }
+                else if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
+                {
+                    globalTotalTable = ConvertListToDataTable(processData, generator.globalTotalVariables);
+                    globalTotalGrid.ItemsSource = globalTotalTable.DefaultView;
+                }
+
+            }
+
+                if (String.Equals((string)filterCB.SelectedItem, "Process")) { 
                 processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
                 // if it is on process filter
                 if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
                 {
-                    string whereColumn = (string)whereSelectName.SelectedItem;
-                    string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
-                    string whereVal = whereValue.Text;
-                    processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal);
-                    dateModelData = generator.getDateModelList(processData, whereColumn);
-                    graphTabItem.Content = PopulateGraph(dateModelData);
-                    processTable = ConvertListToDataTable(processData, generator.processVariables);
-                    processGrid.ItemsSource = processTable.DefaultView;
-                }
-                else
-                {
-                    dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem);
-                    graphTabItem.Content = PopulateGraph(dateModelData);
-                    processTable = ConvertListToDataTable(processData, generator.processVariables);
-                    processGrid.ItemsSource = processTable.DefaultView;
+                    
+                    
                 }
             }
         }
@@ -281,7 +324,20 @@ namespace SiemensPerformance
             }
 
             string filterValue = (string)comboBox.SelectedItem;
-            
+
+            StackPanel _stack = new StackPanel();
+            _stack.Orientation = Orientation.Horizontal;
+
+            _stack = new StackPanel();
+            _stack.Children.Add(selectDockPanelGenerator(new System.Windows.Thickness(0, 10, 0, 0),
+                                                         50,
+                                                         new System.Windows.Thickness(10, 0, 0, 0),
+                                                         100,
+                                                         new System.Windows.Thickness(15, 0, 0, 0),
+                                                         100,
+                                                         new System.Windows.Thickness(0, 0, 10, 0)));
+            mainStackPanel.Children.Add(_stack);
+
             if (filterValue == "Process")
             {
                 stackPanel = processFilterStackPanelGenerator(
@@ -293,30 +349,26 @@ namespace SiemensPerformance
                     new System.Windows.Thickness(10, 0, 0, 0),
                     100
                 );
+
                 filterStackPanel.Children.Add(stackPanel);
-
-                StackPanel _stack = new StackPanel();
-                _stack.Orientation = Orientation.Horizontal;
-
-                _stack.Children.Add(selectDockPanelGenerator(new System.Windows.Thickness(0, 10, 0, 0),
-                                                             50,
-                                                             new System.Windows.Thickness(10, 0, 0, 0),
-                                                             100,
-                                                             new System.Windows.Thickness(15, 0, 0, 0),
-                                                             100,
-                                                             new System.Windows.Thickness(0, 0, 10, 0))
-                );
-
-                mainStackPanel.Children.Add(_stack);
+                
                 selectComboBox.ItemsSource = generator.selectProcessNames;
-                selectComboBox.SelectedIndex = 0;
 
-                stackPanel = new StackPanel();
-                stackPanel.Orientation = Orientation.Horizontal;
-                stackPanel.Children.Add(runButtonGenerator());
-
-                mainStackPanel.Children.Add(stackPanel);
+            } else if (filterValue == "Global(0)")
+            {
+                selectComboBox.ItemsSource = generator.selectGlobalZeroNames;
             }
+            else if (filterValue == "Global(_Total)")
+            {
+                selectComboBox.ItemsSource = generator.selectGlobalTotalNames;
+            }
+
+            selectComboBox.SelectedIndex = 0;
+            stackPanel = new StackPanel();
+            stackPanel.Orientation = Orientation.Horizontal;
+            stackPanel.Children.Add(runButtonGenerator());
+
+            mainStackPanel.Children.Add(stackPanel);
         }
 
 
@@ -472,11 +524,12 @@ namespace SiemensPerformance
             if ((string)finalSelectCB.SelectedItem == "WHERE")
             {
                 string filterValue = (string)filterCB.SelectedItem;
+                stak = new StackPanel();
+                stak.Orientation = Orientation.Horizontal;
+                stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                 if ( filterValue == "Process") { 
-                    stak = new StackPanel();
-                    stak.Orientation = Orientation.Horizontal;
-                    stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                    stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                    
                     stak.Children.Add(whereDockPanelGenerator(  new System.Windows.Thickness(0, 10, 0, 0),
                                                                 new System.Windows.Thickness(15, 0, 0, 0),
                                                                 100,
@@ -488,15 +541,42 @@ namespace SiemensPerformance
                                                                 new System.Windows.Thickness(0, 0, 10, 0),
                                                                 50,
                                                                 generator.selectProcessNames));
-                    mainStackPanel.Children.Add(stak);
-
-                    stak = new StackPanel();
-                    stak.Orientation = Orientation.Horizontal;
-                    stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                    stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                    stak.Children.Add(runButtonGenerator());
-                    mainStackPanel.Children.Add(stak);
+                    
+                } else if (filterValue == "Global(0)")
+                {
+                    stak.Children.Add(whereDockPanelGenerator(new System.Windows.Thickness(0, 10, 0, 0),
+                                                                new System.Windows.Thickness(15, 0, 0, 0),
+                                                                100,
+                                                                new System.Windows.Thickness(40, 0, 0, 0),
+                                                                60,
+                                                                new System.Windows.Thickness(20, 0, 0, 0),
+                                                                new System.Windows.Thickness(10, 0, 0, 0),
+                                                                100,
+                                                                new System.Windows.Thickness(0, 0, 10, 0),
+                                                                50,
+                                                                generator.selectGlobalZeroNames));
+                } else if (filterValue == "Global(_Total)")
+                {
+                    stak.Children.Add(whereDockPanelGenerator(new System.Windows.Thickness(0, 10, 0, 0),
+                                                                new System.Windows.Thickness(15, 0, 0, 0),
+                                                                100,
+                                                                new System.Windows.Thickness(40, 0, 0, 0),
+                                                                60,
+                                                                new System.Windows.Thickness(20, 0, 0, 0),
+                                                                new System.Windows.Thickness(10, 0, 0, 0),
+                                                                100,
+                                                                new System.Windows.Thickness(0, 0, 10, 0),
+                                                                50,
+                                                                generator.selectGlobalTotalNames));
                 }
+                mainStackPanel.Children.Add(stak);
+
+                stak = new StackPanel();
+                stak.Orientation = Orientation.Horizontal;
+                stak.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                stak.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                stak.Children.Add(runButtonGenerator());
+                mainStackPanel.Children.Add(stak);
             }
         }
 
@@ -523,6 +603,7 @@ namespace SiemensPerformance
             whereSelectName.Margin = variableComboMargins;
             whereSelectName.Width = variableComboWidth;
             whereSelectName.ItemsSource = cbNames;
+            whereSelectName.SelectedIndex = 0;
             stackPanel.Children.Add(whereSelectName);
 
             whereOperatorsComboBox = new ComboBox();
@@ -530,7 +611,7 @@ namespace SiemensPerformance
             whereOperatorsComboBox.Width = operatorsComboWidth;
             string[] list = { "==", ">", ">=", "<", "<=", "!=" };
             whereOperatorsComboBox.ItemsSource = list;
-            whereOperatorsComboBox.SelectedIndex = 0;
+            whereOperatorsComboBox.SelectedIndex = 1;
             stackPanel.Children.Add(whereOperatorsComboBox);
 
             label = new Label();
@@ -541,6 +622,7 @@ namespace SiemensPerformance
             whereValue = new TextBox();
             whereValue.Margin = txtBoxMargins;
             whereValue.Width = txtBoxWidth;
+            whereValue.Text = "0";
             stackPanel.Children.Add(whereValue);
 
             dockPanel.Children.Add(stackPanel);
@@ -807,28 +889,12 @@ namespace SiemensPerformance
         }
 
 
-        //private CartesianChart PopulateGraph(List<DateModel> dateModel2dList)
-        //{
-        //    cartesianChart = new CartesianChart();
-        //    data = new ChartValues<DateModel>();
-        //    data.AddRange(dateModel2dList);
-        //    cartesianChart.Series = new SeriesCollection
-        //    {
-        //        new LineSeries
-        //        {
-        //            Title = "Some Data",
-        //            Values = data
-        //        }
-        //    };
-        //    return cartesianChart;
-        //}
-
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<DateModel> dateModel2dList)
         {
             data = new ChartValues<DateModel>();
             data.AddRange(dateModel2dList);
             cartesianChart = new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
             return cartesianChart;
-        } 
+        }
     }
 }
