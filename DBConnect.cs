@@ -17,6 +17,7 @@ namespace SiemensPerformance
         public string uid { get; set; }
         public string password { get; set; }
         MySqlConnectionStringBuilder builder;
+        MySqlConnection conn;
         public static MySqlConnection conn;
         MySqlCommand cmd;
         ServiceController controller;
@@ -25,7 +26,7 @@ namespace SiemensPerformance
         {
             StartMySQL();
         }
-            
+
         public DBConnect(string db, string username, string pwd)
         {
             server = "localhost";
@@ -38,6 +39,7 @@ namespace SiemensPerformance
                 SslMode = 0,
                 Password = password,
                 AllowPublicKeyRetrieval = true
+
             };
 
             conn = new MySqlConnection(builder.ToString());
@@ -148,7 +150,6 @@ namespace SiemensPerformance
             script.Delimiter = "$$";
             script.Execute();
         }
-
         public void openConnection()
         {
             builder = new MySqlConnectionStringBuilder

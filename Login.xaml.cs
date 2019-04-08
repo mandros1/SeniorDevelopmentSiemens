@@ -18,11 +18,9 @@ namespace SiemensPerformance
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    
     public partial class Login : Window
     {
         DBConnect connect;
-       
         public Login()
         {
             InitializeComponent();
