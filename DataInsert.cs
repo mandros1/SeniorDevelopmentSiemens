@@ -349,5 +349,19 @@ namespace SiemensPerformance
 
             conn.Close();
         }
+
+        public void insertQuery(List<string[]> query)
+        {
+
+            conn = DBConnect.conn;
+            conn.Open();
+            MySqlCommand comm = conn.CreateCommand();
+            comm.CommandText = "INSERT INTO trace_queries (name,parameters) VALUES(?name,?parameters)";
+            comm.Parameters.AddWithValue("?name", query[0]);
+            comm.Parameters.AddWithValue("?parameters", query[1]);
+            comm.ExecuteNonQuery();
+            conn.Close();
+        }
+
     }
 }
