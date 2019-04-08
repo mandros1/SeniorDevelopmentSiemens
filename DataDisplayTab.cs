@@ -216,12 +216,21 @@ namespace SiemensPerformance
         //Save Query into Database
         private void SaveButton_Click(object sender, EventArgs e)
         {
+            string name = new InputBox("Name").ShowDialog();
+            if (name == "" || name ==null)
+            {
+                name = new InputBox("Name").ShowDialog();
+            }
             //Console.WriteLine("Just Select");
-            Console.WriteLine("Combobox: " + (string)comboBox.SelectedItem);
+            //Console.WriteLine("Combobox: " + (string)comboBox.SelectedItem);
+            Console.WriteLine("Process Name: " + (string)processNameCB.SelectedItem);
             Console.WriteLine("Process Id: "+ (string)processIdCB.SelectedItem);
             Console.WriteLine((string)finalSelectCB.SelectedItem);
-            Console.WriteLine((string)filterCB.SelectedItem);
-            Console.WriteLine("Value: "+ whereValue.Text);
+            Console.WriteLine("Where Column: " + (string)whereSelectName.SelectedItem);
+            Console.WriteLine("Where Operator: " + (string)whereOperatorsComboBox.SelectedItem);
+            Console.WriteLine("Where Operator Value: " + whereValue.Text);
+             
+            //Console.WriteLine("Value: "+ whereValue.Text);
         }
 
         private Button runButtonGenerator()

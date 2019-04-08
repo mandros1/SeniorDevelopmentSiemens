@@ -62,7 +62,7 @@ CREATE TABLE `global0` (
   `GCPU15Peak` double unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5569 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7425 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,7 +98,7 @@ CREATE TABLE `globaltotal` (
   `GMC` double unsigned DEFAULT NULL,
   `GMCPeak` double unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=712 DEFAULT CHARSET=utf8 COMMENT='		';
+) ENGINE=InnoDB AUTO_INCREMENT=1186 DEFAULT CHARSET=utf8 COMMENT='		';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -134,7 +134,7 @@ CREATE TABLE `mri_data` (
   `PFSPeak` double unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `time_fk_idx` (`TimeStamp`)
-) ENGINE=InnoDB AUTO_INCREMENT=474353 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=569221 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -177,4 +177,4 @@ CREATE TABLE `time` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-08  1:24:02
+-- Dump completed on 2019-04-08 14:45:44
