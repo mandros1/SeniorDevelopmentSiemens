@@ -1,5 +1,4 @@
 ﻿using System;
-
 /*
  * Object used for graph values
  */

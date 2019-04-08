@@ -162,7 +162,6 @@ CREATE TABLE `time` (
   `timeStamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`time_id`),
   UNIQUE KEY `timeStamp_UNIQUE` (`timeStamp`)
-
 ) ENGINE=InnoDB AUTO_INCREMENT=35610 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
