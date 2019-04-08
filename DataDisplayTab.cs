@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using LiveCharts.Wpf;
 using LiveCharts;
 using System.Linq;
+using System.Windows;
 
 namespace SiemensPerformance
 {
@@ -56,8 +57,9 @@ namespace SiemensPerformance
         private TextBox textBox;
         private TabItem tabItem;
         private DataGrid dataGrid;
-        private DataTable dataTable;
+        //private DataTable dataTable;
         private List<string[]> processData;
+        public static string utfFileName;
 
 
 
@@ -67,10 +69,10 @@ namespace SiemensPerformance
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = ".utr";
             ofd.Filter = "Text files (*.utr)|*.utr";
-
             //Get Data
             if (ofd.ShowDialog() == true)
             {
+                utfFileName = System.IO.Path.GetFileName(ofd.FileName);
                 generator.getJsonString(ofd);
                 displayable = true;
             }
@@ -89,21 +91,19 @@ namespace SiemensPerformance
             contextMenu.Items.Add(menuItem1);
             menuItem1.Header = "Rename";
             menuItem1.Click += delegate { Rename(); };
-
-            /* TODO Make this work correctly
-            //Save data to Json
-            MenuItem menuItem2 = new MenuItem();
-            contextMenu.Items.Add(menuItem2);
-            menuItem2.Header = "Save";
-            menuItem2.Click += delegate { Save(); };
-            */
-
+            
             //Close Tab
             MenuItem menuItem2 = new MenuItem();
             contextMenu.Items.Add(menuItem2);
             menuItem2.Header = "Close";
             menuItem2.Click += delegate { Close(); };
-            
+
+            //Save data to Json
+            MenuItem menuItem3 = new MenuItem();
+            contextMenu.Items.Add(menuItem3);
+            menuItem3.Header = "Save";
+            menuItem3.Click += delegate { Save(); };
+
             this.ContextMenu = contextMenu;
             
             // Create process table tab
@@ -762,7 +762,6 @@ namespace SiemensPerformance
                 {
                     table.Rows.Add(array);
                 }
-
             }
             return table;
         }
@@ -812,14 +811,33 @@ namespace SiemensPerformance
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
 
-            string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
-
-            // Process save file dialog box results
-            if (result == true)
+            try
             {
-                // Save document
-                string filename = dlg.FileName;
-                File.WriteAllText(filename, json);
+                if (processTable == null && processTable.Rows.Count < 0)
+                {
+                    Console.WriteLine("Error. Table is null");
+                }
+            }
+
+            catch (NullReferenceException nre)
+            {
+                MessageBox.Show("Cannot create a result file. Create a query first!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                string json = JsonConvert.SerializeObject(processTable, Formatting.Indented);
+
+                // Process save file dialog box results
+                if (result == true)
+                {
+                    // Save document
+                    string filename = dlg.FileName;
+                    File.WriteAllText(filename, json);
+                }
             }
         }
 

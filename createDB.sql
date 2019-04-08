@@ -1,32 +1,33 @@
-CREATE DATABASE  IF NOT EXISTS `mri` /*!40100 DEFAULT CHARACTER SET utf8 */;
+CREATE DATABASE  IF NOT EXISTS `mri` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */;
 USE `mri`;
--- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.15, for Win64 (x86_64)
 --
 -- Host: localhost    Database: mri
 -- ------------------------------------------------------
--- Server version	5.7.21-log
+-- Server version	8.0.15
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+ SET NAMES utf8 ;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-SET GLOBAL max_allowed_packet=1024*1024*1024;
+
 --
 -- Table structure for table `global0`
 --
 
 DROP TABLE IF EXISTS `global0`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `global0` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `time_fk` timestamp(6) NULL DEFAULT NULL,
+  `FileName` varchar(45) NOT NULL,
   `GCPU0` double unsigned DEFAULT NULL,
   `GCPU0Peak` double unsigned DEFAULT NULL,
   `GCPU1` double unsigned DEFAULT NULL,
@@ -61,7 +62,7 @@ CREATE TABLE `global0` (
   `GCPU15Peak` double unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4641 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5569 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,10 +71,11 @@ CREATE TABLE `global0` (
 
 DROP TABLE IF EXISTS `globaltotal`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `globaltotal` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `time_fk` timestamp(6) NULL DEFAULT NULL,
+  `FileName` varchar(45) NOT NULL,
   `GCPU` double unsigned DEFAULT NULL,
   `GCPUPeak` double unsigned DEFAULT NULL,
   `GMA` int(11) unsigned DEFAULT NULL,
@@ -96,7 +98,7 @@ CREATE TABLE `globaltotal` (
   `GMC` double unsigned DEFAULT NULL,
   `GMCPeak` double unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=475 DEFAULT CHARSET=utf8 COMMENT='		';
+) ENGINE=InnoDB AUTO_INCREMENT=712 DEFAULT CHARSET=utf8 COMMENT='		';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -105,12 +107,13 @@ CREATE TABLE `globaltotal` (
 
 DROP TABLE IF EXISTS `mri_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `mri_data` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `time_fk` timestamp(6) NULL DEFAULT NULL,
-  `Process_Name` varchar(255) DEFAULT NULL,
-  `Process_Id` int(11) unsigned DEFAULT NULL,
+  `TimeStamp` timestamp(6) NOT NULL,
+  `FileName` varchar(45) NOT NULL,
+  `Process_Name` varchar(255) NOT NULL,
+  `Process_Id` int(11) unsigned NOT NULL,
   `WSP` double unsigned DEFAULT NULL,
   `WSPPeak` double unsigned DEFAULT NULL,
   `HC` int(11) unsigned DEFAULT NULL,
@@ -130,8 +133,8 @@ CREATE TABLE `mri_data` (
   `PFS` double unsigned DEFAULT NULL,
   `PFSPeak` double unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `time_fk_idx` (`time_fk`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+  KEY `time_fk_idx` (`TimeStamp`)
+) ENGINE=InnoDB AUTO_INCREMENT=474353 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -140,7 +143,7 @@ CREATE TABLE `mri_data` (
 
 DROP TABLE IF EXISTS `process`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `process` (
   `process_id` int(100) unsigned NOT NULL AUTO_INCREMENT,
   `process_name` varchar(255) DEFAULT NULL,
@@ -156,7 +159,7 @@ CREATE TABLE `process` (
 
 DROP TABLE IF EXISTS `time`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `time` (
   `time_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `timeStamp` timestamp(6) NULL DEFAULT NULL,
@@ -164,10 +167,6 @@ CREATE TABLE `time` (
   UNIQUE KEY `timeStamp_UNIQUE` (`timeStamp`)
 ) ENGINE=InnoDB AUTO_INCREMENT=35610 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping routines for database 'mri'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -178,4 +177,4 @@ CREATE TABLE `time` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-26  2:27:13
+-- Dump completed on 2019-04-08  1:24:02
