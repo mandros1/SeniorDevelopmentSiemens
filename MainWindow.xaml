@@ -11,28 +11,65 @@
         Title="Siemens Performance Logs" Height="450" Width="800" MinHeight="250" MinWidth="550">
     <Grid>
         <DockPanel>
-            <StackPanel></StackPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
-                <TabItem x:Name="Queries" Header="Queries">
+                <TabItem x:Name="Welcome" Header="Welcome">
                     <TabControl VerticalAlignment="Top" Margin="0,0,0,0" TabStripPlacement="Left">
                         <TabItem Header="Query">
-                            <Grid HorizontalAlignment="Left" Height="330" Margin="0,0,0,0" VerticalAlignment="Top" Width="681" >
-                                <Label Content="Select:" HorizontalAlignment="Left" Margin="29,15,0,0" VerticalAlignment="Top"/>
-                                <ComboBox x:Name="SelectFile" HorizontalAlignment="Left" Margin="86,15,0,0" VerticalAlignment="Top" Width="120"/>
-                                <Label Content="Between:" HorizontalAlignment="Left" Margin="15,46,0,0" VerticalAlignment="Top"/>
-                                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp1" Width="120" Margin="86,46,475,258" />
-                                <TextBox Height="23" TextWrapping="Wrap" Text="Timestamp2" Width="120" Margin="268,46,293,258"/>
-                                <Label Content="and" HorizontalAlignment="Left" Margin="224,46,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.044,0.538"/>
-                                <Label Content="Where:" HorizontalAlignment="Left" Margin="26,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
-                                <ComboBox HorizontalAlignment="Left" Margin="86,77,0,0" VerticalAlignment="Top" Width="120"/>
-                                <Label Content="equals" HorizontalAlignment="Left" Margin="217,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.477,2.731"/>
-                                <TextBox Height="23" TextWrapping="Wrap" Text="Value" Width="120" Margin="268,77,293,227"/>
-                                <Button IsDefault="true" Content="Run" Margin="174,133,425,168"/>
-                            </Grid>
+                            <StackPanel Margin="0,10,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Margin="10, 0, 0, 0">Filter by:</Label>
+                                    <ComboBox Margin="10, 0, 10, 0" Width="100"></ComboBox>
+                                    <StackPanel Margin="20,0,0,0" Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Process Name:</Label>
+                                            <ComboBox Margin="10,0,0,0" Width="120"></ComboBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Margin="20,0,0,0">Process id:</Label>
+                                            <ComboBox Margin="10,0,10,0" Width="100"></ComboBox>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                                <DockPanel Margin="0,10,0,0">
+                                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                        <Label Width="50" Margin="10,0,0,0">SELECT</Label>
+                                        <ComboBox Width="100" Margin="15,0,0,0"></ComboBox>
+                                    </StackPanel>
+                                    <ComboBox DockPanel.Dock="right" Margin="0,0,10,0" Width="50"></ComboBox>
+                                    <Label></Label>
+                                </DockPanel>
+                                <DockPanel Margin="0,10,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Margin="10,0,0,0" Width="50">WHERE</Label>
+                                        <ComboBox Margin="15,0,0,0" Width="100"></ComboBox>
+                                        <ComboBox Margin="40,0,0,0" Width="60"></ComboBox>
+                                        <Label Margin="20,0,0,0">Value:</Label>
+                                        <TextBox Margin="10,0,0,0" Width="100">Enter a Value</TextBox>
+                                        <ComboBox Margin="40,0,0,0" Width="60"></ComboBox>
+                                    </StackPanel>
+                                    <ComboBox DockPanel.Dock="right" Margin="0,0,10,0" Width="50"></ComboBox>
+                                    <Label></Label>
+                                </DockPanel>
+                                <DockPanel Margin="0,10,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Margin="10,0,0,0" Width="50">WHERE</Label>
+                                        <ComboBox Margin="15,0,0,0" Width="100"></ComboBox>
+                                        <Label Margin="10,0,0,0">BETWEEN</Label>
+                                        <TextBox Margin="10,0,0,0" Width="80">start value</TextBox>
+                                        <Label Margin="10,0,0,0">AND</Label>
+                                        <TextBox Margin="10,0,0,0" Width="80">end value</TextBox>
+                                        <ComboBox Margin="35,0,0,0" Width="60"></ComboBox>
+                                    </StackPanel>
+                                    <ComboBox DockPanel.Dock="right" Margin="0,0,10,0" Width="50"></ComboBox>
+                                    <Label></Label>
+                                </DockPanel>
+                            </StackPanel>
                         </TabItem>
                     </TabControl>
                 </TabItem>
-                <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" />
+                <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" >
+                    Things
+                </TabItem>
             </TabControl>
         </DockPanel>
     </Grid>
