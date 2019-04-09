@@ -153,7 +153,7 @@ namespace SiemensPerformance
             gloabalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
             string line;
-            DataInsert dataInsert = new DataInsert();
+           // DataInsert dataInsert = new DataInsert();
             var time_array = new List<string>();
             List<List<string>> process_array = new List<List<string>>();
 
@@ -201,11 +201,11 @@ namespace SiemensPerformance
                     }
                     counter++;
                 }
-                dataInsert.insertTime(time_array);
+                //dataInsert.insertTime(time_array);
                 //dataInsert.insertProcess(process_array);
-                dataInsert.insertMRI_Data(processes2DList);
-                dataInsert.insertGlobal0(gloabalZero2DList);
-                dataInsert.insertGlobalTotal(globalTotal2DList);
+                //dataInsert.insertMRI_Data(processes2DList);
+               // dataInsert.insertGlobal0(gloabalZero2DList);
+               // dataInsert.insertGlobalTotal(globalTotal2DList);
             }
             catch (Exception e)
             {
