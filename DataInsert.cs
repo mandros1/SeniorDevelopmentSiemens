@@ -350,7 +350,7 @@ namespace SiemensPerformance
             conn.Close();
         }
 
-        public void insertQuery(List<string[]> query)
+        public void insertQuery(List<string> query)
         {
 
             conn = DBConnect.conn;
