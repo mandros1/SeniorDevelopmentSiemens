@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿//using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,17 +21,17 @@ namespace SiemensPerformance
     
     public partial class Login : Window
     {
-        DBConnect connect;
+        //DBConnect connect;
        
         public Login()
         {
             InitializeComponent();
-            connect = new DBConnect();
+           // connect = new DBConnect();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            connect = new DBConnect(database.Text, username.Text, password.Password);
+           // connect = new DBConnect(database.Text, username.Text, password.Password);
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
