@@ -216,6 +216,11 @@ namespace SiemensPerformance
         //Save Query into Database
         private void SaveButton_Click(object sender, EventArgs e)
         {
+            List<string> primes = new List<string>();
+            primes.Add(2);
+            primes.Add(3);
+            primes.Add(5);
+            primes.Add(7);
             string name = new InputBox("Name").ShowDialog();
             if (name == "" || name ==null)
             {
@@ -223,13 +228,17 @@ namespace SiemensPerformance
             }
             //Console.WriteLine("Just Select");
             //Console.WriteLine("Combobox: " + (string)comboBox.SelectedItem);
+            Console.WriteLine("Query Name: " + name);
             Console.WriteLine("Process Name: " + (string)processNameCB.SelectedItem);
             Console.WriteLine("Process Id: "+ (string)processIdCB.SelectedItem);
+            Console.WriteLine("Select Attribute: " + (string)selectComboBox.SelectedItem);
             Console.WriteLine((string)finalSelectCB.SelectedItem);
-            Console.WriteLine("Where Column: " + (string)whereSelectName.SelectedItem);
-            Console.WriteLine("Where Operator: " + (string)whereOperatorsComboBox.SelectedItem);
-            Console.WriteLine("Where Operator Value: " + whereValue.Text);
-             
+            //if 
+            //Console.WriteLine("Where Column: " + (string)whereSelectName.SelectedItem);
+            //Console.WriteLine("Where Operator: " + (string)whereOperatorsComboBox.SelectedItem);
+            //Console.WriteLine("Where Operator Value: " + whereValue.Text);
+            //Console.WriteLine("Where or;: " + finalSelectCB.Text);
+
             //Console.WriteLine("Value: "+ whereValue.Text);
         }
 
