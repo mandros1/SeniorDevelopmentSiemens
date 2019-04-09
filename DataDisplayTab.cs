@@ -303,11 +303,11 @@ namespace SiemensPerformance
                 List<string[]> youGoodMate = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
                 processData = youGoodMate;
             }
-            else
-            {
-                List<string[]> test = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
-                processData = test;
-            }
+           // else
+            //{
+                //List<string[]> test = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                //processData = test;
+            //}
             // if it is on process filter
             if (String.Equals((string)finalSelectCB.SelectedItem, ";") 
                 && 
