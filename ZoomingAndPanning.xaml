@@ -37,8 +37,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <xctk:DateTimePicker Name="startTime" Format="SortableDateTime" DefaultValue="2018-05-08T20:45:50"></xctk:DateTimePicker>
-                <xctk:DateTimePicker Name="endTime"  Format="SortableDateTime" DefaultValue="2018-05-08T21:35:50" Grid.Column="1"></xctk:DateTimePicker>
+                <xctk:DateTimeUpDown Name="startTime" Foreground="White" Format="SortableDateTime" DefaultValue="2018-05-08T20:45:50" DisplayDefaultValueOnEmptyText="True"></xctk:DateTimeUpDown>
+                <xctk:DateTimeUpDown Name="endTime" Foreground="White" Format="SortableDateTime" DefaultValue="2018-05-08T21:35:50"  DisplayDefaultValueOnEmptyText="True" Grid.Column="1"></xctk:DateTimeUpDown>
                 <Button Grid.Column="2" Click="Update">Update</Button>
                 <Button Grid.Column="3" Click="ResetZoomOnClick">Reset Zoom</Button>
             </Grid>
