@@ -61,7 +61,109 @@ namespace SiemensPerformance
         private List<string[]> processData;
         public static string utfFileName;
 
+        private int dbConnection;
 
+        public DataDisplayTab(int dbInt)
+        {
+            dbConnection = dbInt;
+            //Open File
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
+
+            //Get Data
+            if (ofd.ShowDialog() == true)
+            {
+                if (ofd.FileName.EndsWith(".utr"))
+                {
+                    generator.getJsonString(ofd);
+                    displayable = true;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                displayable = false;
+                return;
+            }
+
+            TabControl tc = new TabControl();
+
+            //Tab dropdown menu
+            //Rename Tab
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem menuItem1 = new MenuItem();
+            contextMenu.Items.Add(menuItem1);
+            menuItem1.Header = "Rename";
+            menuItem1.Click += delegate { Rename(); };
+
+            /* TODO Make this work correctly
+            //Save data to Json
+            MenuItem menuItem2 = new MenuItem();
+            contextMenu.Items.Add(menuItem2);
+            menuItem2.Header = "Save";
+            menuItem2.Click += delegate { Save(); };
+            */
+
+            //Close Tab
+            MenuItem menuItem2 = new MenuItem();
+            contextMenu.Items.Add(menuItem2);
+            menuItem2.Header = "Close";
+            menuItem2.Click += delegate { Close(); };
+
+            this.ContextMenu = contextMenu;
+
+            // Create process table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Processes";
+            // Pumping content into the table
+            processGrid = dataGridData(generator.processes2DList, generator.processVariables, processTable);
+            tabItem.Content = processGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(0, tabItem);
+
+            // Create global zero table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Global(0)";
+            // Pumping content into the table
+            globalZeroGrid = dataGridData(generator.gloabalZero2DList, generator.globalVariables, globalZeroTable);
+            tabItem.Content = globalZeroGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(1, tabItem);
+
+
+            // Create global total table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Global(_Total)";
+            // Pumping content into the table
+            globalTotalGrid = dataGridData(generator.globalTotal2DList, generator.globalTotalVariables, globalTotalTable);
+            tabItem.Content = globalTotalGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(2, tabItem);
+
+
+            // Create Graph tab
+            graphTabItem = new TabItem();
+            graphTabItem.Header = "Graph";
+
+            graphTabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(3, graphTabItem);
+
+            // Create Query tab
+            tabItem = generateQueryTabItem();
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(4, tabItem);
+
+            this.Content = tc;
+        }
 
         public DataDisplayTab()
         {
@@ -164,14 +266,17 @@ namespace SiemensPerformance
         } 
 
 
-       
         /**
          * Main method for generating query tab item
          */
         private TabItem generateQueryTabItem()
         {
             TabItem tab = new TabItem();
-            tab.Header = "Query";
+            if (dbConnection == 1) { tab.Header = "Query file"; }
+            else
+            {
+                tab.Header = "Query database";
+            }
 
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
@@ -188,15 +293,24 @@ namespace SiemensPerformance
 
         private void NewButton_Click(object sender, EventArgs e)
         {
-            List<string[]> youGoodMate = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+            if (dbConnection == 1)
+            {
+                List<string[]> youGoodMate = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                processData = youGoodMate;
+            }
+            else
+            {
+                List<string[]> test = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                processData = test;
+            }
             // if it is on process filter
             if (String.Equals((string)finalSelectCB.SelectedItem, ";") 
                 && 
                 String.Equals((string)filterCB.SelectedItem, "Process"))
             {
                 Console.WriteLine("Just Select");
-                processData = youGoodMate;
-                graphTabItem.Content = PopulateGraph(youGoodMate, (string)selectComboBox.SelectedItem);
+               
+                graphTabItem.Content = PopulateGraph(processData, (string)selectComboBox.SelectedItem);
             }
             else if (   String.Equals((string)finalSelectCB.SelectedItem, "WHERE") 
                         && 
@@ -206,7 +320,7 @@ namespace SiemensPerformance
                 string whereColumn = (string)whereSelectName.SelectedItem;
                 string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
                 string whereVal = whereValue.Text;
-                processData = generator.getWhereProcessData(youGoodMate, whereColumn, whereOperator, whereVal);
+                processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal);
             }
 
             processTable = ConvertListToDataTable(processData, generator.processVariables);
@@ -268,6 +382,7 @@ namespace SiemensPerformance
             return saveButton;
         }
         private DockPanel baseDockPanel()
+
         {
             dockPanel = new DockPanel();
 
@@ -783,6 +898,7 @@ namespace SiemensPerformance
                 {
                     table.Rows.Add(array);
                 }
+
             }
             return table;
         }
@@ -826,8 +942,8 @@ namespace SiemensPerformance
             //Create save dialog
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.FileName = defaultName;
-            dlg.DefaultExt = ".json";
-            dlg.Filter = "Json files (.json)|*.json";
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Text files (.txt)|*.txt";
 
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
@@ -885,6 +1001,8 @@ namespace SiemensPerformance
          */
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
         {
+            
+
             ChartValues<DateModel> data = new ChartValues<DateModel>();
 
             int variableIndex = Array.IndexOf(generator.processVariables, variable);

@@ -3,17 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
+using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace SiemensPerformance
 {
     class DataGenerator
     {
-
+        public MySqlConnection conn = DBConnect.conn;
         public List<string[]> dlist { get; set; }
         public List<string[]> processes2DList { get; set; }
         public List<string[]> gloabalZero2DList { get; set; }
         public List<string[]> globalTotal2DList { get; set; }
         public List<string> processes { get; set; }
+        public string[] processesDB { get; set; }
         private List<string> singleList { get; set; }
         public string fileName { get; set; }
         private List<string> processNamesList;
@@ -97,7 +100,73 @@ namespace SiemensPerformance
             Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
             return processes2DList;
         }
+        /// <summary>
+        /// returns all the data and inserts it to list, problem with Ticks , probably with the way i create List.
+        /// </summary>
+        /// <param name="processName"></param>
+        /// <returns></returns>
+        public List<string[]> getDataFromDb(string processName, string processId) {
+            Console.WriteLine(processName);
+            List<string[]> all = new List<string[]>();
+
+            try
+            {
+                Console.WriteLine("Connecting to MySQL...");
+                conn.Open();
+
+                string sql = "SELECT  *, DATE_FORMAT(time_fk, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "' AND process_Id = '" + processId + "';";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                  
+                    string a = "";
+                    for (int i = 0; i < rdr.FieldCount; i++)
+                    {
+                        //Console.WriteLine(i+" "+rdr[i]);
+                        if (i == 1)
+                        {
+                            a += rdr[22].ToString() + ";";
+                            //Console.WriteLine(a);
+                        }
+                        else if (i == 22) {
+                            //Console.WriteLine("Didnt write to array "+ rdr[i]); 
+                        }
+                        else
+                        {
+                            a += rdr[i].ToString() + ";";
+                            //Console.WriteLine(a);
+                        }
+                        
+                        if (i+1 == rdr.FieldCount)
+                        {
+                            //Console.WriteLine(a);
+                            
+                            string[] everything = a.Split(';');
+                            //Remove first and last element from array
+                            everything = everything.Skip(1).ToArray();
+                            everything = everything.Take(everything.Count() - 1).ToArray();
+                            all.Add(everything);
+                        }
         
+                    };
+                }
+                rdr.Close();
+ 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+
+            processData2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
+            Console.WriteLine("Done.");
+            return processData2DList;
+
+        }
 
         public List<string[]> getWhereProcessData(  List<string[]> processDataFilteredNameAndID, 
                                                     string whereColumn, 

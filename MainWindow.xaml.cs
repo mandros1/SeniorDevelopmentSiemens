@@ -27,6 +27,7 @@ namespace SiemensPerformance
 
         public Func<double, string> Formatter { get; set; }
         private TabControl tabs;
+        private int dbConnection;
 
         public MainWindow()
         {
@@ -36,6 +37,14 @@ namespace SiemensPerformance
 
             // Tabs setup
             tabs = (TabControl)this.FindName("logNav");
+        }
+        public MainWindow(int dbInt) {
+            dbConnection = dbInt;
+            InitializeComponent();
+
+            // Tabs setup
+            tabs = (TabControl)this.FindName("logNav");
+
         }
 
         // Called when a new log tab item is chosen
@@ -62,8 +71,13 @@ namespace SiemensPerformance
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
-            DataDisplayTab tab = new DataDisplayTab();
-            if(tab.displayable) return tab;
+            if (dbConnection == 1) { DataDisplayTab tab = new DataDisplayTab(dbConnection); if (tab.displayable) return tab; }
+            else
+            {
+                DataDisplayTab tab = new DataDisplayTab();
+                if (tab.displayable) return tab;
+            }
+          
             return null;
         }
         /*
