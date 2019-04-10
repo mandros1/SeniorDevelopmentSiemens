@@ -118,7 +118,7 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
             }
             else
             {
-                Console.WriteLine("Start time must be less than end time");
+                MessageBox.Show("Start time must be less than end time");
             }
         }
 
