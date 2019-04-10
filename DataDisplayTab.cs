@@ -60,8 +60,7 @@ namespace SiemensPerformance
         //private DataTable dataTable;
         private List<string[]> processData;
         public static string utfFileName;
-
-        private int dbConnection;
+        public static int dbConnection;
 
         public DataDisplayTab(int dbInt)
         {

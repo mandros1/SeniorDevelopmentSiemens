@@ -267,13 +267,19 @@ namespace SiemensPerformance
                     }
                     counter++;
                 }
-                //dataInsert.insertTime(time_array);
-                //dataInsert.insertProcess(process_array);
+                if (DataDisplayTab.dbConnection != 1)
+                {
+                    //dataInsert.insertTime(time_array);
+                    //dataInsert.insertProcess(process_array);
+                    //Throws Object reference not set to an instance of an object. 'System.NullReferenceException'
+                    dataInsert.insertMRI_Data(processes2DList);
+                    //dataInsert.insertGlobal0(gloabalZero2DList);
+                    //dataInsert.insertGlobalTotal(globalTotal2DList);
+                }
+            }
+            catch (NullReferenceException nre)
+            {
 
-                //Throws Object reference not set to an instance of an object. 'System.NullReferenceException'
-                dataInsert.insertMRI_Data(processes2DList);
-                //dataInsert.insertGlobal0(gloabalZero2DList);
-                //dataInsert.insertGlobalTotal(globalTotal2DList);
             }
             catch (Exception e)
             {
