@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `global0`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `global0` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `time_fk` timestamp(6) NULL DEFAULT NULL,
+  `TimeStamp` timestamp(6) NULL DEFAULT NULL,
   `FileName` varchar(45) NOT NULL,
   `GCPU0` double unsigned DEFAULT NULL,
   `GCPU0Peak` double unsigned DEFAULT NULL,
@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS `globaltotal`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `globaltotal` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `time_fk` timestamp(6) NULL DEFAULT NULL,
+  `TimeStamp` timestamp(6) NULL DEFAULT NULL,
   `FileName` varchar(45) NOT NULL,
   `GCPU` double unsigned DEFAULT NULL,
   `GCPUPeak` double unsigned DEFAULT NULL,

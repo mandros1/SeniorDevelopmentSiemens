@@ -131,7 +131,7 @@ namespace SiemensPerformance
         public void insertGlobal0(List<string[]> global0_data)
         {
             conn = DBConnect.conn;
-            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO global0(time_fk, FileName, GCPU0, GCPU0Peak,GCPU1, GCPU1Peak, GCPU2, GCPU2Peak, GCPU3, GCPU3Peak, GCPU4, GCPU4Peak, GCPU5, GCPU5Peak, GCPU6, GCPU6Peak, GCPU7, GCPU7Peak, GCPU8, GCPU8Peak, GCPU9, GCPU9Peak, GCPU10, GCPU10Peak, GCPU11, GCPU11Peak, GCPU12, GCPU12Peak, GCPU13, GCPU13Peak, GCPU14, GCPU14Peak, GCPU15, GCPU15Peak) VALUES ");
+            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO global0(TimeStamp, FileName, GCPU0, GCPU0Peak,GCPU1, GCPU1Peak, GCPU2, GCPU2Peak, GCPU3, GCPU3Peak, GCPU4, GCPU4Peak, GCPU5, GCPU5Peak, GCPU6, GCPU6Peak, GCPU7, GCPU7Peak, GCPU8, GCPU8Peak, GCPU9, GCPU9Peak, GCPU10, GCPU10Peak, GCPU11, GCPU11Peak, GCPU12, GCPU12Peak, GCPU13, GCPU13Peak, GCPU14, GCPU14Peak, GCPU15, GCPU15Peak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable global0Table = new DataTable();
 
@@ -280,7 +280,7 @@ namespace SiemensPerformance
         public void insertGlobalTotal(List<string[]> globalTotal_data)
         {
             conn = DBConnect.conn;
-            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO globaltotal(time_fk,FileName,GCPU, GCPUPeak, GMA, GMAPeak, GPC, GPCPeak, GHC, GHCPeak, GHPF, GCPUP, GCPUPPeak, GMF, GMFPeak, GMCOMM, GMCOMMPeak, GML, GMLPeak, GPFC, GPFCPeak, GMC, GMCPeak) VALUES ");
+            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO globaltotal(TimeStamp,FileName,GCPU, GCPUPeak, GMA, GMAPeak, GPC, GPCPeak, GHC, GHCPeak, GHPF, GCPUP, GCPUPPeak, GMF, GMFPeak, GMCOMM, GMCOMMPeak, GML, GMLPeak, GPFC, GPFCPeak, GMC, GMCPeak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable globalTotalTable = new DataTable();
 

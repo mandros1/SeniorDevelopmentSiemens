@@ -926,8 +926,7 @@ namespace SiemensPerformance
         }
 
         /*
-         * Saves data from a graph to json file
-         * TODO - make this week
+         * Saves data from a graph/query to json file
          */
         private void Save()
         {
@@ -938,15 +937,6 @@ namespace SiemensPerformance
             {
                 defaultName = defaultName.Substring(0, defaultName.Length - 4);
             }
-
-            //Create save dialog
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = defaultName;
-            dlg.DefaultExt = ".txt";
-            dlg.Filter = "Text files (.txt)|*.txt";
-
-            // Show save file dialog box
-            Nullable<bool> result = dlg.ShowDialog();
 
             try
             {
@@ -966,8 +956,17 @@ namespace SiemensPerformance
             }
             finally
             {
-                string json = JsonConvert.SerializeObject(processTable, Formatting.Indented);
+                //Create save dialog
+                Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+                dlg.FileName = defaultName;
+                dlg.DefaultExt = ".json";
+                dlg.Filter = "JSON (.json)|*.json";
 
+                // Show save file dialog box
+                Nullable<bool> result = dlg.ShowDialog();
+
+                string json = JsonConvert.SerializeObject(processTable, Formatting.Indented);
+                var list = 
                 // Process save file dialog box results
                 if (result == true)
                 {
