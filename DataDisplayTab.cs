@@ -68,7 +68,7 @@ namespace SiemensPerformance
             dbConnection = dbInt;
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
+            ofd.Filter = "Log/Text Files (*.utr; *.json)|*.utr; *.json";
 
             //Get Data
             if (ofd.ShowDialog() == true)
@@ -78,6 +78,13 @@ namespace SiemensPerformance
                     generator.getJsonString(ofd);
                     displayable = true;
                 }
+
+                /*Not Working */
+                //else if (ofd.FileName.EndsWith(".json"))
+                //{
+                //    Console.WriteLine("Working");
+                //    displayable = true;
+                //}
                 else
                 {
                     return;
@@ -99,19 +106,19 @@ namespace SiemensPerformance
             menuItem1.Header = "Rename";
             menuItem1.Click += delegate { Rename(); };
 
-            /* TODO Make this work correctly
+            //TODO Make this work correctly
             //Save data to Json
             MenuItem menuItem2 = new MenuItem();
             contextMenu.Items.Add(menuItem2);
             menuItem2.Header = "Save";
             menuItem2.Click += delegate { Save(); };
-            */
+            
 
             //Close Tab
-            MenuItem menuItem2 = new MenuItem();
-            contextMenu.Items.Add(menuItem2);
-            menuItem2.Header = "Close";
-            menuItem2.Click += delegate { Close(); };
+            MenuItem menuItem3 = new MenuItem();
+            contextMenu.Items.Add(menuItem3);
+            menuItem3.Header = "Close";
+            menuItem3.Click += delegate { Close(); };
 
             this.ContextMenu = contextMenu;
 
@@ -470,7 +477,12 @@ namespace SiemensPerformance
                 stackPanel = new StackPanel();
                 stackPanel.Orientation = Orientation.Horizontal;
                 stackPanel.Children.Add(runButtonGenerator());
-                stackPanel.Children.Add(saveButtonGenerator());
+                if (dbConnection == 1) {}
+                else
+                {
+                    stackPanel.Children.Add(saveButtonGenerator());
+                }
+                //stackPanel.Children.Add(saveButtonGenerator());
 
                 mainStackPanel.Children.Add(stackPanel);
             }
@@ -966,7 +978,6 @@ namespace SiemensPerformance
                 Nullable<bool> result = dlg.ShowDialog();
 
                 string json = JsonConvert.SerializeObject(processTable, Formatting.Indented);
-                var list = 
                 // Process save file dialog box results
                 if (result == true)
                 {

@@ -11,7 +11,7 @@ namespace SiemensPerformance
     class DataInsert
     {
         MySqlConnection conn;
-        string fileName = DataDisplayTab.utfFileName.Split('.')[0];
+        string fileName;
         public DataInsert()
         {
             conn = DBConnect.conn;
@@ -19,6 +19,7 @@ namespace SiemensPerformance
 
         public void insertProcess(List<List<string>> process_name)
         {
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
             conn = DBConnect.conn;
             StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO process(process_name, process_name_id) VALUES ");
             List<string> Rows = new List<string>();
@@ -91,6 +92,7 @@ namespace SiemensPerformance
         public void insertTime(List<string> time_timestamp)
         {
             conn = DBConnect.conn;
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
             StringBuilder insertCommand = new StringBuilder("INSERT INTO time(timeStamp) VALUES ");
             List<string> Rows = new List<string>();
 
@@ -131,6 +133,7 @@ namespace SiemensPerformance
         public void insertGlobal0(List<string[]> global0_data)
         {
             conn = DBConnect.conn;
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
             StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO global0(TimeStamp, FileName, GCPU0, GCPU0Peak,GCPU1, GCPU1Peak, GCPU2, GCPU2Peak, GCPU3, GCPU3Peak, GCPU4, GCPU4Peak, GCPU5, GCPU5Peak, GCPU6, GCPU6Peak, GCPU7, GCPU7Peak, GCPU8, GCPU8Peak, GCPU9, GCPU9Peak, GCPU10, GCPU10Peak, GCPU11, GCPU11Peak, GCPU12, GCPU12Peak, GCPU13, GCPU13Peak, GCPU14, GCPU14Peak, GCPU15, GCPU15Peak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable global0Table = new DataTable();
@@ -217,6 +220,7 @@ namespace SiemensPerformance
         public void insertMRI_Data(List<string[]> mri_data)
         {
             conn = DBConnect.conn;
+            //fileName = DataDisplayTab.utfFileName.Split('.')[0];
             StringBuilder insertCommand = new StringBuilder("USE mri; SET GLOBAL max_allowed_packet=1024*1024*1024; INSERT INTO mri_data(TimeStamp, FileName, Process_Name, Process_Id,WSP,WSPPeak,HC,HCPeak,TC,TCPeak,CPU,CPUPeak,GDIC,GDICPeak,USRC,USRCPeak,PRIV,PRIVPeak,VIRT,VIRTPeak,PFS,PFSPeak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable globalTotalTable = new DataTable();
@@ -280,6 +284,7 @@ namespace SiemensPerformance
         public void insertGlobalTotal(List<string[]> globalTotal_data)
         {
             conn = DBConnect.conn;
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
             StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO globaltotal(TimeStamp,FileName,GCPU, GCPUPeak, GMA, GMAPeak, GPC, GPCPeak, GHC, GHCPeak, GHPF, GCPUP, GCPUPPeak, GMF, GMFPeak, GMCOMM, GMCOMMPeak, GML, GMLPeak, GPFC, GPFCPeak, GMC, GMCPeak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable globalTotalTable = new DataTable();
