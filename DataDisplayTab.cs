@@ -832,17 +832,16 @@ namespace SiemensPerformance
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
 
-            string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
+           // string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
 
             // Process save file dialog box results
             if (result == true)
             {
                 // Save document
                 string filename = dlg.FileName;
-                File.WriteAllText(filename, json);
+               // File.WriteAllText(filename, json);
             }
         }
-        */
 
         /*
          * Close a tab
