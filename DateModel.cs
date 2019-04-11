@@ -1,5 +1,8 @@
 ﻿using System;
 
+/*
+ * Object used for graph values
+ */
 namespace SiemensPerformance
 {
     public class DateModel
