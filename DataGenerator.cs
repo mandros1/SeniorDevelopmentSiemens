@@ -193,6 +193,8 @@ namespace SiemensPerformance
             List<List<string>> process_array = new List<List<string>>();
           */
             file = new System.IO.StreamReader(dialog.FileName);
+
+            //int lineCount = File.ReadAllLines(dialog.FileName).Length;
             
             try
             {
@@ -247,6 +249,8 @@ namespace SiemensPerformance
                         globalTotal2DList.Add(singleList.Skip(1).ToArray());
                     }
                     counter++;
+                    //double calc = ((double)counter / (double)lineCount);
+                    //pbar.Value = Math.Ceiling(calc * 100);
                 }
                 //dataInsert.insertTime(time_array);
                 //dataInsert.insertProcess(process_array);
@@ -312,6 +316,7 @@ namespace SiemensPerformance
                     colonIndex = line.IndexOf(':');
                     subbedLine = line.Substring(colonIndex + 2);
                     if (subbedLine.Contains("n.a.")) subbedLine = "0.0";
+                    Console.WriteLine(subbedLine);
                     yield return Regex.Replace(subbedLine, @"[^0-9.]", "");
                 }
 
