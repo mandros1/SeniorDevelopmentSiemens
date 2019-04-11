@@ -59,6 +59,7 @@ namespace SiemensPerformance
         private DataGrid dataGrid;
         //private DataTable dataTable;
         private List<string[]> processData;
+        private List<string> queryList;
         public static string utfFileName;
         public static int dbConnection;
 
@@ -331,23 +332,36 @@ namespace SiemensPerformance
 
             processTable = ConvertListToDataTable(processData, generator.processVariables);
             processGrid.ItemsSource = processTable.DefaultView;
+
+            queryList = new List<string>();
+            queryList.Add("processName:" + (string)processNameCB.SelectedItem);
+            queryList.Add("processId:" + (string)processIdCB.SelectedItem);
+            queryList.Add("selectValue:" + (string)selectComboBox.SelectedItem);
+            queryList.Add("where:" + (string)finalSelectCB.SelectedItem);
+
+            if ((string)finalSelectCB.SelectedItem == "WHERE")
+            {
+                queryList.Add("whereColumn: " + (string)whereSelectName.SelectedItem);
+                queryList.Add("whereOperator: " + (string)whereOperatorsComboBox.SelectedItem);
+                queryList.Add("whereOperatorValue: " + whereValue.Text);
+            }
         }
 
         //Save Query into Database
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            List<string> query = new List<string>();
+            queryList = new List<string>();
             string name = new InputBox("Name").ShowDialog();
             if (name == "" || name ==null)
             {
                 name = new InputBox("Name").ShowDialog();
             }
 
-            query.Add(name);
-            query.Add("processName=" + (string)processNameCB.SelectedItem);
-            query.Add("processId=" + (string)processIdCB.SelectedItem);
-            query.Add("prcoessValue="+ (string)selectComboBox.SelectedItem);
-            query.Add("selectValue=" + (string)finalSelectCB.SelectedItem);
+            queryList.Add(name);
+            queryList.Add("processName:" + (string)processNameCB.SelectedItem);
+            queryList.Add("processId:" + (string)processIdCB.SelectedItem);
+            queryList.Add("prcoessValue:"+ (string)selectComboBox.SelectedItem);
+            queryList.Add("selectValue:" + (string)finalSelectCB.SelectedItem);
 
             Console.WriteLine("Query Name: " + name);
             Console.WriteLine("Process Name: " + (string)processNameCB.SelectedItem);
@@ -362,7 +376,7 @@ namespace SiemensPerformance
 
             //Console.WriteLine("Value: "+ whereValue.Text);
             DataInsert dataInsert = new DataInsert();
-            dataInsert.insertQuery(query);
+            dataInsert.insertQuery(queryList);
         }
 
         private Button runButtonGenerator()
@@ -385,6 +399,14 @@ namespace SiemensPerformance
             saveButton.Margin = new System.Windows.Thickness(320, 10, 0, 0);
             saveButton.Click += new System.Windows.RoutedEventHandler(SaveButton_Click);
 
+            if (dbConnection == 1)
+            {
+
+            }
+            else
+            {
+                return saveButton;
+            }
             return saveButton;
         }
         private DockPanel baseDockPanel()
@@ -955,18 +977,7 @@ namespace SiemensPerformance
                 {
                     Console.WriteLine("Error. Table is null");
                 }
-            }
 
-            catch (NullReferenceException nre)
-            {
-                MessageBox.Show("Cannot create a result file. Create a query first!");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            finally
-            {
                 //Create save dialog
                 Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
                 dlg.FileName = defaultName;
@@ -976,14 +987,25 @@ namespace SiemensPerformance
                 // Show save file dialog box
                 Nullable<bool> result = dlg.ShowDialog();
 
+                var query = JsonConvert.SerializeObject(queryList);
                 string json = JsonConvert.SerializeObject(processTable, Formatting.Indented);
                 // Process save file dialog box results
                 if (result == true)
                 {
                     // Save document
                     string filename = dlg.FileName;
-                    File.WriteAllText(filename, json);
+                    File.WriteAllText(filename, query);
+                    File.AppendAllText(filename, json);
                 }
+            }
+
+            catch (NullReferenceException nre)
+            {
+                MessageBox.Show("Cannot create a result file. Create a query first!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
