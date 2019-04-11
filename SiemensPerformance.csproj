@@ -103,6 +103,10 @@
     <Compile Include="ZoomingAndPanning.xaml.cs">
       <DependentUpon>ZoomingAndPanning.xaml</DependentUpon>
     </Compile>
+    <Page Include="Login.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
