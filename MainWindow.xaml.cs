@@ -46,7 +46,6 @@ namespace SiemensPerformance
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
-            //var myProgressBar = (ProgressBar)this.FindName("pBar");
             DataDisplayTab tab = new DataDisplayTab();
             if(tab.displayable) return tab;
             return null;

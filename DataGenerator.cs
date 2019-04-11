@@ -188,8 +188,6 @@ namespace SiemensPerformance
             globalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
             file = new System.IO.StreamReader(dialog.FileName);
-
-            //int lineCount = File.ReadAllLines(dialog.FileName).Length;
             
             try
             {
@@ -220,8 +218,6 @@ namespace SiemensPerformance
                         globalTotal2DList.Add(singleList.Skip(1).ToArray());
                     }
                     counter++;
-                    //double calc = ((double)counter / (double)lineCount);
-                    //pbar.Value = Math.Ceiling(calc * 100);
                 }
             }
             catch (Exception e)
@@ -282,7 +278,6 @@ namespace SiemensPerformance
                     colonIndex = line.IndexOf(':');
                     subbedLine = line.Substring(colonIndex + 2);
                     if (subbedLine.Contains("n.a.")) subbedLine = "0.0";
-                    Console.WriteLine(subbedLine);
                     yield return Regex.Replace(subbedLine, @"[^0-9.]", "");
                 }
 
