@@ -360,21 +360,15 @@ namespace SiemensPerformance
             queryList.Add(name);
             queryList.Add("processName:" + (string)processNameCB.SelectedItem);
             queryList.Add("processId:" + (string)processIdCB.SelectedItem);
-            queryList.Add("prcoessValue:"+ (string)selectComboBox.SelectedItem);
-            queryList.Add("selectValue:" + (string)finalSelectCB.SelectedItem);
+            queryList.Add("selectValue:" + (string)selectComboBox.SelectedItem);
+            queryList.Add("where:" + (string)finalSelectCB.SelectedItem);
 
-            Console.WriteLine("Query Name: " + name);
-            Console.WriteLine("Process Name: " + (string)processNameCB.SelectedItem);
-            Console.WriteLine("Process Id: "+ (string)processIdCB.SelectedItem);
-            Console.WriteLine("Select Attribute: " + (string)selectComboBox.SelectedItem);
-            Console.WriteLine((string)finalSelectCB.SelectedItem);
-            //if 
-            //Console.WriteLine("Where Column: " + (string)whereSelectName.SelectedItem);
-            //Console.WriteLine("Where Operator: " + (string)whereOperatorsComboBox.SelectedItem);
-            //Console.WriteLine("Where Operator Value: " + whereValue.Text);
-            //Console.WriteLine("Where or;: " + finalSelectCB.Text);
-
-            //Console.WriteLine("Value: "+ whereValue.Text);
+            if ((string)finalSelectCB.SelectedItem == "WHERE")
+            {
+                queryList.Add("whereColumn: " + (string)whereSelectName.SelectedItem);
+                queryList.Add("whereOperator: " + (string)whereOperatorsComboBox.SelectedItem);
+                queryList.Add("whereOperatorValue: " + whereValue.Text);
+            }
             DataInsert dataInsert = new DataInsert();
             dataInsert.insertQuery(queryList);
         }
@@ -503,8 +497,6 @@ namespace SiemensPerformance
                 {
                     stackPanel.Children.Add(saveButtonGenerator());
                 }
-                //stackPanel.Children.Add(saveButtonGenerator());
-
                 mainStackPanel.Children.Add(stackPanel);
             }
         }
