@@ -187,6 +187,11 @@ namespace SiemensPerformance
             globalTotal2DList = new List<string[]>();
             globalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
+            /*
+            DataInsert dataInsert = new DataInsert();
+            var time_array = new List<string>();
+            List<List<string>> process_array = new List<List<string>>();
+          */
             file = new System.IO.StreamReader(dialog.FileName);
             
             try
@@ -204,6 +209,30 @@ namespace SiemensPerformance
                             singleList.Add(item);
                         }
                     }
+/*
+                    //sw.Write("\n");
+                    //
+                    if (singleList.Count == 21)
+                    {
+                        // for processess
+                        processes2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        process_array.Add(new List<string> { singleList[1], singleList[2] });
+                        dlist.Add(singleList.ToArray());
+                    } else if (singleList.Count == 33)
+                    {
+                        // for global 0
+                        gloabalZero2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        dlist.Add(singleList.ToArray());
+                    }
+                    else if (singleList.Count == 22)
+                    {
+                        // for global total
+                        globalTotal2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        dlist.Add(singleList.ToArray());
+*/
                     if (singleList.Count == 22 && singleList[0] == "Process:")
                     {
                         // for processess
@@ -219,6 +248,11 @@ namespace SiemensPerformance
                     }
                     counter++;
                 }
+                //dataInsert.insertTime(time_array);
+                //dataInsert.insertProcess(process_array);
+                dataInsert.insertMRI_Data(processes2DList);
+                dataInsert.insertGlobal0(gloabalZero2DList);
+                dataInsert.insertGlobalTotal(globalTotal2DList);
             }
             catch (Exception e)
             {

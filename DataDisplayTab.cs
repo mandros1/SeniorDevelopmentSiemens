@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using Newtonsoft.Json;
 using LiveCharts.Wpf;
 using LiveCharts;
+using System.Linq;
 
 namespace SiemensPerformance
 {
@@ -495,8 +496,7 @@ namespace SiemensPerformance
             finalSelectCB.Margin = outsideComboMargins;
             finalSelectCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             finalSelectCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            // UPGRADE TO BELOW
-            //string[] list = { ";", "WHERE", "BETWEEN" };
+            
             string[] list = { ";", "WHERE" };
             finalSelectCB.SelectedIndex = 0;
             finalSelectCB.ItemsSource = list; 
@@ -747,82 +747,9 @@ namespace SiemensPerformance
         }
 
 
-        /**
-         * TO BE IMPLEMENTED
+        /*
+         * Generate DataGrid from data
          */
-
-        //private DockPanel betweenDockPanelGenerator(System.Windows.Thickness dockPanelMargins,
-        //                                           System.Windows.Thickness whereLabelMargins,
-        //                                           int whereLabelWidth,
-        //                                           System.Windows.Thickness variableComboMargins,
-        //                                           int variableComboWidth,
-        //                                           System.Windows.Thickness betweenLabelMargins,
-        //                                           int betweenLabelWidth,
-        //                                           System.Windows.Thickness startTextMargins,
-        //                                           int startTextWidth,
-        //                                           System.Windows.Thickness andLabelMargins,
-        //                                           int andLabelWidth,
-        //                                           System.Windows.Thickness endTextMargins,
-        //                                           int endTextWidth,
-        //                                           System.Windows.Thickness finalComboboxMargins,
-        //                                           int finalComboBoxWidth)
-        //{
-        //    dockPanel = new DockPanel();
-        //    dockPanel.Margin = dockPanelMargins;
-
-        //    stackPanel = new StackPanel();
-        //    stackPanel.Orientation = Orientation.Horizontal;
-
-        //    label = new Label();
-        //    label.Margin = whereLabelMargins;
-        //    label.Width = whereLabelWidth;
-        //    label.Content = "WHERE";
-        //    stackPanel.Children.Add(label);
-
-        //    comboBox = new ComboBox();
-        //    comboBox.Margin = variableComboMargins;
-        //    comboBox.Width = variableComboWidth;
-        //    parameterNamesComboBox.Add(comboBox);
-        //    stackPanel.Children.Add(comboBox);
-
-        //    label = new Label();
-        //    label.Margin = betweenLabelMargins;
-        //    label.Width = betweenLabelWidth;
-        //    label.Content = "BETWEEN";
-        //    stackPanel.Children.Add(label);
-
-        //    textBox = new TextBox();
-        //    textBox.Margin = startTextMargins;
-        //    textBox.Width = startTextWidth;
-        //    stackPanel.Children.Add(textBox);
-
-        //    label = new Label();
-        //    label.Margin = andLabelMargins;
-        //    label.Width = andLabelWidth;
-        //    label.Content = "AND";
-        //    stackPanel.Children.Add(label);
-
-        //    textBox = new TextBox();
-        //    textBox.Margin = endTextMargins;
-        //    textBox.Width = endTextWidth;
-        //    stackPanel.Children.Add(textBox);
-
-        //    dockPanel.Children.Add(stackPanel);
-
-        //    comboBox = new ComboBox();
-        //    comboBox.Margin = finalComboboxMargins;
-        //    comboBox.Width = finalComboBoxWidth;
-
-        //    DockPanel.SetDock(comboBox, Dock.Right);
-        //    dockPanel.Children.Add(comboBox);
-        //    dockPanel.Children.Add(new Label());
-
-        //    return dockPanel;
-        //}
-
-
-
-        //Generate DataGrid from data
         private DataGrid GenerateTable(String[] columns)
         {
             DataGrid grid = new DataGrid();
@@ -839,7 +766,9 @@ namespace SiemensPerformance
             return grid;
         }
 
-        //Converts list to data table
+        /*
+         * Converts list to data table
+         */
         private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
         {
             DataTable table = new DataTable();
@@ -857,6 +786,7 @@ namespace SiemensPerformance
                 {
                     table.Rows.Add(array);
                 }
+
             }
             return table;
         }
@@ -871,7 +801,9 @@ namespace SiemensPerformance
             return dataGrid;
         }
 
-        //Renames a Tab
+        /*
+         * Opens a popup window to ask for a new name and renames the tab
+         */
         private void Rename()
         {
             string name = new InputBox("Name").ShowDialog();
@@ -881,8 +813,6 @@ namespace SiemensPerformance
             }
         }
 
-        /*
-        //Saves data from a tab to json file
         private void Save()
         {
             //set default file name to tab header
@@ -914,7 +844,9 @@ namespace SiemensPerformance
         }
         */
 
-        //Close Tab
+        /*
+         * Close a tab
+         */
         private void Close()
         {
             if (this != null)
@@ -930,6 +862,40 @@ namespace SiemensPerformance
             }
         }
 
+        /*
+         * Converts data from a list of String arrays [timstamp, data] to a Chartvalues<DateModel> and puts it in the graph
+         
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
+        {
+            ChartValues<DateModel> data = new ChartValues<DateModel>();
+
+            int variableIndex = Array.IndexOf(generator.processVariables, variable);
+
+            //Get data
+            foreach (var array in data2DList)
+            {
+                try
+                {
+                    Double value = Double.Parse(array[variableIndex].Replace(".", ","));
+                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
+                    data.Add(new DateModel
+                    {
+                        DateTime = timeStamp,
+                        Value = value
+                    });
+                }
+                catch (IndexOutOfRangeException t)
+                {
+                    Console.WriteLine(t);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
+        } 
+  */
 
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<DateModel> dateModel2dList)
         {
