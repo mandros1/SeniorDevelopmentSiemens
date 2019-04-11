@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using Newtonsoft.Json;
 using LiveCharts.Wpf;
 using LiveCharts;
-using System.Linq;
 
 namespace SiemensPerformance
 {
@@ -68,133 +67,28 @@ namespace SiemensPerformance
         private Label label;
         private ComboBox comboBox;
         private DockPanel dockPanel;
-        private TextBox textBox;
         private TabItem tabItem;
         private DataGrid dataGrid;
-        private DataTable dataTable;
         private List<string[]> processData;
+        private string[] columnNames;
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning cartesianChart;
+        private ChartValues<DateModel> data;
+        private List<DateModel> dateModelData;
 
-        private int dbConnection;
-
-        public DataDisplayTab(int dbInt)
-        {
-            dbConnection = dbInt;
-            //Open File
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
-
-            //Get Data
-            if (ofd.ShowDialog() == true)
-            {
-                if (ofd.FileName.EndsWith(".utr"))
-                {
-                    generator.getJsonString(ofd);
-                    displayable = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else
-            {
-                displayable = false;
-                return;
-            }
-
-            TabControl tc = new TabControl();
-
-            //Tab dropdown menu
-            //Rename Tab
-            ContextMenu contextMenu = new ContextMenu();
-            MenuItem menuItem1 = new MenuItem();
-            contextMenu.Items.Add(menuItem1);
-            menuItem1.Header = "Rename";
-            menuItem1.Click += delegate { Rename(); };
-
-            /* TODO Make this work correctly
-            //Save data to Json
-            MenuItem menuItem2 = new MenuItem();
-            contextMenu.Items.Add(menuItem2);
-            menuItem2.Header = "Save";
-            menuItem2.Click += delegate { Save(); };
-            */
-
-            //Close Tab
-            MenuItem menuItem2 = new MenuItem();
-            contextMenu.Items.Add(menuItem2);
-            menuItem2.Header = "Close";
-            menuItem2.Click += delegate { Close(); };
-
-            this.ContextMenu = contextMenu;
-
-            // Create process table tab
-            tabItem = new TabItem();
-            this.Header = generator.fileName;
-            tabItem.Header = "Processes";
-            // Pumping content into the table
-            processGrid = dataGridData(generator.processes2DList, generator.processVariables, processTable);
-            tabItem.Content = processGrid;
-
-            tabItem.ContextMenu = new ContextMenu();
-            tc.Items.Insert(0, tabItem);
-
-            // Create global zero table tab
-            tabItem = new TabItem();
-            this.Header = generator.fileName;
-            tabItem.Header = "Global(0)";
-            // Pumping content into the table
-            globalZeroGrid = dataGridData(generator.gloabalZero2DList, generator.globalVariables, globalZeroTable);
-            tabItem.Content = globalZeroGrid;
-
-            tabItem.ContextMenu = new ContextMenu();
-            tc.Items.Insert(1, tabItem);
-
-
-            // Create global total table tab
-            tabItem = new TabItem();
-            this.Header = generator.fileName;
-            tabItem.Header = "Global(_Total)";
-            // Pumping content into the table
-            globalTotalGrid = dataGridData(generator.globalTotal2DList, generator.globalTotalVariables, globalTotalTable);
-            tabItem.Content = globalTotalGrid;
-
-            tabItem.ContextMenu = new ContextMenu();
-            tc.Items.Insert(2, tabItem);
-
-
-            // Create Graph tab
-            graphTabItem = new TabItem();
-            graphTabItem.Header = "Graph";
-
-            graphTabItem.ContextMenu = new ContextMenu();
-            tc.Items.Insert(3, graphTabItem);
-
-            // Create Query tab
-            tabItem = generateQueryTabItem();
-            tabItem.ContextMenu = new ContextMenu();
-            tc.Items.Insert(4, tabItem);
-
-            this.Content = tc;
-        }
 
         public DataDisplayTab()
         {
+            
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
+            ofd.DefaultExt = ".utr";
+            ofd.Filter = "Text files (*.utr)|*.utr";
 
             //Get Data
             if (ofd.ShowDialog() == true)
             {
-                if (ofd.FileName.EndsWith(".utr")) {
-                    generator.getJsonString(ofd);
-                    displayable = true;
-                }
-                else
-                {
-                    return;
-                }
+                generator.getJsonString(ofd);
+                displayable = true;
             }
             else
             {
@@ -285,17 +179,15 @@ namespace SiemensPerformance
             processIdCB.ItemsSource = generator.getDistinctProcessIDs(procName);
         } 
 
+
+       
         /**
          * Main method for generating query tab item
          */
         private TabItem generateQueryTabItem()
         {
             TabItem tab = new TabItem();
-            if (dbConnection == 1) { tab.Header = "Query file"; }
-            else
-            {
-                tab.Header = "Query database";
-            }
+            tab.Header = "Query";
 
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
@@ -928,9 +820,9 @@ namespace SiemensPerformance
         //    return dockPanel;
         //}
 
-        /*
-         * Generate DataGrid from data
-         */
+
+
+        //Generate DataGrid from data
         private DataGrid GenerateTable(String[] columns)
         {
             DataGrid grid = new DataGrid();
@@ -947,9 +839,7 @@ namespace SiemensPerformance
             return grid;
         }
 
-        /*
-         * Converts list to data table
-         */
+        //Converts list to data table
         private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
         {
             DataTable table = new DataTable();
@@ -981,9 +871,7 @@ namespace SiemensPerformance
             return dataGrid;
         }
 
-        /*
-         * Opens a popup window to ask for a new name and renames the tab
-         */
+        //Renames a Tab
         private void Rename()
         {
             string name = new InputBox("Name").ShowDialog();
@@ -994,9 +882,7 @@ namespace SiemensPerformance
         }
 
         /*
-         * Saves data from a graph to json file
-         * TODO - make this week
-         */
+        //Saves data from a tab to json file
         private void Save()
         {
             //set default file name to tab header
@@ -1010,8 +896,8 @@ namespace SiemensPerformance
             //Create save dialog
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.FileName = defaultName;
-            dlg.DefaultExt = ".txt";
-            dlg.Filter = "Text files (.txt)|*.txt";
+            dlg.DefaultExt = ".json";
+            dlg.Filter = "Json files (.json)|*.json";
 
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
@@ -1026,10 +912,9 @@ namespace SiemensPerformance
                 File.WriteAllText(filename, json);
             }
         }
+        */
 
-        /*
-         * Close a tab
-         */
+        //Close Tab
         private void Close()
         {
             if (this != null)
@@ -1045,40 +930,13 @@ namespace SiemensPerformance
             }
         }
 
-        /*
-         * Converts data from a list of String arrays [timstamp, data] to a Chartvalues<DateModel> and puts it in the graph
-         */
-        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
+
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<DateModel> dateModel2dList)
         {
-            
-
-            ChartValues<DateModel> data = new ChartValues<DateModel>();
-
-            int variableIndex = Array.IndexOf(generator.processVariables, variable);
-
-            //Get data
-            foreach (var array in data2DList)
-            {
-                try
-                {
-                    Double value = Double.Parse(array[variableIndex].Replace(".", ","));
-                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
-                    data.Add(new DateModel
-                    {
-                        DateTime = timeStamp,
-                        Value = value
-                    });
-                }
-                catch (IndexOutOfRangeException t)
-                {
-                    Console.WriteLine(t);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
-        } 
+            data = new ChartValues<DateModel>();
+            data.AddRange(dateModel2dList);
+            cartesianChart = new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
+            return cartesianChart;
+        }
     }
 }

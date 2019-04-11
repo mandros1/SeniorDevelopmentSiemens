@@ -23,6 +23,8 @@ namespace SiemensPerformance
         string errormessage = "Name can't be empty";//error messagebox content
         string errortitle = "Error";//error messagebox heading title
         string okbuttontext = "OK";//Ok button content
+        Brush BoxBackgroundColor = Brushes.GreenYellow;// Window Background
+        Brush InputBackgroundColor = Brushes.Ivory;// Textbox Background
         bool clicked = false;
         TextBox input = new TextBox();
         Button ok = new Button();
@@ -52,7 +54,6 @@ namespace SiemensPerformance
             content.Text = boxcontent;
             content.FontFamily = font;
             content.FontSize = FontSize;
-            content.Foreground = Brushes.White;
             sp1.Children.Add(content);
 
             input.FontFamily = font;
