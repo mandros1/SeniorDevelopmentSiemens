@@ -282,6 +282,7 @@ namespace SiemensPerformance
                     colonIndex = line.IndexOf(':');
                     subbedLine = line.Substring(colonIndex + 2);
                     if (subbedLine.Contains("n.a.")) subbedLine = "0.0";
+                    Console.WriteLine(subbedLine);
                     yield return Regex.Replace(subbedLine, @"[^0-9.]", "");
                 }
 
