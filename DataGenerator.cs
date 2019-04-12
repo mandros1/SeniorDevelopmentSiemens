@@ -326,13 +326,12 @@ namespace SiemensPerformance
         {
             variableIndex = Array.IndexOf(columnNames, whereColumn);
             data = new List<DateModel>();
-
             foreach (string[] list in dataList)
             {
                 data.Add(new DateModel
                 {
                     DateTime = DateTime.ParseExact(list[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null),
-                    Value = Double.Parse(list[variableIndex].Replace(".", ","))
+                    Value = Double.Parse(list[variableIndex])
                 });
             }
             return data;
