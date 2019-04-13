@@ -16,6 +16,14 @@ namespace SiemensPerformance
         {
             
             InitializeComponent();
+
+            // Tabs setup
+            tabs = (TabControl)this.FindName("logNav");
+        }
+        public MainWindow(int dbInt) {
+            dbConnection = dbInt;
+
+            InitializeComponent();
             
 
             // Tabs setup

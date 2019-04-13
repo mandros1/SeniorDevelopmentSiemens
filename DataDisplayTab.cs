@@ -75,7 +75,112 @@ namespace SiemensPerformance
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning cartesianChart;
         private ChartValues<DateModel> data;
         private List<DateModel> dateModelData;
+        public static string utfFileName;
+        private int dbConnection;
 
+
+        public DataDisplayTab(int dbInt)
+        {
+            dbConnection = dbInt;
+            //Open File
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.DefaultExt = ".utr";
+            ofd.Filter = "Text files (*.utr)|*.utr";
+
+            //Get Data
+            if (ofd.ShowDialog() == true)
+            {if (dbConnection == 1)
+                {
+                    generator.getJsonString(ofd);
+                    displayable = true;
+                }
+                else {
+                    utfFileName = System.IO.Path.GetFileName(ofd.FileName);
+                    generator.writeDataToDB(ofd);
+                    displayable = true;
+                }
+            }
+            else
+            {
+                displayable = false;
+                return;
+            }
+
+            TabControl tc = new TabControl();
+
+            //Tab dropdown menu
+            //Rename Tab
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem menuItem1 = new MenuItem();
+            contextMenu.Items.Add(menuItem1);
+            menuItem1.Header = "Rename";
+            menuItem1.Click += delegate { Rename(); };
+
+            /* TODO Make this work correctly
+            //Save data to Json
+            MenuItem menuItem2 = new MenuItem();
+            contextMenu.Items.Add(menuItem2);
+            menuItem2.Header = "Save";
+            menuItem2.Click += delegate { Save(); };
+            */
+
+            //Close Tab
+            MenuItem menuItem2 = new MenuItem();
+            contextMenu.Items.Add(menuItem2);
+            menuItem2.Header = "Close";
+            menuItem2.Click += delegate { Close(); };
+
+            this.ContextMenu = contextMenu;
+
+            // Create process table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Processes";
+            // Pumping content into the table
+            processGrid = dataGridData(generator.processes2DList, generator.processVariables, processTable);
+            tabItem.Content = processGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(0, tabItem);
+
+            // Create global zero table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Global(0)";
+            // Pumping content into the table
+            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalZeroVariables, globalZeroTable);
+            tabItem.Content = globalZeroGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(1, tabItem);
+
+
+            // Create global total table tab
+            tabItem = new TabItem();
+            this.Header = generator.fileName;
+            tabItem.Header = "Global(_Total)";
+            // Pumping content into the table
+            globalTotalGrid = dataGridData(generator.globalTotal2DList, generator.globalTotalVariables, globalTotalTable);
+            tabItem.Content = globalTotalGrid;
+
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(2, tabItem);
+
+
+            // Create Graph tab
+            graphTabItem = new TabItem();
+            graphTabItem.Header = "Graph";
+
+            graphTabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(3, graphTabItem);
+
+            // Create Query tab
+            tabItem = generateQueryTabItem();
+            tabItem.ContextMenu = new ContextMenu();
+            tc.Items.Insert(4, tabItem);
+
+            this.Content = tc;
+        }
 
         public DataDisplayTab()
         {
@@ -188,7 +293,13 @@ namespace SiemensPerformance
         private TabItem generateQueryTabItem()
         {
             TabItem tab = new TabItem();
-            tab.Header = "Query";
+            if (dbConnection == 1) {
+                tab.Header = "Query file"; }
+            else
+            {
+                tab.Header = "Query database";
+            }
+
 
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
@@ -205,45 +316,101 @@ namespace SiemensPerformance
 
         private void RunButtonClick(object sender, EventArgs e)
         {
+            string test1 = "";
+
             if (String.Equals((string)filterCB.SelectedItem, "Process"))
             {
-                processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
-                columnNames = generator.processVariables;
+                if (dbConnection == 1)
+                {
+                    processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                    columnNames = generator.processVariables;
+                }
+                else {
+                    processData = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                    columnNames = generator.processVariables;
+                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data";
+                }
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
             {
                 processData = generator.globalZero2DList;
                 columnNames = generator.globalZeroVariables;
+                test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0";
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
             {
                 processData = generator.globalTotal2DList;
                 columnNames = generator.globalTotalVariables;
+                test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal";
             }
-
 
             if (String.Equals((string)finalSelectCB.SelectedItem, ";"))
             {
-                dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
-                graphTabItem.Content = PopulateGraph(dateModelData);
-                processTable = ConvertListToDataTable(processData, generator.processVariables);
-                processGrid.ItemsSource = processTable.DefaultView;
+                if (dbConnection == 1)
+                {
+                    dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+                    graphTabItem.Content = PopulateGraph(dateModelData);
+                    processTable = ConvertListToDataTable(processData, generator.processVariables);
+                    processGrid.ItemsSource = processTable.DefaultView;
+                }
+                else
+                {                  
+                    dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+                    graphTabItem.Content = PopulateGraph(dateModelData);
+                    processTable = ConvertListToDataTable(processData, generator.processVariables);
+                    processGrid.ItemsSource = processTable.DefaultView;
+
+                }
             }
+
             else if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
             {
                 
                 string whereColumn = (string)whereSelectName.SelectedItem;
-                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
+                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;    
                 string whereVal = whereValue.Text;
-                processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
 
-                if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
+                if (dbConnection == 1)
                 {
-                    whereColumn = (string)andSelectNameCB.SelectedItem;
-                    whereOperator = (string)andOperatorsCB.SelectedItem;
-                    whereVal = andValue.Text;
                     processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
+                    if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
+                    {
+                        whereColumn = (string)andSelectNameCB.SelectedItem;
+                        whereOperator = (string)andOperatorsCB.SelectedItem;
+                        whereVal = andValue.Text;
+                        Console.WriteLine(whereOperator);
+                        processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames); 
+
+                    }
                 }
+                else {
+                    if (whereOperator.Equals("=="))
+                    {
+                        test1 += " WHERE " + " " + whereColumn + " = " + whereVal + " ";
+                    }
+                    else
+                    {
+                        test1 += " WHERE " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                    }
+                   
+                    if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
+                    {
+                        whereColumn = (string)andSelectNameCB.SelectedItem;
+                        whereOperator = (string)andOperatorsCB.SelectedItem;
+                        whereVal = andValue.Text;
+                        Console.WriteLine(whereOperator);
+                        if (whereOperator.Equals("=="))
+                        {
+                            test1 += " AND " + " " + whereColumn + " = " + whereVal + " ";
+                        }
+                        else
+                        {
+                            test1 += " AND " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                        }
+                    }
+                    processData = generator.getDataFromQueryDb(test1);
+                }
+               
 
                 dateModelData = generator.getDateModelList(processData, whereColumn, columnNames);
                 graphTabItem.Content = PopulateGraph(dateModelData);

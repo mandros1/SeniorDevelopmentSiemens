@@ -5,12 +5,14 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.IO;
 using System.Windows.Controls;
+using MySql.Data.MySqlClient;
 
 
 namespace SiemensPerformance
 {
     class DataGenerator
     {
+        public MySqlConnection conn = DBConnect.conn;
 
         // Constants
         public string[] processVariables = {"TimeStamp", "Process Name", "Process ID", "WSP", "WSPPeak",
@@ -140,6 +142,159 @@ namespace SiemensPerformance
             return processes2DList;
         }
 
+        /// <summary>
+        /// POGLEDAJ OVU METODU I METODU ISPOD OVE, STA TREBA TVOJOJ METODI DATEMODELLIST, KAKAV FORMAT PODATAKA
+        /// </summary>
+        /// <param name="processName"></param>
+        /// <param name="processId"></param>
+        /// <returns></returns>
+        public List<string[]> getDataFromDb(string processName, string processId)
+        {
+            Console.WriteLine(processName);
+            List<string[]> all = new List<string[]>();
+
+            try
+            {
+                Console.WriteLine("Connecting to MySQL...");
+                conn.Open();
+
+                string sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "' AND process_Id = '" + processId + "';";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+
+                    string a = "";
+                    for (int i = 0; i < rdr.FieldCount; i++)
+                    {
+                        //Console.WriteLine(i+" "+rdr[i]);
+                        if (i == 1)
+                        {
+                            a += rdr[23].ToString() + ";";
+                            //Console.WriteLine(a);
+                        } else if (i == 2) {
+
+                        }
+                        else if (i == 23)
+                        {
+                            //Console.WriteLine("Didnt write to array "+ rdr[i]); 
+                        }
+                        else
+                        {
+                            a += rdr[i].ToString() + ";";
+                            //Console.WriteLine(a);
+                        }
+
+                        if (i + 1 == rdr.FieldCount)
+                        {
+                            //Console.WriteLine(a);
+
+                            string[] everything = a.Split(';');
+                            //Remove first and last element from array
+                            everything = everything.Skip(1).ToArray();
+                            //everything = everything.Skip(3).ToArray();
+                            //everything = everything.Take(everything.Count() - 1).ToArray();
+                          
+                        }
+
+                    };
+                }
+                rdr.Close();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+
+            processData2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
+            Console.WriteLine("Done.");
+            return processData2DList;
+
+        }
+        /// <summary>
+        ///  POGLEDAJ OVU METODU, STA TREBA TVOJOJ METODI DATEMODELLIST, KAKAV FORMAT PODATAKA
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public List<string[]> getDataFromQueryDb(string query)
+        {
+           
+            List<string[]> all = new List<string[]>();
+
+            try
+            {
+                Console.WriteLine("Connecting to MySQL...");
+                conn.Open();
+
+                string sql = "USE mri; SELECT "+ query+";";
+                Console.WriteLine(sql);
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+
+                    string a = "";
+                    //Console.WriteLine(rdr.FieldCount);
+                    for (int i = 0; i < rdr.FieldCount; i++)
+                    {
+
+                        if (i == 1)
+                        {
+                            a += rdr[rdr.FieldCount - 1].ToString() + ";";
+                            //Console.WriteLine(a);
+                        }
+                        else if (i == 2)
+                        {
+
+                        } else if(i +1 == rdr.FieldCount){
+
+
+                        }
+
+                        else
+                        {
+                            a += rdr[i].ToString() + ";";
+                            //Console.WriteLine(a);
+                        }
+
+                        if (i + 1 == rdr.FieldCount)
+                        {
+                            //Console.WriteLine(a);
+
+                            string[] everything = a.Split(';');
+                            
+                            //Remove first and last element from array
+                            everything = everything.Skip(1).ToArray();
+                            //everything = everything.Skip(2).ToArray();
+                           // everything = everything.Take(everything.Count() - 1).ToArray();
+                            //Console.WriteLine( everything.Length);
+                           
+                            all.Add(everything);
+                        }
+
+                    };
+                }
+                rdr.Close();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            conn.Close();
+
+            processData2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
+            Console.WriteLine("Done.");
+            return processData2DList;
+
+        }
+
         public List<string[]> getWhereProcessData(List<string[]> processDataFilteredNameAndID,
                                                     string whereColumn,
                                                     string whereOperator,
@@ -187,6 +342,7 @@ namespace SiemensPerformance
             globalTotal2DList = new List<string[]>();
             globalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
+          
             /*
             DataInsert dataInsert = new DataInsert();
             var time_array = new List<string>();
@@ -211,6 +367,7 @@ namespace SiemensPerformance
                             singleList.Add(item);
                         }
                     }
+
 /*
                     //sw.Write("\n");
                     //
@@ -235,6 +392,7 @@ namespace SiemensPerformance
                         time_array.Add(singleList[0].Split('.')[0]);
                         dlist.Add(singleList.ToArray());
 */
+
                     if (singleList.Count == 22 && singleList[0] == "Process:")
                     {
                         // for processess
@@ -252,6 +410,7 @@ namespace SiemensPerformance
                     //double calc = ((double)counter / (double)lineCount);
                     //pbar.Value = Math.Ceiling(calc * 100);
                 }
+
                 //dataInsert.insertTime(time_array);
                 //dataInsert.insertProcess(process_array);
             }
@@ -265,7 +424,91 @@ namespace SiemensPerformance
             }
             this.sortProcessesByTimeStamp();
         }
-        
+
+        public void writeDataToDB(OpenFileDialog dialog)
+        {
+           // dlist = new List<string[]>();
+            processes2DList = new List<string[]>();
+            globalTotal2DList = new List<string[]>();
+            globalZero2DList = new List<string[]>();
+            this.fileName = dialog.SafeFileName;
+            string line;
+            DataInsert dataInsert = new DataInsert();
+            var time_array = new List<string>();
+            List<List<string>> process_array = new List<List<string>>();
+
+            //StreamWriter sw = new StreamWriter("D:\\WPF_Applications\\SeniorDevelopmentSiemens\\Data.txt");
+            System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
+
+            try
+            {
+                file.ReadLine(); // skip the firstLine
+                int counter = 1;
+                while ((line = file.ReadLine()) != null)
+                {
+                    singleList = new List<string>();
+                    var enumerate = GetSplitData(line);
+
+                    foreach (var item in enumerate)
+                    {
+                        if (item != "ErrorLine")
+                        {
+                            singleList.Add(item);
+                            //sw.Write(item+",");
+                        }
+                    }
+                    //sw.Write("\n");
+                    //
+                    if (singleList.Count == 21)
+                    {
+                        // for processess
+                        processes2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        process_array.Add(new List<string> { singleList[1], singleList[2] });
+                       // dlist.Add(singleList.ToArray());
+                    }
+                    else if (singleList.Count == 33)
+                    {
+                        // for global 0
+                        globalZero2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        //dlist.Add(singleList.ToArray());
+                    }
+                    else if (singleList.Count == 22)
+                    {
+                        // for global total
+                        globalTotal2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                       // dlist.Add(singleList.ToArray());
+                    }
+                    counter++;
+                }
+               
+                
+                    dataInsert.insertTime(time_array);
+                    dataInsert.insertProcess(process_array);
+                    //Throws Object reference not set to an instance of an object. 'System.NullReferenceException'
+                    dataInsert.insertMRI_Data(processes2DList);
+                    dataInsert.insertGlobal0(globalZero2DList);
+                    dataInsert.insertGlobalTotal(globalTotal2DList);
+                
+            }
+            catch (NullReferenceException nre)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+            finally
+            {
+                //sw.Close();
+                file.Close();
+            }
+
+        }
+
 
         /*
          * Method that reads the each line from the file and creates an IEnumerable from them
@@ -313,7 +556,7 @@ namespace SiemensPerformance
                     colonIndex = line.IndexOf(':');
                     subbedLine = line.Substring(colonIndex + 2);
                     if (subbedLine.Contains("n.a.")) subbedLine = "0.0";
-                    Console.WriteLine(subbedLine);
+                   // Console.WriteLine(subbedLine);
                     yield return Regex.Replace(subbedLine, @"[^0-9.]", "");
                 }
 
