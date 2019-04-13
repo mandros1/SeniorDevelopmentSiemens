@@ -84,7 +84,9 @@ namespace SiemensPerformance
         private int counter { get; set; } // reusable counter used while reading through the file
         private string dataType, subbedLine, dataString, processName, procID;
         private int i, j, colonIndex, index, bracketPosition, finalLength;
-        private List<string[]> graphData2;
+        private List<string[]> graphData2, all;
+        private MySqlCommand cmd;
+        private MySqlDataReader rdr;
 
 
         /*
@@ -166,19 +168,32 @@ namespace SiemensPerformance
         /// <param name="processName"></param>
         /// <param name="processId"></param>
         /// <returns></returns>
-        public List<string[]> getDataFromDb(string processName, string processId)
+        public List<string[]> getProcessDataFromDB(string processName, string processId)
         {
-            Console.WriteLine(processName);
-            List<string[]> all = new List<string[]>();
+            all = new List<string[]>();
+            string sql;
+
+            if (!String.IsNullOrEmpty(processName) && String.IsNullOrEmpty(processId) && processName != "None")
+            {
+                Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
+                sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "';";
+            }
+            else if (!String.IsNullOrEmpty(processName) && !String.IsNullOrEmpty(processId))
+            {
+                Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
+                sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "' AND process_Id = '" + processId + "';";
+            }
+            Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
+            sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data;";
+
 
             try
             {
                 Console.WriteLine("Connecting to MySQL...");
                 conn.Open();
 
-                string sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "' AND process_Id = '" + processId + "';";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                MySqlDataReader rdr = cmd.ExecuteReader();
+                cmd = new MySqlCommand(sql, conn);
+                rdr = cmd.ExecuteReader();
 
                 while (rdr.Read())
                 {
@@ -228,9 +243,9 @@ namespace SiemensPerformance
 
             conn.Close();
 
-            processData2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
+            processes2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
             Console.WriteLine("Done.");
-            return processData2DList;
+            return processes2DList;
 
         }
         /// <summary>
@@ -250,8 +265,8 @@ namespace SiemensPerformance
 
                 string sql = "USE mri; SELECT "+ query+";";
                 Console.WriteLine(sql);
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                MySqlDataReader rdr = cmd.ExecuteReader();
+                cmd = new MySqlCommand(sql, conn);
+                rdr = cmd.ExecuteReader();
 
                 while (rdr.Read())
                 {
@@ -307,9 +322,9 @@ namespace SiemensPerformance
 
             conn.Close();
 
-            processData2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
+            processes2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
             Console.WriteLine("Done.");
-            return processData2DList;
+            return processes2DList;
 
         }
 

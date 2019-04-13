@@ -54,10 +54,13 @@ namespace SiemensPerformance
         //Generates and returns a new TabItem object
         private TabItem GenerateTabItem()
         {
-            if (dbConnection == 1) { DataDisplayTab tab = new DataDisplayTab(dbConnection); if (tab.displayable) return tab; }
+            if (dbConnection == 1) {
+                DataDisplayTab tab = new DataDisplayTab(dbConnection);
+                if (tab.displayable) return tab;
+            }
             else
             {
-                DataDisplayTab tab = new DataDisplayTab();
+                DataDisplayTab tab = new DataDisplayTab(0);
                 if (tab.displayable) return tab;
             }
             /*
