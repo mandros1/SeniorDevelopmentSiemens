@@ -178,6 +178,7 @@ namespace SiemensPerformance
             tc.Items.Insert(3, graphTabItem);
 
             // Create Query tab
+            //tabItem = new TabItem();
             tabItem = generateQueryTabItem();
             tabItem.ContextMenu = new ContextMenu();
             tc.Items.Insert(4, tabItem);
@@ -313,7 +314,7 @@ namespace SiemensPerformance
             // Create Query tab
             tabItem = generateQueryTabItem();
             tabItem.ContextMenu = new ContextMenu();
-            //tc.Items.Insert(4, tabItem);
+            tc.Items.Insert(4, tabItem);
 
             if (import)
             {
@@ -358,8 +359,8 @@ namespace SiemensPerformance
             dockPanel.Children.Add(stackPanel);
 
 
-            tabItem.Content = dockPanel;
-            return tabItem;
+            tab.Content = dockPanel;
+            return tab;
         }
 
         /**
