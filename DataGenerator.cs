@@ -171,6 +171,8 @@ namespace SiemensPerformance
                         {
                             a += rdr[23].ToString() + ";";
                             //Console.WriteLine(a);
+                        } else if (i == 2) {
+
                         }
                         else if (i == 23)
                         {
@@ -188,13 +190,10 @@ namespace SiemensPerformance
 
                             string[] everything = a.Split(';');
                             //Remove first and last element from array
-                           // everything = everything.Skip(1).ToArray();
+                            everything = everything.Skip(1).ToArray();
+                            //everything = everything.Skip(3).ToArray();
                             //everything = everything.Take(everything.Count() - 1).ToArray();
-                            foreach (string at in everything)
-                            {
-                                Console.WriteLine(at);
-                            }
-                            all.Add(everything);
+                          
                         }
 
                     };
@@ -238,17 +237,23 @@ namespace SiemensPerformance
                 {
 
                     string a = "";
+                    //Console.WriteLine(rdr.FieldCount);
                     for (int i = 0; i < rdr.FieldCount; i++)
                     {
-                        // Console.WriteLine(i+" "+rdr[i]);
+
                         if (i == 1)
                         {
-                            a += rdr[23].ToString() + ";";
+                            a += rdr[rdr.FieldCount - 1].ToString() + ";";
                             //Console.WriteLine(a);
                         }
-                        else if (i == 23) {
+                        else if (i == 2)
+                        {
+
+                        } else if(i +1 == rdr.FieldCount){
+
 
                         }
+
                         else
                         {
                             a += rdr[i].ToString() + ";";
@@ -260,15 +265,13 @@ namespace SiemensPerformance
                             //Console.WriteLine(a);
 
                             string[] everything = a.Split(';');
-                          
+                            
                             //Remove first and last element from array
-                            everything = everything.Skip(0).ToArray();
+                            everything = everything.Skip(1).ToArray();
                             //everything = everything.Skip(2).ToArray();
-                            everything = everything.Take(everything.Count() - 1).ToArray();
+                           // everything = everything.Take(everything.Count() - 1).ToArray();
                             //Console.WriteLine( everything.Length);
-                           // foreach (string at in everything) {
-                               // Console.WriteLine(at);
-                           // }
+                           
                             all.Add(everything);
                         }
 
@@ -399,8 +402,8 @@ namespace SiemensPerformance
             this.fileName = dialog.SafeFileName;
             string line;
             DataInsert dataInsert = new DataInsert();
-            //var time_array = new List<string>();
-            //List<List<string>> process_array = new List<List<string>>();
+            var time_array = new List<string>();
+            List<List<string>> process_array = new List<List<string>>();
 
             //StreamWriter sw = new StreamWriter("D:\\WPF_Applications\\SeniorDevelopmentSiemens\\Data.txt");
             System.IO.StreamReader file = new System.IO.StreamReader(dialog.FileName);
@@ -428,34 +431,34 @@ namespace SiemensPerformance
                     {
                         // for processess
                         processes2DList.Add(singleList.ToArray());
-                        //time_array.Add(singleList[0].Split('.')[0]);
-                        //process_array.Add(new List<string> { singleList[1], singleList[2] });
-                        //dlist.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        process_array.Add(new List<string> { singleList[1], singleList[2] });
+                       // dlist.Add(singleList.ToArray());
                     }
                     else if (singleList.Count == 33)
                     {
                         // for global 0
                         globalZero2DList.Add(singleList.ToArray());
-                        //time_array.Add(singleList[0].Split('.')[0]);
+                        time_array.Add(singleList[0].Split('.')[0]);
                         //dlist.Add(singleList.ToArray());
                     }
                     else if (singleList.Count == 22)
                     {
                         // for global total
                         globalTotal2DList.Add(singleList.ToArray());
-                        //time_array.Add(singleList[0].Split('.')[0]);
+                        time_array.Add(singleList[0].Split('.')[0]);
                        // dlist.Add(singleList.ToArray());
                     }
                     counter++;
                 }
                
                 
-                    //dataInsert.insertTime(time_array);
-                    //dataInsert.insertProcess(process_array);
+                    dataInsert.insertTime(time_array);
+                    dataInsert.insertProcess(process_array);
                     //Throws Object reference not set to an instance of an object. 'System.NullReferenceException'
                     dataInsert.insertMRI_Data(processes2DList);
-                    //dataInsert.insertGlobal0(gloabalZero2DList);
-                    //dataInsert.insertGlobalTotal(globalTotal2DList);
+                    dataInsert.insertGlobal0(globalZero2DList);
+                    dataInsert.insertGlobalTotal(globalTotal2DList);
                 
             }
             catch (NullReferenceException nre)

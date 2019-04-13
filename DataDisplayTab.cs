@@ -315,7 +315,8 @@ namespace SiemensPerformance
 
         private void RunButtonClick(object sender, EventArgs e)
         {
-          
+            string test1 = "";
+
             if (String.Equals((string)filterCB.SelectedItem, "Process"))
             {
                 if (dbConnection == 1)
@@ -326,19 +327,21 @@ namespace SiemensPerformance
                 else {
                     processData = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
                     columnNames = generator.processVariables;
+                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data";
                 }
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
             {
                 processData = generator.globalZero2DList;
                 columnNames = generator.globalZeroVariables;
+                test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0";
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
             {
                 processData = generator.globalTotal2DList;
                 columnNames = generator.globalTotalVariables;
+                test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal";
             }
-
 
             if (String.Equals((string)finalSelectCB.SelectedItem, ";"))
             {
@@ -350,22 +353,22 @@ namespace SiemensPerformance
                     processGrid.ItemsSource = processTable.DefaultView;
                 }
                 else
-                {
-                    string test =  "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date from mri_data";
-                    Console.WriteLine(test);
-                    processData = generator.getDataFromQueryDb(test);
-                 
+                {                  
+                    dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+                    graphTabItem.Content = PopulateGraph(dateModelData);
+                    processTable = ConvertListToDataTable(processData, generator.processVariables);
+                    processGrid.ItemsSource = processTable.DefaultView;
+
                 }
             }
 
             else if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
             {
-                string test1 = "";
+                
                 string whereColumn = (string)whereSelectName.SelectedItem;
-               
-                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
-                Console.WriteLine(whereOperator);
+                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;    
                 string whereVal = whereValue.Text;
+
                 if (dbConnection == 1)
                 {
                     processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
@@ -380,15 +383,29 @@ namespace SiemensPerformance
                     }
                 }
                 else {
-                     test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE "+ whereColumn + " " + whereOperator + " " + whereVal+" " ;
+                    if (whereOperator.Equals("=="))
+                    {
+                        test1 += " WHERE " + " " + whereColumn + " = " + whereVal + " ";
+                    }
+                    else
+                    {
+                        test1 += " WHERE " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                    }
+                   
                     if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
                     {
                         whereColumn = (string)andSelectNameCB.SelectedItem;
                         whereOperator = (string)andOperatorsCB.SelectedItem;
                         whereVal = andValue.Text;
-                       
-                            test1 += " AND " + " "+ whereColumn + " " + whereOperator + " " + whereVal + " ";
-                        
+                        Console.WriteLine(whereOperator);
+                        if (whereOperator.Equals("=="))
+                        {
+                            test1 += " AND " + " " + whereColumn + " = " + whereVal + " ";
+                        }
+                        else
+                        {
+                            test1 += " AND " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                        }
                     }
                     processData = generator.getDataFromQueryDb(test1);
                 }
