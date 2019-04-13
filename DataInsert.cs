@@ -52,8 +52,8 @@ namespace SiemensPerformance
             }
             catch (MySqlException se)
             {
+                Console.WriteLine(se.StackTrace);
             }
-
             finally
             {
                 conn.Close();
@@ -89,7 +89,7 @@ namespace SiemensPerformance
                 }
                 catch(Exception e)
                 {
-
+                    Console.WriteLine(e.StackTrace);
                 }
             }
 
@@ -135,7 +135,10 @@ namespace SiemensPerformance
                 {
                     myCmd.CommandType = CommandType.Text;
                     myCmd.ExecuteNonQuery();
-                }catch(Exception e) { }
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
             }
 
             conn.Close();

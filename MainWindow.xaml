@@ -8,7 +8,7 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Siemens Performance Logs" Height="450" Width="800" MinHeight="250" MinWidth="550">
+        Title="Siemens Performance Logs" Height="650" Width="800" MinHeight="250" MinWidth="550">
     <Grid>
         <DockPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">

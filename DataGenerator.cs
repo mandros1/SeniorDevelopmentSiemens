@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.IO;
 using System.Windows.Controls;
+using Newtonsoft.Json;
 
 
 namespace SiemensPerformance
@@ -47,53 +48,67 @@ namespace SiemensPerformance
             "GMFPeak", "GMCOMM", "GMCOMMPeak", "GML", "GMLPeak",
             "GPFC", "GPFCPeak", "GMC", "GMCPeak"};
         
-
-        public List<string[]> processes2DList { get; set; }
-
-        public List<string[]> globalZero2DList { get; set; }
-
-        public List<string[]> globalTotal2DList { get; set; }
         
-        private List<string> singleList { get; set; }
+        public List<string[]> processes2DList { get; set; } // Store all process data from the file
 
-        public string fileName { get; set; }
+        public List<string[]> globalZero2DList { get; set; } // Store all the Global(0) data from the file
 
-        private List<string> processNamesList { get; set; }
-        private List<string[]> processData2DList { get; set; }
-        private List<DateModel> data { get; set; }
-        private IEnumerable<string> distinctNotes { get; set; }
-        private List<string[]> filteredList { get; set; }
-        private string line { get; set; }
-        private System.IO.StreamReader file { get; set; }
+        public List<string[]> globalTotal2DList { get; set; } // Store all the Global(_Total) data from the file
 
-        private int variableIndex { get; set; }
-        private Double value { get; set; }
-        private List<string> processReusableList { get; set; }
-        private int counter { get; set; }
+        private List<string> singleList { get; set; } // Used to store each read line while reading from the file
 
-        // Reusables for reading the file
+        private List<string[]> filterProcessData2DList { get; set; } // list used to store filtered data
+        
+        Dictionary<string, List<string[]>> multiDimenstionalDictionary { get; set; } // dictionary used to store data for JSON exporting and importing
+        
+        private List<string> processNamesList { get; set; } // list of all process names
+        
 
-        private string dataType;
-        private string dataString;
-        private string processName;
-        private int bracketPosition;
-        private string procID;
-        private int finalLength;
-        private int i;
-        private int j;
-        private int colonIndex;
-        private string subbedLine;
-        private int index;
+        private List<DateModel> data { get; set; } // List used to hold the feed for the graphs
+        private IEnumerable<string> distinctNotes { get; set; } // this IEnumerable is used to get store only distinct/not repeating process names
+        private List<string[]> filteredList { get; set; } // this list is used for storing all the processnames from the loaded file - not distinct
+        private List<string> processReusableList { get; set; } // list containing processNames from a loaded file - distinct
+        private System.IO.StreamReader file { get; set; } // file object that will be read through
+        public string fileName { get; set; } // name of the loaded utr file
+
+        // Data connected to the graph
+        public List<string[]> graphData { get; set; } // list used to store the data that is currently loaded in the Graph
+        public string graphColumn { get; set; }
+        public string[] graphColumnNames { get; set; }
+
+        // reusable variables
+        private string line { get; set; } // used when reading through file
+        private int variableIndex { get; set; } // reusable component to get the column number
+        private Double value { get; set; } // reusable used for reading numerical values from the utr file
+        private int counter { get; set; } // reusable counter used while reading through the file
+        private string dataType, subbedLine, dataString, processName, procID;
+        private int i, j, colonIndex, index, bracketPosition, finalLength;
+        private List<string[]> graphData2;
 
 
         /*
-         * This part is for generating data for PROCESSES
-        * ########################################################################################################
-        */
+         * Method that creates a JSON string for the result file export
+         */
+        public string resultFileDataGenerator()
+        {
+            multiDimenstionalDictionary = new Dictionary<string, List<string[]>>();
+            multiDimenstionalDictionary.Add("graphData", graphData);
+            string[] container = new string[1] { graphColumn };
+            graphData2 = new List<string[]>();
+            graphData2.Add(container);
+            graphData2.Add(graphColumnNames);
+            multiDimenstionalDictionary.Add("graphColumns", graphData2);
+            multiDimenstionalDictionary.Add("Process", processes2DList);
+            multiDimenstionalDictionary.Add("Global_Zero", globalZero2DList);
+            multiDimenstionalDictionary.Add("Global_Total", globalTotal2DList);
+            
+            return JsonConvert.SerializeObject(multiDimenstionalDictionary, Formatting.Indented);
+        }
 
         /*
-         * Returns the distinct List of all the processNames found in the current process2DList
-         */ 
+         * Returns the distinct List of all the processNames found in the current process2DList, no repeated data
+         * @return list containing distinct string process names 
+         */
         public List<string> getDistinctProcessNames()
         {
             processNamesList = processes2DList.Select(list => list[1]).ToList();
@@ -104,7 +119,8 @@ namespace SiemensPerformance
 
         /*
          * Returns the distinct List of all the processIDs found in the current process2DList for the specific process name
-         * @parameter processName is the name of the process for which IDs are filtered
+         * @param processName is the name of the process for which IDs are filtered
+         * @return list containing distinct string process IDs
          */
         public List<string> getDistinctProcessIDs(string processName)
         {
@@ -120,27 +136,35 @@ namespace SiemensPerformance
         }
 
         /*
-         * This method accepts processName and processId and generates the 2d list of data for those specific parameters
+         * Filtering process data on specific process name and process id and consoling the filter process that was put in place
+         * @param processName is a name of the process
+         * @param processId is the id of the latter process name
+         * @return 2D list with data filtered by process name and process id
          */
         public List<string[]> getProcessData(string processName, string processId)
         {
             if (!String.IsNullOrEmpty(processName) && String.IsNullOrEmpty(processId) && processName != "None")
             {
-                processData2DList = processes2DList.Where(x => x[1] == processName).ToList();
+                filterProcessData2DList = processes2DList.Where(x => x[1] == processName).ToList();
                 Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
-                return processData2DList;
+                return filterProcessData2DList;
             }
             else if (!String.IsNullOrEmpty(processName) && !String.IsNullOrEmpty(processId))
             {
                 Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
-                processData2DList = processes2DList.Where(x => x[1] == processName && x[2] == processId).ToList();
-                return processData2DList;
+                filterProcessData2DList = processes2DList.Where(x => x[1] == processName && x[2] == processId).ToList();
+                return filterProcessData2DList;
             }
             Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
             return processes2DList;
         }
 
-        public List<string[]> getWhereProcessData(List<string[]> processDataFilteredNameAndID,
+
+        /*
+         * Method that handles in code query WHERE functionality by filtering the 2D lists depending on the provided params
+         * @param processDataFilteredNameAndID 
+         */
+        public List<string[]> getWhereProcessData(  List<string[]> processDataFilteredNameAndID,
                                                     string whereColumn,
                                                     string whereOperator,
                                                     string whereValue,
@@ -166,17 +190,59 @@ namespace SiemensPerformance
             return processDataFilteredNameAndID;
         }
 
+
+        /*
+         * Sort all the 2D arrays of data by its respective timestamps
+         */
         public void sortProcessesByTimeStamp()
         {
             if (processes2DList != null) processes2DList = processes2DList.OrderBy(x => x[0]).ToList();
             if (globalZero2DList != null) globalZero2DList = globalZero2DList.OrderBy(x => x[0]).ToList();
             if (globalTotal2DList != null) globalTotal2DList = globalTotal2DList.OrderBy(x => x[0]).ToList();
         }
+        
+        
+        public void importResultFile(OpenFileDialog ofd)
+        {
+            /*
+             multiDimenstionalDictionary.Add("graphData", graphData);
+            string[] container = new string[1] { graphColumn };
+            graphData2 = new List<string[]>();
+            graphData2.Add(container);
+            graphData2.Add(graphColumnNames);
+            multiDimenstionalDictionary.Add("graphColumns", graphData2);
+            multiDimenstionalDictionary.Add("Process", processes2DList);
+            multiDimenstionalDictionary.Add("Global_Zero", globalZero2DList);
+            multiDimenstionalDictionary.Add("Global_Total", globalTotal2DList);
+             */
 
-        /*
-         * ########################################################################################################
-         */
-         
+            string[] dictKeys = new string[5] { "graphData", "graphColumns", "Process", "Global_Zero", "Global_Total" };
+            this.fileName = ofd.SafeFileName;
+            file = new System.IO.StreamReader(ofd.FileName);
+            try
+            {
+                string json = file.ReadToEnd();
+
+                multiDimenstionalDictionary = new Dictionary<string, List<string[]>>();
+                multiDimenstionalDictionary = JsonConvert.DeserializeObject<Dictionary<string, List<string[]>>>(json);
+                graphData = multiDimenstionalDictionary[dictKeys[0]];
+                graphData2 = multiDimenstionalDictionary[dictKeys[1]];
+                graphColumn = graphData2[0][0];
+                graphColumnNames = graphData2[1];
+                processes2DList = multiDimenstionalDictionary[dictKeys[2]];
+                globalZero2DList = multiDimenstionalDictionary[dictKeys[3]];
+                globalTotal2DList = multiDimenstionalDictionary[dictKeys[4]];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+            finally
+            {
+                file.Close();
+            }
+        }
+
 
         /*
          * Method that accepts the file selected from the dialog window and reads through it storing them into an appropriate 2DList
@@ -187,14 +253,7 @@ namespace SiemensPerformance
             globalTotal2DList = new List<string[]>();
             globalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
-            /*
-            DataInsert dataInsert = new DataInsert();
-            var time_array = new List<string>();
-            List<List<string>> process_array = new List<List<string>>();
-          */
             file = new System.IO.StreamReader(dialog.FileName);
-
-            //int lineCount = File.ReadAllLines(dialog.FileName).Length;
             
             try
             {
@@ -211,30 +270,6 @@ namespace SiemensPerformance
                             singleList.Add(item);
                         }
                     }
-/*
-                    //sw.Write("\n");
-                    //
-                    if (singleList.Count == 21)
-                    {
-                        // for processess
-                        processes2DList.Add(singleList.ToArray());
-                        time_array.Add(singleList[0].Split('.')[0]);
-                        process_array.Add(new List<string> { singleList[1], singleList[2] });
-                        dlist.Add(singleList.ToArray());
-                    } else if (singleList.Count == 33)
-                    {
-                        // for global 0
-                        gloabalZero2DList.Add(singleList.ToArray());
-                        time_array.Add(singleList[0].Split('.')[0]);
-                        dlist.Add(singleList.ToArray());
-                    }
-                    else if (singleList.Count == 22)
-                    {
-                        // for global total
-                        globalTotal2DList.Add(singleList.ToArray());
-                        time_array.Add(singleList[0].Split('.')[0]);
-                        dlist.Add(singleList.ToArray());
-*/
                     if (singleList.Count == 22 && singleList[0] == "Process:")
                     {
                         // for processess
@@ -249,11 +284,7 @@ namespace SiemensPerformance
                         globalTotal2DList.Add(singleList.Skip(1).ToArray());
                     }
                     counter++;
-                    //double calc = ((double)counter / (double)lineCount);
-                    //pbar.Value = Math.Ceiling(calc * 100);
                 }
-                //dataInsert.insertTime(time_array);
-                //dataInsert.insertProcess(process_array);
             }
             catch (Exception e)
             {
@@ -264,8 +295,18 @@ namespace SiemensPerformance
                 file.Close();
             }
             this.sortProcessesByTimeStamp();
+
+            //// this is used for exporting to JSON
+            //multiDimenstionalDictionary = new Dictionary<string, List<string[]>>();
+            //multiDimenstionalDictionary.Add("Process", processes2DList);
+            //multiDimenstionalDictionary.Add("Global_Zero", globalZero2DList);
+            //multiDimenstionalDictionary.Add("Global_Total", globalTotal2DList); 
+            //string json = JsonConvert.SerializeObject(multiDimenstionalDictionary, Formatting.Indented);
+
+            //Dictionary<string, List<string[]>>  mdDict = new Dictionary<string, List<string[]>>();
+            //mdDict = JsonConvert.DeserializeObject<Dictionary<string, List<string[]>>>(json);
         }
-        
+
 
         /*
          * Method that reads the each line from the file and creates an IEnumerable from them
@@ -313,7 +354,6 @@ namespace SiemensPerformance
                     colonIndex = line.IndexOf(':');
                     subbedLine = line.Substring(colonIndex + 2);
                     if (subbedLine.Contains("n.a.")) subbedLine = "0.0";
-                    Console.WriteLine(subbedLine);
                     yield return Regex.Replace(subbedLine, @"[^0-9.]", "");
                 }
 
@@ -324,6 +364,9 @@ namespace SiemensPerformance
         
         public List<DateModel> getDateModelList(List<string[]> dataList, string whereColumn, string[] columnNames)
         {
+            graphData = dataList;
+            graphColumn = whereColumn;
+            graphColumnNames = columnNames;
             variableIndex = Array.IndexOf(columnNames, whereColumn);
             data = new List<DateModel>();
 

@@ -17,15 +17,12 @@ namespace SiemensPerformance
         
         // Processes data grid and data table
         private DataGrid processGrid;
-        private DataTable processTable;
 
         // Global(0) data grid and data table
         private DataGrid globalZeroGrid;
-        private DataTable globalZeroTable;
 
         // Global(_Total) grid and data table
         private DataGrid globalTotalGrid;
-        private DataTable globalTotalTable;
 
         private string[] filterByArray = { "Process", "Global(0)", "Global(_Total)" };
 
@@ -60,11 +57,8 @@ namespace SiemensPerformance
         private Button runButton;
         private TabItem graphTabItem;
 
-        private ComboBox finalBetweenCB;
-
         // reusable components
-        private StackPanel stackPanel;
-        private StackPanel stackPanel2;
+        private StackPanel stackPanel, stackPanel2;
         private Label label;
         private ComboBox comboBox;
         private DockPanel dockPanel;
@@ -75,6 +69,12 @@ namespace SiemensPerformance
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning cartesianChart;
         private ChartValues<DateModel> data;
         private List<DateModel> dateModelData;
+        private string stringData;
+        private int selection;
+        private DataTable reusableDataTable;
+        private Button resetButton;
+        private MenuItem reusableMenuItem;
+        private Boolean import = false;
 
 
         public DataDisplayTab()
@@ -83,12 +83,21 @@ namespace SiemensPerformance
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = ".utr";
-            ofd.Filter = "Text files (*.utr)|*.utr";
+            ofd.Filter = "Text files (*.utr)|*.utr|Json files (*.json)|*.json";
 
             //Get Data
             if (ofd.ShowDialog() == true)
             {
-                generator.getJsonString(ofd);
+                string ext = Path.GetExtension(ofd.FileName);
+                if(ext == ".utr")
+                {
+                    generator.getJsonString(ofd);
+                }
+                else if(ext == ".json")
+                {
+                    generator.importResultFile(ofd);
+                    import = true;
+                }
                 displayable = true;
             }
             else
@@ -98,28 +107,28 @@ namespace SiemensPerformance
             }
 
             TabControl tc = new TabControl();
+            if (import) Console.WriteLine("IMPORT IS TRUE");
 
             //Tab dropdown menu
             //Rename Tab
             ContextMenu contextMenu = new ContextMenu();
-            MenuItem menuItem1 = new MenuItem();
-            contextMenu.Items.Add(menuItem1);
-            menuItem1.Header = "Rename";
-            menuItem1.Click += delegate { Rename(); };
 
-            /* TODO Make this work correctly
+            reusableMenuItem = new MenuItem();
+            contextMenu.Items.Add(reusableMenuItem);
+            reusableMenuItem.Header = "Rename";
+            reusableMenuItem.Click += delegate { Rename(); };
+
             //Save data to Json
-            MenuItem menuItem2 = new MenuItem();
-            contextMenu.Items.Add(menuItem2);
-            menuItem2.Header = "Save";
-            menuItem2.Click += delegate { Save(); };
-            */
+            reusableMenuItem = new MenuItem();
+            contextMenu.Items.Add(reusableMenuItem);
+            reusableMenuItem.Header = "Export";
+            reusableMenuItem.Click += delegate { Export(); };
 
             //Close Tab
-            MenuItem menuItem2 = new MenuItem();
-            contextMenu.Items.Add(menuItem2);
-            menuItem2.Header = "Close";
-            menuItem2.Click += delegate { Close(); };
+            reusableMenuItem = new MenuItem();
+            contextMenu.Items.Add(reusableMenuItem);
+            reusableMenuItem.Header = "Close";
+            reusableMenuItem.Click += delegate { Close(); };
             
             this.ContextMenu = contextMenu;
             
@@ -127,10 +136,19 @@ namespace SiemensPerformance
             tabItem = new TabItem();
             this.Header = generator.fileName;
             tabItem.Header = "Processes";
-            // Pumping content into the table
-            processGrid = dataGridData(generator.processes2DList, generator.processVariables, processTable);
-            tabItem.Content = processGrid;
 
+            processGrid = dataGridData(generator.processes2DList, generator.processVariables, reusableDataTable);
+            processGrid.Height = 450;
+           
+            resetButton = resetButtonGenerator("Reset Process Table");
+
+            dockPanel = new DockPanel();
+            DockPanel.SetDock(processGrid, Dock.Top);
+            DockPanel.SetDock(resetButton, Dock.Bottom);
+            dockPanel.Children.Add(processGrid);
+            dockPanel.Children.Add(resetButton);
+            
+            tabItem.Content = dockPanel;
             tabItem.ContextMenu = new ContextMenu();
             tc.Items.Insert(0, tabItem);
 
@@ -138,9 +156,19 @@ namespace SiemensPerformance
             tabItem = new TabItem();
             this.Header = generator.fileName;
             tabItem.Header = "Global(0)";
-            // Pumping content into the table
-            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalZeroVariables, globalZeroTable);
-            tabItem.Content = globalZeroGrid;
+
+
+            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalZeroVariables, reusableDataTable);
+            globalZeroGrid.Height = 450;
+            resetButton = resetButtonGenerator("Reset Global_0 Table");
+
+            dockPanel = new DockPanel();
+            DockPanel.SetDock(globalZeroGrid, Dock.Top);
+            DockPanel.SetDock(resetButton, Dock.Bottom);
+            dockPanel.Children.Add(globalZeroGrid);
+            dockPanel.Children.Add(resetButton);
+
+            tabItem.Content = dockPanel;
 
             tabItem.ContextMenu = new ContextMenu();
             tc.Items.Insert(1, tabItem);
@@ -150,9 +178,18 @@ namespace SiemensPerformance
             tabItem = new TabItem();
             this.Header = generator.fileName;
             tabItem.Header = "Global(_Total)";
-            // Pumping content into the table
-            globalTotalGrid = dataGridData(generator.globalTotal2DList, generator.globalTotalVariables, globalTotalTable);
-            tabItem.Content = globalTotalGrid;
+
+            globalTotalGrid = dataGridData(generator.globalTotal2DList, generator.globalTotalVariables, reusableDataTable);
+            globalTotalGrid.Height = 450;
+            resetButton = resetButtonGenerator("Reset Global_Total Table");
+
+            dockPanel = new DockPanel();
+            DockPanel.SetDock(globalTotalGrid, Dock.Top);
+            DockPanel.SetDock(resetButton, Dock.Bottom);
+            dockPanel.Children.Add(globalTotalGrid);
+            dockPanel.Children.Add(resetButton);
+
+            tabItem.Content = dockPanel;
 
             tabItem.ContextMenu = new ContextMenu();
             tc.Items.Insert(2, tabItem);
@@ -169,15 +206,24 @@ namespace SiemensPerformance
             tabItem = generateQueryTabItem();
             tabItem.ContextMenu = new ContextMenu();
             tc.Items.Insert(4, tabItem);
-            
+
+            if (import)
+            {
+                dateModelData = generator.getDateModelList(generator.graphData, generator.graphColumn, generator.graphColumnNames);
+                graphTabItem.Content = this.PopulateGraph(dateModelData);
+            }
+
             this.Content = tc;
         } 
 
+        /**
+         * When the name of the process is changed generate the IDs in the IDComboBox that belong to that process name
+         */
         private void procName_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ComboBox combo = (ComboBox)sender;
-            string procName = (string) combo.SelectedItem;
-            processIdCB.ItemsSource = generator.getDistinctProcessIDs(procName);
+            comboBox = (ComboBox)sender;
+            stringData = (string)comboBox.SelectedItem;
+            processIdCB.ItemsSource = generator.getDistinctProcessIDs(stringData);
         } 
 
 
@@ -187,8 +233,8 @@ namespace SiemensPerformance
          */
         private TabItem generateQueryTabItem()
         {
-            TabItem tab = new TabItem();
-            tab.Header = "Query";
+            tabItem = new TabItem();
+            tabItem.Header = "Query";
 
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
@@ -197,44 +243,44 @@ namespace SiemensPerformance
 
             DockPanel.SetDock(stackPanel, Dock.Top);
             dockPanel.Children.Add(stackPanel);
-            
 
-            tab.Content = dockPanel;
-            return tab;
+
+            tabItem.Content = dockPanel;
+            return tabItem;
         }
 
+        /**
+        * Handles on button click event and runs the queries depending on multiple selecitons
+        */
         private void RunButtonClick(object sender, EventArgs e)
         {
+            string whereColumn = "";
+            string whereOperator = "";
+            string whereVal = "";
+
             if (String.Equals((string)filterCB.SelectedItem, "Process"))
             {
                 processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
                 columnNames = generator.processVariables;
+                selection = 1;
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
             {
                 processData = generator.globalZero2DList;
                 columnNames = generator.globalZeroVariables;
+                selection = 2;
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
             {
                 processData = generator.globalTotal2DList;
                 columnNames = generator.globalTotalVariables;
+                selection = 3;
             }
-
-
-            if (String.Equals((string)finalSelectCB.SelectedItem, ";"))
+            if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
             {
-                dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
-                graphTabItem.Content = PopulateGraph(dateModelData);
-                processTable = ConvertListToDataTable(processData, generator.processVariables);
-                processGrid.ItemsSource = processTable.DefaultView;
-            }
-            else if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
-            {
-                
-                string whereColumn = (string)whereSelectName.SelectedItem;
-                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
-                string whereVal = whereValue.Text;
+                whereColumn = (string)whereSelectName.SelectedItem;
+                whereOperator = (string)whereOperatorsComboBox.SelectedItem;
+                whereVal = whereValue.Text;
                 processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
 
                 if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
@@ -244,26 +290,15 @@ namespace SiemensPerformance
                     whereVal = andValue.Text;
                     processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
                 }
-
-                dateModelData = generator.getDateModelList(processData, whereColumn, columnNames);
-                graphTabItem.Content = PopulateGraph(dateModelData);
-
-                if (String.Equals((string)filterCB.SelectedItem, "Process"))
-                {
-                    processTable = ConvertListToDataTable(processData, generator.processVariables);
-                    processGrid.ItemsSource = processTable.DefaultView;
-                }
-                else if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
-                {
-                    globalZeroTable = ConvertListToDataTable(processData, generator.globalZeroVariables);
-                    globalZeroGrid.ItemsSource = globalZeroTable.DefaultView;
-                }
-                else if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
-                {
-                    globalTotalTable = ConvertListToDataTable(processData, generator.globalTotalVariables);
-                    globalTotalGrid.ItemsSource = globalTotalTable.DefaultView;
-                }
             }
+
+            dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+            graphTabItem.Content = PopulateGraph(dateModelData);
+            reusableDataTable = ConvertListToDataTable(processData, columnNames);
+
+            if (selection == 1) processGrid.ItemsSource = reusableDataTable.DefaultView;
+            if (selection == 2) globalZeroGrid.ItemsSource = reusableDataTable.DefaultView;
+            if (selection == 3) globalTotalGrid.ItemsSource = reusableDataTable.DefaultView;
         }
 
         private Button runButtonGenerator()
@@ -276,6 +311,37 @@ namespace SiemensPerformance
             runButton.Click += new System.Windows.RoutedEventHandler(RunButtonClick);
 
             return runButton;
+        }
+
+        private void ResetButtonClick(object sender, EventArgs e)
+        {
+            resetButton = (Button)sender;
+            stringData = (string)resetButton.Content;
+            if (stringData == "Reset Process Table")
+            {
+                reusableDataTable = ConvertListToDataTable(generator.processes2DList, generator.processVariables);
+                processGrid.ItemsSource = reusableDataTable.DefaultView;
+            } else if (stringData == "Reset Global_0 Table")
+            {
+                reusableDataTable = ConvertListToDataTable(generator.globalZero2DList, generator.globalZeroVariables);
+                globalZeroGrid.ItemsSource = reusableDataTable.DefaultView;
+            } else if (stringData == "Reset Global_Total Table")
+            {
+                reusableDataTable = ConvertListToDataTable(generator.globalTotal2DList, generator.globalTotalVariables);
+                globalTotalGrid.ItemsSource = reusableDataTable.DefaultView;
+            }
+        }
+
+        private Button resetButtonGenerator(string text)
+        {
+            resetButton = new Button();
+            resetButton.Content = text;
+            resetButton.Width = 200;
+            resetButton.Height = 50;
+            resetButton.Margin = new System.Windows.Thickness(100, 0, 0, 0);
+            resetButton.Click += new System.Windows.RoutedEventHandler(ResetButtonClick);
+
+            return resetButton;
         }
 
         private DockPanel baseDockPanel()
@@ -746,13 +812,38 @@ namespace SiemensPerformance
             return dockPanel;
         }
 
+        /*
+        * Converts list to data table
+        */
+        private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
+        {
+            DataTable dataTable = new DataTable();
+
+            // Get max columns.
+            int columnsNum = columns.Length;
+            for (int i = 0; i < columnsNum; i++)
+            {
+                dataTable.Columns.Add(columns[i]);
+            }
+
+            foreach (var array in list)
+            {
+                if (array.Length == columnsNum)
+                {
+                    dataTable.Rows.Add(array);
+                }
+
+            }
+            return dataTable;
+        }
+
 
         /*
          * Generate DataGrid from data
          */
         private DataGrid GenerateTable(String[] columns)
         {
-            DataGrid grid = new DataGrid();
+            dataGrid = new DataGrid();
 
             for (int i = 0; i < columns.Length; i++)
             {
@@ -761,37 +852,12 @@ namespace SiemensPerformance
                 // TODO: replace with the column name
                 col.Header = columns[i];
                 // should be able to bind data to the row
-                grid.Columns.Add(col);
+                dataGrid.Columns.Add(col);
             }
-            return grid;
+            return dataGrid;
         }
 
-        /*
-         * Converts list to data table
-         */
-        private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
-        {
-            DataTable table = new DataTable();
-
-            // Get max columns.
-            int columnsNum = columns.Length;
-            for (int i = 0; i < columnsNum; i++)
-            {
-                table.Columns.Add(columns[i]);
-            }
-
-            foreach (var array in list)
-            {
-                if (array.Length == columnsNum)
-                {
-                    table.Rows.Add(array);
-                }
-
-            }
-            return table;
-        }
-
-
+       
         private DataGrid dataGridData(List<string[]> data2dList, string[] columns, DataTable whichTable)
         {
             whichTable = ConvertListToDataTable(data2dList, columns);
@@ -813,10 +879,11 @@ namespace SiemensPerformance
             }
         }
 
-        private void Save()
+        private void Export()
         {
             //set default file name to tab header
             String defaultName = this.Header.ToString();
+
             //Remove .utr extention if present
             if (defaultName.EndsWith(".utr"))
             {
@@ -832,14 +899,14 @@ namespace SiemensPerformance
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
 
-           // string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
+            string json = generator.resultFileDataGenerator();
 
             // Process save file dialog box results
             if (result == true)
             {
                 // Save document
                 string filename = dlg.FileName;
-               // File.WriteAllText(filename, json);
+                File.WriteAllText(filename, json);
             }
         }
 
