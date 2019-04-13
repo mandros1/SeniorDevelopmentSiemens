@@ -140,7 +140,7 @@ namespace SiemensPerformance
 
             global0Table.Columns.AddRange(new DataColumn[]
             {
-                new DataColumn("time_fk"),new DataColumn("FileName"),
+                new DataColumn("TimeStamp"),new DataColumn("FileName"),
                 new DataColumn("GCPU0"), new DataColumn("GCPU0Peak"),
                 new DataColumn("GCPU1"), new DataColumn("GCPU1Peak"),
                 new DataColumn("GCPU2"), new DataColumn("GCPU2Peak"),
@@ -162,7 +162,7 @@ namespace SiemensPerformance
             foreach (var line  in global0_data)
             {
                 DataRow newRow = global0Table.NewRow();
-                newRow["time_fk"] = line[0]; newRow["FileName"] = fileName;
+                newRow["TimeStamp"] = line[0]; newRow["FileName"] = fileName;
                 newRow["GCPU0"] = line[1]; newRow["GCPU0Peak"] = line[2];
                 newRow["GCPU1"] = line[3]; newRow["GCPU1Peak"] = line[4];
                 newRow["GCPU2"] = line[5]; newRow["GCPU2Peak"] = line[6];
@@ -291,7 +291,7 @@ namespace SiemensPerformance
 
             globalTotalTable.Columns.AddRange(new DataColumn[]
             {
-                new DataColumn("time_fk"),new DataColumn("FileName"),
+                new DataColumn("TimeStamp"),new DataColumn("FileName"),
                 new DataColumn("GCPU"), new DataColumn("GCPUPeak"),
                 new DataColumn("GMA"), new DataColumn("GMAPeak"),
                 new DataColumn("GPC"), new DataColumn("GPCPeak"),
@@ -309,7 +309,7 @@ namespace SiemensPerformance
             {
                 //Console.WriteLine(line);
                 DataRow newRow = globalTotalTable.NewRow();
-                newRow["time_fk"] = line[0]; newRow["FileName"] = fileName;
+                newRow["TimeStamp"] = line[0]; newRow["FileName"] = fileName;
                 newRow["GCPU"] = line[1]; newRow["GCPUPeak"] = line[2];
                 newRow["GMA"] = line[3]; newRow["GMAPeak"] = line[4];
                 newRow["GPC"] = line[5]; newRow["GPCPeak"] = line[6];

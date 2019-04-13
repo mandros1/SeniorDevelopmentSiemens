@@ -16,16 +16,25 @@ namespace SiemensPerformance
     {
         private DataGenerator generator = new DataGenerator();
         private DataGrid processGrid;
-        private DataGrid globalZeroGrid;
-        private DataGrid globalTotalGrid;
         private DataTable processTable;
+
+        // Global(0) data grid and data table
+        private DataGrid globalZeroGrid;
         private DataTable globalZeroTable;
+
+        // Global(_Total) grid and data table
+        private DataGrid globalTotalGrid;
         private DataTable globalTotalTable;
-        private CartesianChart ch;
+
         private string[] filterByArray = { "Process", "Global(0)", "Global(_Total)" };
 
-        public Boolean displayable {get; set;}
+        public Boolean displayable { get; set; }
+
+        private CartesianChart ch;
+
+        // Main stack to which all of the below are appended to
         private StackPanel mainStackPanel;
+
         // Filter stack elements
         private StackPanel filterStackPanel;
         private ComboBox processNameCB;
@@ -42,10 +51,15 @@ namespace SiemensPerformance
         private ComboBox whereOperatorsComboBox;
         private ComboBox finalWhereCB;
 
+        // And stack elements    
+        private ComboBox andSelectNameCB;
+        private TextBox andValue;
+        private ComboBox andOperatorsCB;
+        private ComboBox finalAndCB;
+
         private Button runButton, saveButton; 
         private TabItem graphTabItem;
 
-        private ComboBox finalAndCB;
         private ComboBox finalBetweenCB;
 
         // reusable components
@@ -57,8 +71,12 @@ namespace SiemensPerformance
         private TextBox textBox;
         private TabItem tabItem;
         private DataGrid dataGrid;
-        //private DataTable dataTable;
+        private DataTable dataTable;
         private List<string[]> processData;
+        private string[] columnNames;
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning cartesianChart;
+        private ChartValues<DateModel> data;
+        private List<DateModel> dateModelData;
         private List<string> queryList;
         public static string utfFileName;
         public static int dbConnection;
@@ -106,7 +124,6 @@ namespace SiemensPerformance
             menuItem1.Header = "Rename";
             menuItem1.Click += delegate { Rename(); };
 
-            //TODO Make this work correctly
             //Save data to Json
             MenuItem menuItem2 = new MenuItem();
             contextMenu.Items.Add(menuItem2);
@@ -138,7 +155,8 @@ namespace SiemensPerformance
             this.Header = generator.fileName;
             tabItem.Header = "Global(0)";
             // Pumping content into the table
-            globalZeroGrid = dataGridData(generator.gloabalZero2DList, generator.globalVariables, globalZeroTable);
+            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalZeroVariables, globalZeroTable);
+
             tabItem.Content = globalZeroGrid;
 
             tabItem.ContextMenu = new ContextMenu();
@@ -231,7 +249,7 @@ namespace SiemensPerformance
             this.Header = generator.fileName;
             tabItem.Header = "Global(0)";
             // Pumping content into the table
-            globalZeroGrid = dataGridData(generator.gloabalZero2DList, generator.globalVariables, globalZeroTable);
+            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalZeroVariables, globalZeroTable);
             tabItem.Content = globalZeroGrid;
 
             tabItem.ContextMenu = new ContextMenu();
@@ -298,6 +316,69 @@ namespace SiemensPerformance
             return tab;
         }
 
+        private void RunButtonClick(object sender, EventArgs e)
+        {
+            if (String.Equals((string)filterCB.SelectedItem, "Process"))
+            {
+                processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                columnNames = generator.processVariables;
+            }
+            if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
+            {
+                processData = generator.globalZero2DList;
+                columnNames = generator.globalZeroVariables;
+            }
+            if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
+            {
+                processData = generator.globalTotal2DList;
+                columnNames = generator.globalTotalVariables;
+            }
+
+
+            if (String.Equals((string)finalSelectCB.SelectedItem, ";"))
+            {
+                dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+                graphTabItem.Content = PopulateGraph(dateModelData);
+                processTable = ConvertListToDataTable(processData, generator.processVariables);
+                processGrid.ItemsSource = processTable.DefaultView;
+            }
+            else if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
+            {
+
+                string whereColumn = (string)whereSelectName.SelectedItem;
+                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
+                string whereVal = whereValue.Text;
+                processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
+
+                if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
+                {
+                    whereColumn = (string)andSelectNameCB.SelectedItem;
+                    whereOperator = (string)andOperatorsCB.SelectedItem;
+                    whereVal = andValue.Text;
+                    processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
+                }
+
+                dateModelData = generator.getDateModelList(processData, whereColumn, columnNames);
+                graphTabItem.Content = PopulateGraph(dateModelData);
+
+                if (String.Equals((string)filterCB.SelectedItem, "Process"))
+                {
+                    processTable = ConvertListToDataTable(processData, generator.processVariables);
+                    processGrid.ItemsSource = processTable.DefaultView;
+                }
+                else if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
+                {
+                    globalZeroTable = ConvertListToDataTable(processData, generator.globalZeroVariables);
+                    globalZeroGrid.ItemsSource = globalZeroTable.DefaultView;
+                }
+                else if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
+                {
+                    globalTotalTable = ConvertListToDataTable(processData, generator.globalTotalVariables);
+                    globalTotalGrid.ItemsSource = globalTotalTable.DefaultView;
+                }
+            }
+        }
+
         private void NewButton_Click(object sender, EventArgs e)
         {
             if (dbConnection == 1)
@@ -307,17 +388,18 @@ namespace SiemensPerformance
             }
             else
             {
-                List<string[]> test = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
-                processData = test;
+                //Fix
+                //Method not found
+                //List<string[]> test = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                //processData = test;
             }
-            // if it is on process filter
-            if (String.Equals((string)finalSelectCB.SelectedItem, ";") 
-                && 
-                String.Equals((string)filterCB.SelectedItem, "Process"))
+
+            if (String.Equals((string)finalSelectCB.SelectedItem, ";"))
             {
-                Console.WriteLine("Just Select");
-               
-                graphTabItem.Content = PopulateGraph(processData, (string)selectComboBox.SelectedItem);
+                dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+                graphTabItem.Content = PopulateGraph(dateModelData);
+                processTable = ConvertListToDataTable(processData, generator.processVariables);
+                processGrid.ItemsSource = processTable.DefaultView;
             }
             else if (   String.Equals((string)finalSelectCB.SelectedItem, "WHERE") 
                         && 
@@ -327,7 +409,7 @@ namespace SiemensPerformance
                 string whereColumn = (string)whereSelectName.SelectedItem;
                 string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
                 string whereVal = whereValue.Text;
-                processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal);
+                processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
             }
 
             processTable = ConvertListToDataTable(processData, generator.processVariables);
@@ -1022,37 +1104,12 @@ namespace SiemensPerformance
         /*
          * Converts data from a list of String arrays [timstamp, data] to a Chartvalues<DateModel> and puts it in the graph
          */
-        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<DateModel> dateModel2dList)
         {
-            
-
-            ChartValues<DateModel> data = new ChartValues<DateModel>();
-
-            int variableIndex = Array.IndexOf(generator.processVariables, variable);
-
-            //Get data
-            foreach (var array in data2DList)
-            {
-                try
-                {
-                    Double value = Double.Parse(array[variableIndex].Replace(".", ","));
-                    DateTime timeStamp = DateTime.ParseExact(array[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null);
-                    data.Add(new DateModel
-                    {
-                        DateTime = timeStamp,
-                        Value = value
-                    });
-                }
-                catch (IndexOutOfRangeException t)
-                {
-                    Console.WriteLine(t);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
-        } 
+            data = new ChartValues<DateModel>();
+            data.AddRange(dateModel2dList);
+            cartesianChart = new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
+            return cartesianChart;
+        }
     }
 }
