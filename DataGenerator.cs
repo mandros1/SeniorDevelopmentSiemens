@@ -52,6 +52,8 @@ namespace SiemensPerformance
         
         public List<string[]> processes2DList { get; set; } // Store all process data from the file
 
+        private List<string[]> processData2DList { get; set; }
+
         public List<string[]> globalZero2DList { get; set; } // Store all the Global(0) data from the file
 
         public List<string[]> globalTotal2DList { get; set; } // Store all the Global(_Total) data from the file

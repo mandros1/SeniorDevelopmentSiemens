@@ -17,12 +17,15 @@ namespace SiemensPerformance
         
         // Processes data grid and data table
         private DataGrid processGrid;
+        private DataTable processTable;
 
         // Global(0) data grid and data table
         private DataGrid globalZeroGrid;
+        private DataTable globalZeroTable;
 
         // Global(_Total) grid and data table
         private DataGrid globalTotalGrid;
+        private DataTable globalTotalTable;
 
         private string[] filterByArray = { "Process", "Global(0)", "Global(_Total)" };
 
@@ -310,7 +313,7 @@ namespace SiemensPerformance
             // Create Query tab
             tabItem = generateQueryTabItem();
             tabItem.ContextMenu = new ContextMenu();
-            tc.Items.Insert(4, tabItem);
+            //tc.Items.Insert(4, tabItem);
 
             if (import)
             {
@@ -420,9 +423,9 @@ namespace SiemensPerformance
             else if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
             {
                 
-                string whereColumn = (string)whereSelectName.SelectedItem;
-                string whereOperator = (string)whereOperatorsComboBox.SelectedItem;    
-                string whereVal = whereValue.Text;
+               // string whereColumn = (string)whereSelectName.SelectedItem;
+                //string whereOperator = (string)whereOperatorsComboBox.SelectedItem;    
+                //string whereVal = whereValue.Text;
 				processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
 
                 if (dbConnection == 1)
