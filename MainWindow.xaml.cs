@@ -10,7 +10,7 @@ namespace SiemensPerformance
 
         public Func<double, string> Formatter { get; set; }
         private TabControl tabs;
-        
+        private int dbConnection;
 
         public MainWindow()
         {
