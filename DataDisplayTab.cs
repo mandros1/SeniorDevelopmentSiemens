@@ -300,6 +300,7 @@ namespace SiemensPerformance
                 tab.Header = "Query database";
             }
 
+
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
             

@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows.Controls;
 using MySql.Data.MySqlClient;
 
+
 namespace SiemensPerformance
 {
     class DataGenerator
@@ -140,6 +141,7 @@ namespace SiemensPerformance
             Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
             return processes2DList;
         }
+
         /// <summary>
         /// POGLEDAJ OVU METODU I METODU ISPOD OVE, STA TREBA TVOJOJ METODI DATEMODELLIST, KAKAV FORMAT PODATAKA
         /// </summary>
@@ -340,8 +342,12 @@ namespace SiemensPerformance
             globalTotal2DList = new List<string[]>();
             globalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
-         
           
+            /*
+            DataInsert dataInsert = new DataInsert();
+            var time_array = new List<string>();
+            List<List<string>> process_array = new List<List<string>>();
+          */
             file = new System.IO.StreamReader(dialog.FileName);
 
             //int lineCount = File.ReadAllLines(dialog.FileName).Length;
@@ -362,6 +368,31 @@ namespace SiemensPerformance
                         }
                     }
 
+/*
+                    //sw.Write("\n");
+                    //
+                    if (singleList.Count == 21)
+                    {
+                        // for processess
+                        processes2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        process_array.Add(new List<string> { singleList[1], singleList[2] });
+                        dlist.Add(singleList.ToArray());
+                    } else if (singleList.Count == 33)
+                    {
+                        // for global 0
+                        gloabalZero2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        dlist.Add(singleList.ToArray());
+                    }
+                    else if (singleList.Count == 22)
+                    {
+                        // for global total
+                        globalTotal2DList.Add(singleList.ToArray());
+                        time_array.Add(singleList[0].Split('.')[0]);
+                        dlist.Add(singleList.ToArray());
+*/
+
                     if (singleList.Count == 22 && singleList[0] == "Process:")
                     {
                         // for processess
@@ -379,8 +410,9 @@ namespace SiemensPerformance
                     //double calc = ((double)counter / (double)lineCount);
                     //pbar.Value = Math.Ceiling(calc * 100);
                 }
-             
 
+                //dataInsert.insertTime(time_array);
+                //dataInsert.insertProcess(process_array);
             }
             catch (Exception e)
             {
@@ -537,13 +569,12 @@ namespace SiemensPerformance
         {
             variableIndex = Array.IndexOf(columnNames, whereColumn);
             data = new List<DateModel>();
-
             foreach (string[] list in dataList)
             {
                 data.Add(new DateModel
                 {
                     DateTime = DateTime.ParseExact(list[0], "yyyy/MM/dd-HH:mm:ss.ffffff", null),
-                    Value = Double.Parse(list[variableIndex].Replace(".", ","))
+                    Value = Double.Parse(list[variableIndex])
                 });
             }
             return data;
