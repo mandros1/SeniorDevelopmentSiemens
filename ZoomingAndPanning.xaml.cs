@@ -73,10 +73,7 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
          */
         private void ResetZoomOnClick(object sender, RoutedEventArgs e)
         {
-            X.MinValue = double.NaN;
-            X.MaxValue = double.NaN;
-            Y.MinValue = 0;
-            Y.MaxValue = double.NaN;
+            populateGraph(data);
         }
 
         /*
@@ -150,6 +147,13 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
             YFormatter = val => val.ToString();
 
             DataContext = this;
+            setTimeSpanDefault(insertData);
+        }
+
+        private void setTimeSpanDefault(ChartValues<DateModel> insertData)
+        {
+            startTime.Text = insertData[0].DateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+            endTime.Text = insertData[insertData.Count-1].DateTime.ToString("yyyy-MM-ddTHH:mm:ss");
         }
     }
 }
