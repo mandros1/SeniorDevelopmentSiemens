@@ -18,9 +18,11 @@ namespace SiemensPerformance
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
+    
     public partial class Login : Window
     {
         DBConnect connect;
+       
         public Login()
         {
             InitializeComponent();
@@ -35,6 +37,18 @@ namespace SiemensPerformance
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             System.Environment.Exit(1);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var loginWindow = (Application.Current.MainWindow as Login);
+            if (loginWindow != null)
+            {
+                MainWindow mainWindow = new MainWindow(1);
+                mainWindow.Show();
+                loginWindow.Close();
+            }
+
         }
     }
 }
