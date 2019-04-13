@@ -68,32 +68,36 @@ namespace SiemensPerformance
         private Label label;
         private ComboBox comboBox;
         private DockPanel dockPanel;
-        private TextBox textBox;
         private TabItem tabItem;
         private DataGrid dataGrid;
-        private DataTable dataTable;
         private List<string[]> processData;
-
+        private string[] columnNames;
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning cartesianChart;
+        private ChartValues<DateModel> data;
+        private List<DateModel> dateModelData;
+        public static string utfFileName;
         private int dbConnection;
+
 
         public DataDisplayTab(int dbInt)
         {
             dbConnection = dbInt;
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
+            ofd.DefaultExt = ".utr";
+            ofd.Filter = "Text files (*.utr)|*.utr";
 
             //Get Data
             if (ofd.ShowDialog() == true)
-            {
-                if (ofd.FileName.EndsWith(".utr"))
+            {if (dbConnection == 1)
                 {
                     generator.getJsonString(ofd);
                     displayable = true;
                 }
-                else
-                {
-                    return;
+                else {
+                    utfFileName = System.IO.Path.GetFileName(ofd.FileName);
+                    generator.writeDataToDB(ofd);
+                    displayable = true;
                 }
             }
             else
@@ -144,7 +148,7 @@ namespace SiemensPerformance
             this.Header = generator.fileName;
             tabItem.Header = "Global(0)";
             // Pumping content into the table
-            globalZeroGrid = dataGridData(generator.gloabalZero2DList, generator.globalVariables, globalZeroTable);
+            globalZeroGrid = dataGridData(generator.globalZero2DList, generator.globalZeroVariables, globalZeroTable);
             tabItem.Content = globalZeroGrid;
 
             tabItem.ContextMenu = new ContextMenu();
@@ -180,21 +184,17 @@ namespace SiemensPerformance
 
         public DataDisplayTab()
         {
+            
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Log/Text Files (*.utr; *.txt)|*.utr; *.txt";
+            ofd.DefaultExt = ".utr";
+            ofd.Filter = "Text files (*.utr)|*.utr";
 
             //Get Data
             if (ofd.ShowDialog() == true)
             {
-                if (ofd.FileName.EndsWith(".utr")) {
-                    generator.getJsonString(ofd);
-                    displayable = true;
-                }
-                else
-                {
-                    return;
-                }
+                generator.getJsonString(ofd);
+                displayable = true;
             }
             else
             {
@@ -285,13 +285,16 @@ namespace SiemensPerformance
             processIdCB.ItemsSource = generator.getDistinctProcessIDs(procName);
         } 
 
+
+       
         /**
          * Main method for generating query tab item
          */
         private TabItem generateQueryTabItem()
         {
             TabItem tab = new TabItem();
-            if (dbConnection == 1) { tab.Header = "Query file"; }
+            if (dbConnection == 1) {
+                tab.Header = "Query file"; }
             else
             {
                 tab.Header = "Query database";
@@ -312,10 +315,18 @@ namespace SiemensPerformance
 
         private void RunButtonClick(object sender, EventArgs e)
         {
+          
             if (String.Equals((string)filterCB.SelectedItem, "Process"))
             {
-                processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
-                columnNames = generator.processVariables;
+                if (dbConnection == 1)
+                {
+                    processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                    columnNames = generator.processVariables;
+                }
+                else {
+                    processData = generator.getDataFromDb((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                    columnNames = generator.processVariables;
+                }
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
             {
@@ -331,26 +342,57 @@ namespace SiemensPerformance
 
             if (String.Equals((string)finalSelectCB.SelectedItem, ";"))
             {
-                dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
-                graphTabItem.Content = PopulateGraph(dateModelData);
-                processTable = ConvertListToDataTable(processData, generator.processVariables);
-                processGrid.ItemsSource = processTable.DefaultView;
+                if (dbConnection == 1)
+                {
+                    dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
+                    graphTabItem.Content = PopulateGraph(dateModelData);
+                    processTable = ConvertListToDataTable(processData, generator.processVariables);
+                    processGrid.ItemsSource = processTable.DefaultView;
+                }
+                else
+                {
+                    string test =  "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date from mri_data";
+                    Console.WriteLine(test);
+                    processData = generator.getDataFromQueryDb(test);
+                 
+                }
             }
+
             else if (String.Equals((string)finalSelectCB.SelectedItem, "WHERE"))
             {
-                
+                string test1 = "";
                 string whereColumn = (string)whereSelectName.SelectedItem;
+               
                 string whereOperator = (string)whereOperatorsComboBox.SelectedItem;
+                Console.WriteLine(whereOperator);
                 string whereVal = whereValue.Text;
-                processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
-
-                if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
+                if (dbConnection == 1)
                 {
-                    whereColumn = (string)andSelectNameCB.SelectedItem;
-                    whereOperator = (string)andOperatorsCB.SelectedItem;
-                    whereVal = andValue.Text;
                     processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames);
+                    if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
+                    {
+                        whereColumn = (string)andSelectNameCB.SelectedItem;
+                        whereOperator = (string)andOperatorsCB.SelectedItem;
+                        whereVal = andValue.Text;
+                        Console.WriteLine(whereOperator);
+                        processData = generator.getWhereProcessData(processData, whereColumn, whereOperator, whereVal, columnNames); 
+
+                    }
                 }
+                else {
+                     test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE "+ whereColumn + " " + whereOperator + " " + whereVal+" " ;
+                    if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
+                    {
+                        whereColumn = (string)andSelectNameCB.SelectedItem;
+                        whereOperator = (string)andOperatorsCB.SelectedItem;
+                        whereVal = andValue.Text;
+                       
+                            test1 += " AND " + " "+ whereColumn + " " + whereOperator + " " + whereVal + " ";
+                        
+                    }
+                    processData = generator.getDataFromQueryDb(test1);
+                }
+               
 
                 dateModelData = generator.getDateModelList(processData, whereColumn, columnNames);
                 graphTabItem.Content = PopulateGraph(dateModelData);
@@ -603,8 +645,7 @@ namespace SiemensPerformance
             finalSelectCB.Margin = outsideComboMargins;
             finalSelectCB.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             finalSelectCB.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            // UPGRADE TO BELOW
-            //string[] list = { ";", "WHERE", "BETWEEN" };
+            
             string[] list = { ";", "WHERE" };
             finalSelectCB.SelectedIndex = 0;
             finalSelectCB.ItemsSource = list; 
@@ -855,79 +896,6 @@ namespace SiemensPerformance
         }
 
 
-        /**
-         * TO BE IMPLEMENTED
-         */
-
-        //private DockPanel betweenDockPanelGenerator(System.Windows.Thickness dockPanelMargins,
-        //                                           System.Windows.Thickness whereLabelMargins,
-        //                                           int whereLabelWidth,
-        //                                           System.Windows.Thickness variableComboMargins,
-        //                                           int variableComboWidth,
-        //                                           System.Windows.Thickness betweenLabelMargins,
-        //                                           int betweenLabelWidth,
-        //                                           System.Windows.Thickness startTextMargins,
-        //                                           int startTextWidth,
-        //                                           System.Windows.Thickness andLabelMargins,
-        //                                           int andLabelWidth,
-        //                                           System.Windows.Thickness endTextMargins,
-        //                                           int endTextWidth,
-        //                                           System.Windows.Thickness finalComboboxMargins,
-        //                                           int finalComboBoxWidth)
-        //{
-        //    dockPanel = new DockPanel();
-        //    dockPanel.Margin = dockPanelMargins;
-
-        //    stackPanel = new StackPanel();
-        //    stackPanel.Orientation = Orientation.Horizontal;
-
-        //    label = new Label();
-        //    label.Margin = whereLabelMargins;
-        //    label.Width = whereLabelWidth;
-        //    label.Content = "WHERE";
-        //    stackPanel.Children.Add(label);
-
-        //    comboBox = new ComboBox();
-        //    comboBox.Margin = variableComboMargins;
-        //    comboBox.Width = variableComboWidth;
-        //    parameterNamesComboBox.Add(comboBox);
-        //    stackPanel.Children.Add(comboBox);
-
-        //    label = new Label();
-        //    label.Margin = betweenLabelMargins;
-        //    label.Width = betweenLabelWidth;
-        //    label.Content = "BETWEEN";
-        //    stackPanel.Children.Add(label);
-
-        //    textBox = new TextBox();
-        //    textBox.Margin = startTextMargins;
-        //    textBox.Width = startTextWidth;
-        //    stackPanel.Children.Add(textBox);
-
-        //    label = new Label();
-        //    label.Margin = andLabelMargins;
-        //    label.Width = andLabelWidth;
-        //    label.Content = "AND";
-        //    stackPanel.Children.Add(label);
-
-        //    textBox = new TextBox();
-        //    textBox.Margin = endTextMargins;
-        //    textBox.Width = endTextWidth;
-        //    stackPanel.Children.Add(textBox);
-
-        //    dockPanel.Children.Add(stackPanel);
-
-        //    comboBox = new ComboBox();
-        //    comboBox.Margin = finalComboboxMargins;
-        //    comboBox.Width = finalComboBoxWidth;
-
-        //    DockPanel.SetDock(comboBox, Dock.Right);
-        //    dockPanel.Children.Add(comboBox);
-        //    dockPanel.Children.Add(new Label());
-
-        //    return dockPanel;
-        //}
-
         /*
          * Generate DataGrid from data
          */
@@ -967,6 +935,7 @@ namespace SiemensPerformance
                 {
                     table.Rows.Add(array);
                 }
+
             }
             return table;
         }
@@ -993,10 +962,6 @@ namespace SiemensPerformance
             }
         }
 
-        /*
-         * Saves data from a graph to json file
-         * TODO - make this week
-         */
         private void Save()
         {
             //set default file name to tab header
@@ -1010,20 +975,20 @@ namespace SiemensPerformance
             //Create save dialog
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.FileName = defaultName;
-            dlg.DefaultExt = ".txt";
-            dlg.Filter = "Text files (.txt)|*.txt";
+            dlg.DefaultExt = ".json";
+            dlg.Filter = "Json files (.json)|*.json";
 
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
 
-            string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
+           // string json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
 
             // Process save file dialog box results
             if (result == true)
             {
                 // Save document
                 string filename = dlg.FileName;
-                File.WriteAllText(filename, json);
+               // File.WriteAllText(filename, json);
             }
         }
 
@@ -1047,11 +1012,9 @@ namespace SiemensPerformance
 
         /*
          * Converts data from a list of String arrays [timstamp, data] to a Chartvalues<DateModel> and puts it in the graph
-         */
+         
         private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<string[]> data2DList, string variable)
         {
-            
-
             ChartValues<DateModel> data = new ChartValues<DateModel>();
 
             int variableIndex = Array.IndexOf(generator.processVariables, variable);
@@ -1080,5 +1043,14 @@ namespace SiemensPerformance
             }
             return new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
         } 
+  */
+
+        private Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning PopulateGraph(List<DateModel> dateModel2dList)
+        {
+            data = new ChartValues<DateModel>();
+            data.AddRange(dateModel2dList);
+            cartesianChart = new Wpf.CartesianChart.ZoomingAndPanning.ZoomingAndPanning(data);
+            return cartesianChart;
+        }
     }
 }

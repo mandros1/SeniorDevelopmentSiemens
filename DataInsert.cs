@@ -11,18 +11,15 @@ namespace SiemensPerformance
     class DataInsert
     {
         MySqlConnection conn;
-        MySqlCommand cmd;
-        MySqlConnectionStringBuilder builder;
-
-
+        string fileName;
         public DataInsert()
         {
             conn = DBConnect.conn;
         }
 
-        //Working
         public void insertProcess(List<List<string>> process_name)
         {
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
             conn = DBConnect.conn;
             StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO process(process_name, process_name_id) VALUES ");
             List<string> Rows = new List<string>();
@@ -60,7 +57,6 @@ namespace SiemensPerformance
             }
 
             //Prints out the size of the process data table
-            //Console.WriteLine("Process Count: " +processTable.Rows.Count);
             DataTable uniqueProcessTable = processTable.DefaultView.ToTable(true, "Process Name", "Process Id");
             Console.WriteLine("Unique Count: " + uniqueProcessTable.Rows.Count);
 
@@ -71,14 +67,11 @@ namespace SiemensPerformance
             //Prints all of the values in the process data table
             foreach (DataRow dataRow in differenceTable.Rows)
             {
-                //Console.WriteLine("Process Name: " +dataRow[0] + " Process Id: " + dataRow[1]);
                 Rows.Add(string.Format("('{0}','{1}')", MySqlHelper.EscapeString(dataRow[0].ToString()), MySqlHelper.EscapeString(dataRow[1].ToString())));
             }
 
-            //Queries the database for current process information 
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
@@ -87,7 +80,7 @@ namespace SiemensPerformance
                     myCmd.CommandType = CommandType.Text;
                     myCmd.ExecuteNonQuery();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
 
                 }
@@ -96,19 +89,16 @@ namespace SiemensPerformance
             conn.Close();
         }
 
-        //Working
         public void insertTime(List<string> time_timestamp)
         {
             conn = DBConnect.conn;
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
             StringBuilder insertCommand = new StringBuilder("INSERT INTO time(timeStamp) VALUES ");
             List<string> Rows = new List<string>();
 
-            //Removes the duplicate processes from the list and stores in a new array
             String[] new_time_array = time_timestamp.Distinct().ToArray();
-            //Console.WriteLine("Amount of Times: " +new_time_array.Length);
             var dbTime = new List<string>();
 
-            //Writes out processes
             conn.Open();
             MySqlCommand get_Process_Name = new MySqlCommand("USE mri;SELECT timeStamp FROM time", conn);
             var reader = get_Process_Name.ExecuteReader();
@@ -127,7 +117,6 @@ namespace SiemensPerformance
             }
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
@@ -135,23 +124,24 @@ namespace SiemensPerformance
                 {
                     myCmd.CommandType = CommandType.Text;
                     myCmd.ExecuteNonQuery();
-                }catch(Exception e) { }
+                }
+                catch (Exception e) { }
             }
 
             conn.Close();
         }
-        
-        //Successful Inserts into Table 
+        /*Working with Filenames*/
         public void insertGlobal0(List<string[]> global0_data)
         {
             conn = DBConnect.conn;
-            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO global0(time_fk, GCPU0, GCPU0Peak,GCPU1, GCPU1Peak, GCPU2, GCPU2Peak, GCPU3, GCPU3Peak, GCPU4, GCPU4Peak, GCPU5, GCPU5Peak, GCPU6, GCPU6Peak, GCPU7, GCPU7Peak, GCPU8, GCPU8Peak, GCPU9, GCPU9Peak, GCPU10, GCPU10Peak, GCPU11, GCPU11Peak, GCPU12, GCPU12Peak, GCPU13, GCPU13Peak, GCPU14, GCPU14Peak, GCPU15, GCPU15Peak) VALUES ");
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
+            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO global0(TimeStamp, FileName, GCPU0, GCPU0Peak,GCPU1, GCPU1Peak, GCPU2, GCPU2Peak, GCPU3, GCPU3Peak, GCPU4, GCPU4Peak, GCPU5, GCPU5Peak, GCPU6, GCPU6Peak, GCPU7, GCPU7Peak, GCPU8, GCPU8Peak, GCPU9, GCPU9Peak, GCPU10, GCPU10Peak, GCPU11, GCPU11Peak, GCPU12, GCPU12Peak, GCPU13, GCPU13Peak, GCPU14, GCPU14Peak, GCPU15, GCPU15Peak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable global0Table = new DataTable();
 
             global0Table.Columns.AddRange(new DataColumn[]
             {
-                new DataColumn("time_fk"),
+                new DataColumn("TimeStamp"),new DataColumn("FileName"),
                 new DataColumn("GCPU0"), new DataColumn("GCPU0Peak"),
                 new DataColumn("GCPU1"), new DataColumn("GCPU1Peak"),
                 new DataColumn("GCPU2"), new DataColumn("GCPU2Peak"),
@@ -170,11 +160,10 @@ namespace SiemensPerformance
                 new DataColumn("GCPU15"), new DataColumn("GCPU15Peak"),
              });
 
-            foreach (var line  in global0_data)
+            foreach (var line in global0_data)
             {
-                //Console.WriteLine(line);
                 DataRow newRow = global0Table.NewRow();
-                newRow["time_fk"] = line[0];
+                newRow["TimeStamp"] = line[0]; newRow["FileName"] = fileName;
                 newRow["GCPU0"] = line[1]; newRow["GCPU0Peak"] = line[2];
                 newRow["GCPU1"] = line[3]; newRow["GCPU1Peak"] = line[4];
                 newRow["GCPU2"] = line[5]; newRow["GCPU2Peak"] = line[6];
@@ -196,47 +185,29 @@ namespace SiemensPerformance
 
             foreach (DataRow dataRow in global0Table.Rows)
             {
-                    Rows.Add(string.Format("('{0}',{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32})",
+                Rows.Add(string.Format("('{0}','{1}',{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33})",
 
-                    //Rows.Add(string.Format("((SELECT time_id FROM time WHERE timeStamp = '{0}'),{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32})", 
-                    MySqlHelper.EscapeString(dataRow[0].ToString()),
-                    MySqlHelper.EscapeString(dataRow[1].ToString()),
-                    MySqlHelper.EscapeString(dataRow[2].ToString()),
-                    MySqlHelper.EscapeString(dataRow[3].ToString()),
-                    MySqlHelper.EscapeString(dataRow[4].ToString()),
-                    MySqlHelper.EscapeString(dataRow[5].ToString()),
-                    MySqlHelper.EscapeString(dataRow[6].ToString()),
-                    MySqlHelper.EscapeString(dataRow[7].ToString()),
-                    MySqlHelper.EscapeString(dataRow[8].ToString()),
-                    MySqlHelper.EscapeString(dataRow[9].ToString()),
-                    MySqlHelper.EscapeString(dataRow[10].ToString()),
-                    MySqlHelper.EscapeString(dataRow[11].ToString()),
-                    MySqlHelper.EscapeString(dataRow[12].ToString()),
-                    MySqlHelper.EscapeString(dataRow[13].ToString()),
-                    MySqlHelper.EscapeString(dataRow[14].ToString()),
-                    MySqlHelper.EscapeString(dataRow[15].ToString()),
-                    MySqlHelper.EscapeString(dataRow[16].ToString()),
-                    MySqlHelper.EscapeString(dataRow[17].ToString()),
-                    MySqlHelper.EscapeString(dataRow[18].ToString()),
-                    MySqlHelper.EscapeString(dataRow[19].ToString()),
-                    MySqlHelper.EscapeString(dataRow[20].ToString()),
-                    MySqlHelper.EscapeString(dataRow[21].ToString()),
-                    MySqlHelper.EscapeString(dataRow[22].ToString()),
-                    MySqlHelper.EscapeString(dataRow[23].ToString()),
-                    MySqlHelper.EscapeString(dataRow[24].ToString()),
-                    MySqlHelper.EscapeString(dataRow[25].ToString()),
-                    MySqlHelper.EscapeString(dataRow[26].ToString()),
-                    MySqlHelper.EscapeString(dataRow[27].ToString()),
-                    MySqlHelper.EscapeString(dataRow[28].ToString()),
-                    MySqlHelper.EscapeString(dataRow[29].ToString()),
-                    MySqlHelper.EscapeString(dataRow[30].ToString()),
-                    MySqlHelper.EscapeString(dataRow[31].ToString()),
-                    MySqlHelper.EscapeString(dataRow[32].ToString())));
+                MySqlHelper.EscapeString(dataRow[0].ToString()), MySqlHelper.EscapeString(dataRow[1].ToString()),
+                MySqlHelper.EscapeString(dataRow[2].ToString()), MySqlHelper.EscapeString(dataRow[3].ToString()),
+                MySqlHelper.EscapeString(dataRow[4].ToString()), MySqlHelper.EscapeString(dataRow[5].ToString()),
+                MySqlHelper.EscapeString(dataRow[6].ToString()), MySqlHelper.EscapeString(dataRow[7].ToString()),
+                MySqlHelper.EscapeString(dataRow[8].ToString()), MySqlHelper.EscapeString(dataRow[9].ToString()),
+                MySqlHelper.EscapeString(dataRow[10].ToString()), MySqlHelper.EscapeString(dataRow[11].ToString()),
+                MySqlHelper.EscapeString(dataRow[12].ToString()), MySqlHelper.EscapeString(dataRow[13].ToString()),
+                MySqlHelper.EscapeString(dataRow[14].ToString()), MySqlHelper.EscapeString(dataRow[15].ToString()),
+                MySqlHelper.EscapeString(dataRow[16].ToString()), MySqlHelper.EscapeString(dataRow[17].ToString()),
+                MySqlHelper.EscapeString(dataRow[18].ToString()), MySqlHelper.EscapeString(dataRow[19].ToString()),
+                MySqlHelper.EscapeString(dataRow[20].ToString()), MySqlHelper.EscapeString(dataRow[21].ToString()),
+                MySqlHelper.EscapeString(dataRow[22].ToString()), MySqlHelper.EscapeString(dataRow[23].ToString()),
+                MySqlHelper.EscapeString(dataRow[24].ToString()), MySqlHelper.EscapeString(dataRow[25].ToString()),
+                MySqlHelper.EscapeString(dataRow[26].ToString()), MySqlHelper.EscapeString(dataRow[27].ToString()),
+                MySqlHelper.EscapeString(dataRow[28].ToString()), MySqlHelper.EscapeString(dataRow[29].ToString()),
+                MySqlHelper.EscapeString(dataRow[30].ToString()), MySqlHelper.EscapeString(dataRow[31].ToString()),
+                MySqlHelper.EscapeString(dataRow[32].ToString()), MySqlHelper.EscapeString(dataRow[33].ToString())));
             }
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
             insertCommand.Replace("..", "0");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
@@ -246,42 +217,37 @@ namespace SiemensPerformance
 
             conn.Close();
         }
-        //Working
+        //Working with Filenames                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
         public void insertMRI_Data(List<string[]> mri_data)
         {
             conn = DBConnect.conn;
-            StringBuilder insertCommand = new StringBuilder("USE mri; SET GLOBAL max_allowed_packet=1024*1024*1024; INSERT INTO mri_data(time_fk, Process_Name, Process_Id,WSP,WSPPeak,HC,HCPeak,TC,TCPeak,CPU,CPUPeak,GDIC,GDICPeak,USRC,USRCPeak,PRIV,PRIVPeak,VIRT,VIRTPeak,PFS,PFSPeak) VALUES ");
+            //fileName = DataDisplayTab.utfFileName.Split('.')[0];
+            StringBuilder insertCommand = new StringBuilder("USE mri; SET GLOBAL max_allowed_packet=1024*1024*1024; INSERT INTO mri_data(TimeStamp, FileName, Process_Name, Process_Id,WSP,WSPPeak,HC,HCPeak,TC,TCPeak,CPU,CPUPeak,GDIC,GDICPeak,USRC,USRCPeak,PRIV,PRIVPeak,VIRT,VIRTPeak,PFS,PFSPeak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable globalTotalTable = new DataTable();
 
             globalTotalTable.Columns.AddRange(new DataColumn[]
             {
-                new DataColumn("time_fk"),
-                new DataColumn("Process_Name"), new DataColumn("Process_Id"),
-                new DataColumn("WSP"), new DataColumn("WSPPeak"),
-                new DataColumn("HC"), new DataColumn("HCPeak"),
-                new DataColumn("TC"), new DataColumn("TCPeak"),
-                new DataColumn("CPU"), new DataColumn("CPUPeak"),
-                new DataColumn("GDIC"), new DataColumn("GDICPeak"),
-                new DataColumn("USRC"), new DataColumn("USRCPeak"),
-                new DataColumn("PRIV"), new DataColumn("PRIVPeak"),
-                new DataColumn("VIRT"), new DataColumn("VIRTPeak"),
+                new DataColumn("TimeStamp"),new DataColumn("FileName"),new DataColumn("Process_Name"), new DataColumn("Process_Id"),
+                new DataColumn("WSP"), new DataColumn("WSPPeak"),new DataColumn("HC"), new DataColumn("HCPeak"),
+                new DataColumn("TC"), new DataColumn("TCPeak"),new DataColumn("CPU"), new DataColumn("CPUPeak"),
+                new DataColumn("GDIC"), new DataColumn("GDICPeak"),new DataColumn("USRC"), new DataColumn("USRCPeak"),
+                new DataColumn("PRIV"), new DataColumn("PRIVPeak"),new DataColumn("VIRT"), new DataColumn("VIRTPeak"),
                 new DataColumn("PFS"), new DataColumn("PFSPeak"),
-             });
+            });
 
             foreach (var line in mri_data)
             {
-                //Console.WriteLine(line);
                 DataRow newRow = globalTotalTable.NewRow();
-                newRow["time_fk"] = line[0];
+                newRow["TimeStamp"] = line[0]; newRow["FileName"] = fileName;
                 newRow["Process_Name"] = line[1]; newRow["Process_Id"] = line[2];
                 newRow["WSP"] = line[3]; newRow["WSPPeak"] = line[4];
                 newRow["HC"] = line[5]; newRow["HCPeak"] = line[6];
                 newRow["TC"] = line[7]; newRow["TCPeak"] = line[8];
                 newRow["CPU"] = line[9]; newRow["CPUPeak"] = line[10];
-                newRow["GDIC"] = line[11];newRow["GDICPeak"] = line[12];
-                newRow["USRC"] = line[13];newRow["USRCPeak"] = line[14];
-                newRow["PRIV"] = line[15];newRow["PRIVPeak"] = line[16];
+                newRow["GDIC"] = line[11]; newRow["GDICPeak"] = line[12];
+                newRow["USRC"] = line[13]; newRow["USRCPeak"] = line[14];
+                newRow["PRIV"] = line[15]; newRow["PRIVPeak"] = line[16];
                 newRow["VIRT"] = line[17]; newRow["VIRTPeak"] = line[18];
                 newRow["PFS"] = line[19]; newRow["PFSPeak"] = line[20];
                 globalTotalTable.Rows.Add(newRow);
@@ -289,31 +255,19 @@ namespace SiemensPerformance
 
             foreach (DataRow dataRow in globalTotalTable.Rows)
             {
-                Rows.Add(string.Format("('{0}','{1}',{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20})",
+                Rows.Add(string.Format("('{0}','{1}','{2}',{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21})",
 
-                //Rows.Add(string.Format("((SELECT time_id FROM time WHERE timeStamp = '{0}'),{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20})", 
-                MySqlHelper.EscapeString(dataRow[0].ToString()),
-                MySqlHelper.EscapeString(dataRow[1].ToString()),
-                MySqlHelper.EscapeString(dataRow[2].ToString()),
-                MySqlHelper.EscapeString(dataRow[3].ToString()),
-                MySqlHelper.EscapeString(dataRow[4].ToString()),
-                MySqlHelper.EscapeString(dataRow[5].ToString()),
-                MySqlHelper.EscapeString(dataRow[6].ToString()),
-                MySqlHelper.EscapeString(dataRow[7].ToString()),
-                MySqlHelper.EscapeString(dataRow[8].ToString()),
-                MySqlHelper.EscapeString(dataRow[9].ToString()),
-                MySqlHelper.EscapeString(dataRow[10].ToString()),
-                MySqlHelper.EscapeString(dataRow[11].ToString()),
-                MySqlHelper.EscapeString(dataRow[12].ToString()),
-                MySqlHelper.EscapeString(dataRow[13].ToString()),
-                MySqlHelper.EscapeString(dataRow[14].ToString()),
-                MySqlHelper.EscapeString(dataRow[15].ToString()),
-                MySqlHelper.EscapeString(dataRow[16].ToString()),
-                MySqlHelper.EscapeString(dataRow[17].ToString()),
-                MySqlHelper.EscapeString(dataRow[18].ToString()),
-                MySqlHelper.EscapeString(dataRow[19].ToString()),
-                MySqlHelper.EscapeString(dataRow[20].ToString())
-                ));
+                MySqlHelper.EscapeString(dataRow[0].ToString()), MySqlHelper.EscapeString(dataRow[1].ToString()),
+                MySqlHelper.EscapeString(dataRow[2].ToString()), MySqlHelper.EscapeString(dataRow[3].ToString()),
+                MySqlHelper.EscapeString(dataRow[4].ToString()), MySqlHelper.EscapeString(dataRow[5].ToString()),
+                MySqlHelper.EscapeString(dataRow[6].ToString()), MySqlHelper.EscapeString(dataRow[7].ToString()),
+                MySqlHelper.EscapeString(dataRow[8].ToString()), MySqlHelper.EscapeString(dataRow[9].ToString()),
+                MySqlHelper.EscapeString(dataRow[10].ToString()), MySqlHelper.EscapeString(dataRow[11].ToString()),
+                MySqlHelper.EscapeString(dataRow[12].ToString()), MySqlHelper.EscapeString(dataRow[13].ToString()),
+                MySqlHelper.EscapeString(dataRow[14].ToString()), MySqlHelper.EscapeString(dataRow[15].ToString()),
+                MySqlHelper.EscapeString(dataRow[16].ToString()), MySqlHelper.EscapeString(dataRow[17].ToString()),
+                MySqlHelper.EscapeString(dataRow[18].ToString()), MySqlHelper.EscapeString(dataRow[19].ToString()),
+                MySqlHelper.EscapeString(dataRow[20].ToString()), MySqlHelper.EscapeString(dataRow[21].ToString())));
             }
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
@@ -331,13 +285,14 @@ namespace SiemensPerformance
         public void insertGlobalTotal(List<string[]> globalTotal_data)
         {
             conn = DBConnect.conn;
-            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO globaltotal(time_fk, GCPU, GCPUPeak, GMA, GMAPeak, GPC, GPCPeak, GHC, GHCPeak, GHPF, GCPUP, GCPUPPeak, GMF, GMFPeak, GMCOMM, GMCOMMPeak, GML, GMLPeak, GPFC, GPFCPeak, GMC, GMCPeak) VALUES ");
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
+            StringBuilder insertCommand = new StringBuilder("USE mri; INSERT INTO globaltotal(TimeStamp,FileName,GCPU, GCPUPeak, GMA, GMAPeak, GPC, GPCPeak, GHC, GHCPeak, GHPF, GCPUP, GCPUPPeak, GMF, GMFPeak, GMCOMM, GMCOMMPeak, GML, GMLPeak, GPFC, GPFCPeak, GMC, GMCPeak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable globalTotalTable = new DataTable();
 
             globalTotalTable.Columns.AddRange(new DataColumn[]
             {
-                new DataColumn("time_fk"),
+                new DataColumn("TimeStamp"),new DataColumn("FileName"),
                 new DataColumn("GCPU"), new DataColumn("GCPUPeak"),
                 new DataColumn("GMA"), new DataColumn("GMAPeak"),
                 new DataColumn("GPC"), new DataColumn("GPCPeak"),
@@ -355,7 +310,7 @@ namespace SiemensPerformance
             {
                 //Console.WriteLine(line);
                 DataRow newRow = globalTotalTable.NewRow();
-                newRow["time_fk"] = line[0];
+                newRow["TimeStamp"] = line[0]; newRow["FileName"] = fileName;
                 newRow["GCPU"] = line[1]; newRow["GCPUPeak"] = line[2];
                 newRow["GMA"] = line[3]; newRow["GMAPeak"] = line[4];
                 newRow["GPC"] = line[5]; newRow["GPCPeak"] = line[6];
@@ -372,37 +327,25 @@ namespace SiemensPerformance
 
             foreach (DataRow dataRow in globalTotalTable.Rows)
             {
-                Rows.Add(string.Format("('{0}',{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21})",
+                Rows.Add(string.Format("('{0}','{1}',{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22})",
 
-                //Rows.Add(string.Format("((SELECT time_id FROM time WHERE timeStamp = '{0}'),{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21})", 
-                MySqlHelper.EscapeString(dataRow[0].ToString()),
-                MySqlHelper.EscapeString(dataRow[1].ToString()),
-                MySqlHelper.EscapeString(dataRow[2].ToString()),
-                MySqlHelper.EscapeString(dataRow[3].ToString()),
-                MySqlHelper.EscapeString(dataRow[4].ToString()),
-                MySqlHelper.EscapeString(dataRow[5].ToString()),
-                MySqlHelper.EscapeString(dataRow[6].ToString()),
-                MySqlHelper.EscapeString(dataRow[7].ToString()),
-                MySqlHelper.EscapeString(dataRow[8].ToString()),
-                MySqlHelper.EscapeString(dataRow[9].ToString()),
-                MySqlHelper.EscapeString(dataRow[10].ToString()),
-                MySqlHelper.EscapeString(dataRow[11].ToString()),
-                MySqlHelper.EscapeString(dataRow[12].ToString()),
-                MySqlHelper.EscapeString(dataRow[13].ToString()),
-                MySqlHelper.EscapeString(dataRow[14].ToString()),
-                MySqlHelper.EscapeString(dataRow[15].ToString()),
-                MySqlHelper.EscapeString(dataRow[16].ToString()),
-                MySqlHelper.EscapeString(dataRow[17].ToString()),
-                MySqlHelper.EscapeString(dataRow[18].ToString()),
-                MySqlHelper.EscapeString(dataRow[19].ToString()),
-                MySqlHelper.EscapeString(dataRow[20].ToString()),
-                MySqlHelper.EscapeString(dataRow[21].ToString())
+                MySqlHelper.EscapeString(dataRow[0].ToString()), MySqlHelper.EscapeString(dataRow[1].ToString()),
+                MySqlHelper.EscapeString(dataRow[2].ToString()), MySqlHelper.EscapeString(dataRow[3].ToString()),
+                MySqlHelper.EscapeString(dataRow[4].ToString()), MySqlHelper.EscapeString(dataRow[5].ToString()),
+                MySqlHelper.EscapeString(dataRow[6].ToString()), MySqlHelper.EscapeString(dataRow[7].ToString()),
+                MySqlHelper.EscapeString(dataRow[8].ToString()), MySqlHelper.EscapeString(dataRow[9].ToString()),
+                MySqlHelper.EscapeString(dataRow[10].ToString()), MySqlHelper.EscapeString(dataRow[11].ToString()),
+                MySqlHelper.EscapeString(dataRow[12].ToString()), MySqlHelper.EscapeString(dataRow[13].ToString()),
+                MySqlHelper.EscapeString(dataRow[14].ToString()), MySqlHelper.EscapeString(dataRow[15].ToString()),
+                MySqlHelper.EscapeString(dataRow[16].ToString()), MySqlHelper.EscapeString(dataRow[17].ToString()),
+                MySqlHelper.EscapeString(dataRow[18].ToString()), MySqlHelper.EscapeString(dataRow[19].ToString()),
+                MySqlHelper.EscapeString(dataRow[20].ToString()), MySqlHelper.EscapeString(dataRow[21].ToString()),
+                MySqlHelper.EscapeString(dataRow[22].ToString())
                 ));
             }
             insertCommand.Append(string.Join(",", Rows));
             insertCommand.Append(";");
             insertCommand.Replace("..", "0");
-            //Console.WriteLine(insertCommand);
             conn.Open();
             using (MySqlCommand myCmd = new MySqlCommand(insertCommand.ToString(), conn))
             {
@@ -412,5 +355,19 @@ namespace SiemensPerformance
 
             conn.Close();
         }
+
+        public void insertQuery(List<string> query)
+        {
+
+            conn = DBConnect.conn;
+            conn.Open();
+            MySqlCommand comm = conn.CreateCommand();
+            comm.CommandText = "INSERT INTO trace_queries (name,parameters) VALUES(?name,?parameters)";
+            comm.Parameters.AddWithValue("?name", query[0]);
+            comm.Parameters.AddWithValue("?parameters", query[1]);
+            comm.ExecuteNonQuery();
+            conn.Close();
+        }
+
     }
 }

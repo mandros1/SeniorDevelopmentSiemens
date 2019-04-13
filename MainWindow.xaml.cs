@@ -1,23 +1,7 @@
 ﻿using System;
-using System.Data;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using LiveCharts;
-using LiveCharts.Defaults;
-using LiveCharts.Wpf;
 using MahApps.Metro.Controls;
-using Microsoft.Win32;
-using Newtonsoft.Json;
-using Microsoft.VisualBasic;
-using System.Windows.Interactivity;
-using System.IO;
-using System.Collections.Generic;
+
 
 namespace SiemensPerformance
 {
@@ -32,12 +16,12 @@ namespace SiemensPerformance
         public MainWindow()
         {
 
+            
             InitializeComponent();
 
             // Tabs setup
             tabs = (TabControl)this.FindName("logNav");
         }
-
         public MainWindow(int dbInt) {
             dbConnection = dbInt;
             InitializeComponent();

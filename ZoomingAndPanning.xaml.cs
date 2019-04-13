@@ -88,8 +88,8 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
             string endString = endTime.Text;
             try
             {
-                DateTime start = DateTime.ParseExact(startString, "yyyy/MM/dd-HH:mm:ss", null);
-                DateTime end = DateTime.ParseExact(endString, "yyyy/MM/dd-HH:mm:ss", null);
+                DateTime start = DateTime.ParseExact(startString, "yyyy-MM-ddTHH:mm:ss", null);
+                DateTime end = DateTime.ParseExact(endString, "yyyy-MM-ddTHH:mm:ss", null);
                 setTimeSpan(start, end);
             }catch (Exception)
             {
@@ -118,7 +118,7 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
             }
             else
             {
-                Console.WriteLine("Start time must be less than end time");
+                MessageBox.Show("Start time must be less than end time");
             }
         }
 
@@ -147,9 +147,7 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
             Y.MaxValue = double.NaN;
 
             XFormatter = val => new System.DateTime((long)(val * TimeSpan.FromHours(1).Ticks)).ToString("T");
-            Console.WriteLine(XFormatter.ToString());
             YFormatter = val => val.ToString();
-            Console.WriteLine(YFormatter);
 
             DataContext = this;
         }
