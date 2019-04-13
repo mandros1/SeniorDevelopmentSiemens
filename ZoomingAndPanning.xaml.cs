@@ -152,8 +152,11 @@ namespace Wpf.CartesianChart.ZoomingAndPanning
 
         private void setTimeSpanDefault(ChartValues<DateModel> insertData)
         {
-            startTime.Text = insertData[0].DateTime.ToString("yyyy-MM-ddTHH:mm:ss");
-            endTime.Text = insertData[insertData.Count-1].DateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+            if (insertData.Count != 0)
+            {
+                startTime.Text = insertData[0].DateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+                endTime.Text = insertData[insertData.Count - 1].DateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+            }
         }
     }
 }

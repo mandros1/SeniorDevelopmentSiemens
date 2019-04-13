@@ -255,8 +255,8 @@ namespace SiemensPerformance
             dockPanel.Children.Add(stackPanel);
 
 
-            tabItem.Content = dockPanel;
-            return tabItem;
+            tab.Content = dockPanel;
+            return tab;
         }
 
         /**
