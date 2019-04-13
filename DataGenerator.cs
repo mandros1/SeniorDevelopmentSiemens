@@ -96,7 +96,7 @@ namespace SiemensPerformance
         {
             multiDimenstionalDictionary = new Dictionary<string, List<string[]>>();
             multiDimenstionalDictionary.Add("graphData", graphData);
-            string[] container = new string[1] { graphColumn };
+            string[] container = new string[2] { graphColumn, fileName };
             graphData2 = new List<string[]>();
             graphData2.Add(container);
             graphData2.Add(graphColumnNames);
@@ -104,6 +104,7 @@ namespace SiemensPerformance
             multiDimenstionalDictionary.Add("Process", processes2DList);
             multiDimenstionalDictionary.Add("Global_Zero", globalZero2DList);
             multiDimenstionalDictionary.Add("Global_Total", globalTotal2DList);
+
             
             return JsonConvert.SerializeObject(multiDimenstionalDictionary, Formatting.Indented);
         }
@@ -374,15 +375,16 @@ namespace SiemensPerformance
         public void importResultFile(OpenFileDialog ofd)
         {
             /*
-             multiDimenstionalDictionary.Add("graphData", graphData);
-            string[] container = new string[1] { graphColumn };
-            graphData2 = new List<string[]>();
-            graphData2.Add(container);
-            graphData2.Add(graphColumnNames);
-            multiDimenstionalDictionary.Add("graphColumns", graphData2);
-            multiDimenstionalDictionary.Add("Process", processes2DList);
-            multiDimenstionalDictionary.Add("Global_Zero", globalZero2DList);
-            multiDimenstionalDictionary.Add("Global_Total", globalTotal2DList);
+                multiDimenstionalDictionary = new Dictionary<string, List<string[]>>();
+                multiDimenstionalDictionary.Add("graphData", graphData);
+                string[] container = new string[2] { graphColumn, fileName };
+                graphData2 = new List<string[]>();
+                graphData2.Add(container);
+                graphData2.Add(graphColumnNames);
+                multiDimenstionalDictionary.Add("graphColumns", graphData2);
+                multiDimenstionalDictionary.Add("Process", processes2DList);
+                multiDimenstionalDictionary.Add("Global_Zero", globalZero2DList);
+                multiDimenstionalDictionary.Add("Global_Total", globalTotal2DList);
              */
 
             string[] dictKeys = new string[5] { "graphData", "graphColumns", "Process", "Global_Zero", "Global_Total" };
@@ -397,6 +399,8 @@ namespace SiemensPerformance
                 graphData = multiDimenstionalDictionary[dictKeys[0]];
                 graphData2 = multiDimenstionalDictionary[dictKeys[1]];
                 graphColumn = graphData2[0][0];
+                this.fileName = graphData2[0][1];
+                Console.WriteLine(this.fileName);
                 graphColumnNames = graphData2[1];
                 processes2DList = multiDimenstionalDictionary[dictKeys[2]];
                 globalZero2DList = multiDimenstionalDictionary[dictKeys[3]];

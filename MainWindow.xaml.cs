@@ -63,11 +63,6 @@ namespace SiemensPerformance
                 DataDisplayTab tab = new DataDisplayTab(0);
                 if (tab.displayable) return tab;
             }
-            /*
-            //var myProgressBar = (ProgressBar)this.FindName("pBar");
-            DataDisplayTab tab = new DataDisplayTab();
-            if(tab.displayable) return tab;
-            */
             return null;
         }
     }

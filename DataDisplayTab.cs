@@ -73,7 +73,7 @@ namespace SiemensPerformance
         private int dbConnection { get; set; }
         private string stringData;
         private int selection;
-        private DataTable reusableDataTable;
+        private DataTable reusableDataTable { get; set; }
         private Button resetButton;
         private MenuItem reusableMenuItem;
         private Boolean import = false;
@@ -91,13 +91,22 @@ namespace SiemensPerformance
             if (ofd.ShowDialog() == true)
             {
                 string ext = Path.GetExtension(ofd.FileName);
-                if(ext == ".utr")
+                
+                if (ext == ".utr")
                 {
                     generator.getJsonString(ofd);
+                    if (dbConnection != 1)
+                    {
+                        //TODO: insert into DB
+                    }
                 }
-                else if(ext == ".json")
+                else if (ext == ".json")
                 {
                     generator.importResultFile(ofd);
+                    if (dbConnection != 1)
+                    {
+                        //TODO: insert into DB
+                    }
                     import = true;
                 }
                 displayable = true;
@@ -109,7 +118,6 @@ namespace SiemensPerformance
             }
 
             TabControl tc = new TabControl();
-            if (import) Console.WriteLine("IMPORT IS TRUE");
 
             //Tab dropdown menu
             //Rename Tab
@@ -213,10 +221,6 @@ namespace SiemensPerformance
             {
                 dateModelData = generator.getDateModelList(generator.graphData, generator.graphColumn, generator.graphColumnNames);
                 graphTabItem.Content = this.PopulateGraph(dateModelData);
-                if(dbConnection == 1)
-                {
-                    // do something when online
-                }
             }
 
             this.Content = tc;
@@ -240,13 +244,8 @@ namespace SiemensPerformance
         private TabItem generateQueryTabItem()
         {
             TabItem tab = new TabItem();
-            if (dbConnection == 1) {
-                tab.Header = "Query file"; }
-            else
-            {
-                tab.Header = "Query database";
-            }
-
+            tab.Header = dbConnection == 1 ? "Query file" : "Query database";
+           
             stackPanel = new StackPanel();
             stackPanel.Orientation = Orientation.Horizontal;
             
@@ -348,11 +347,10 @@ namespace SiemensPerformance
                     processData = generator.getDataFromQueryDb(test1);
                 }
             }
-
-           
+            
             dateModelData = generator.getDateModelList(processData, (string)selectComboBox.SelectedItem, columnNames);
             graphTabItem.Content = PopulateGraph(dateModelData);
-            reusableDataTable = ConvertListToDataTable(processData, columnNames);
+            reusableDataTable = ConvertListToDataTable(reusableDataTable, processData, columnNames);
 
             if (selection == 1) processGrid.ItemsSource = reusableDataTable.DefaultView;
             if (selection == 2) globalZeroGrid.ItemsSource = reusableDataTable.DefaultView;
@@ -380,23 +378,37 @@ namespace SiemensPerformance
                 // TODO:
                 if(dbConnection == 1)
                 {
-                    reusableDataTable = ConvertListToDataTable(generator.processes2DList, generator.processVariables);
+                    reusableDataTable = ConvertListToDataTable(reusableDataTable, generator.processes2DList, generator.processVariables);
                     processGrid.ItemsSource = reusableDataTable.DefaultView;
                 }
                 else
                 {
                     processData = generator.getProcessDataFromDB(null, null);
-                    reusableDataTable = ConvertListToDataTable(processData, generator.processVariables);
+                    reusableDataTable = ConvertListToDataTable(reusableDataTable, processData, generator.processVariables);
                     processGrid.ItemsSource = reusableDataTable.DefaultView;
                 }
                 
             } else if (stringData == "Reset Global_0 Table")
             {
-                reusableDataTable = ConvertListToDataTable(generator.globalZero2DList, generator.globalZeroVariables);
+                if (dbConnection == 1)
+                {
+                    reusableDataTable = ConvertListToDataTable(reusableDataTable, generator.globalZero2DList, generator.globalZeroVariables);
+                }
+                else
+                {
+                    // TODO: get the globalZero2D list over the DB
+                }
                 globalZeroGrid.ItemsSource = reusableDataTable.DefaultView;
             } else if (stringData == "Reset Global_Total Table")
             {
-                reusableDataTable = ConvertListToDataTable(generator.globalTotal2DList, generator.globalTotalVariables);
+                if (dbConnection == 1)
+                {
+                    reusableDataTable = ConvertListToDataTable(reusableDataTable, generator.globalTotal2DList, generator.globalTotalVariables);
+                }
+                else
+                {
+                    // TODO: get the globalTotal2D list over the DB
+                }
                 globalTotalGrid.ItemsSource = reusableDataTable.DefaultView;
             }
         }
@@ -412,6 +424,7 @@ namespace SiemensPerformance
 
             return resetButton;
         }
+
 
         private DockPanel baseDockPanel()
         {
@@ -884,26 +897,26 @@ namespace SiemensPerformance
         /*
         * Converts list to data table
         */
-        private static DataTable ConvertListToDataTable(List<string[]> list, string[] columns)
+        private static DataTable ConvertListToDataTable(DataTable dt, List<string[]> list, string[] columns)
         {
-            DataTable dataTable = new DataTable();
+             dt = new DataTable();
 
             // Get max columns.
             int columnsNum = columns.Length;
             for (int i = 0; i < columnsNum; i++)
             {
-                dataTable.Columns.Add(columns[i]);
+                dt.Columns.Add(columns[i]);
             }
 
             foreach (var array in list)
             {
                 if (array.Length == columnsNum)
                 {
-                    dataTable.Rows.Add(array);
+                    dt.Rows.Add(array);
                 }
 
             }
-            return dataTable;
+            return dt;
         }
 
 
@@ -929,7 +942,7 @@ namespace SiemensPerformance
        
         private DataGrid dataGridData(List<string[]> data2dList, string[] columns, DataTable whichTable)
         {
-            whichTable = ConvertListToDataTable(data2dList, columns);
+            whichTable = ConvertListToDataTable(whichTable, data2dList, columns);
             dataGrid = new DataGrid();
             dataGrid.ItemsSource = whichTable.DefaultView;
             dataGrid.IsReadOnly = true;
