@@ -13,7 +13,31 @@
         <DockPanel>
             <TabControl x:Name="logNav" Margin="10" BorderBrush="Gainsboro" SelectionChanged="LogNav_SelectionChanged">
                 <TabItem x:Name="Welcome" Header="Welcome">
-                    Welcome to the Siemens MRI machine log Visualiser. To get started click the plus button on the tab bar.
+                    <StackPanel>
+                        <Label Content="Welcome to the Siemens MRI machine log Visualiser!" FontSize="24" Margin="5,0,0,0"/>
+                        <TextBlock TextWrapping="Wrap" FontSize="14" Margin="15,0,5,0">
+                            To get started click the plus button on the tab bar. 
+                            This will bring up a dialog to import '.utr' trace files or open result files of previously imported '.utr' trace files.
+                        </TextBlock>
+                        <Label Content="Querying the Data" FontSize="24" Margin="5,0,0,0"/>
+                        <TextBlock TextWrapping="Wrap" FontSize="14" Margin="15,0,5,0">
+                            Select the Query tab under the trace file tab area. There are labeled dropdown fields to help select which process you wish to query.
+                            There are optional dropdowns that allow for further restraints for query results.
+                            When you are ready, click the 'Query Data' button to have the query applied to the tables and to the graph.
+                        </TextBlock>
+                        <Label Content="Graphs" FontSize="24" Height="38" Margin="5,0,0,0"/>
+                        <TextBlock TextWrapping="Wrap" FontSize="14" Margin="15,0,5,0">
+                            There is a Graph tab under the trace file's tab. This is initially empty until a query is applied. See above for querying the data.
+                            Once you have successfully queried the data the graph will populate, and you will be able to scroll by clicking and dragging and zoom by using the scroll wheel on the graph.
+                            There is a 'Reset Zoom' button if you want to go back to the default view of the graph.
+                            There are also fields that have the start and end timestamps of the graph that can be changed to alter the range of time on the x axis.
+                            After changing the time int the two fields remember to click the 'Update' button to apply those changes.
+                        </TextBlock>
+                        <Label Content="Exporting to a Result File" FontSize="24" Margin="5,0,0,0"/>
+                        <TextBlock TextWrapping="Wrap" FontSize="14" Margin="15,0,5,0">
+                            Right click on the trace file tab you want to export and click the 'Export' menu item.
+                        </TextBlock>
+                    </StackPanel>
                 </TabItem>
                 <TabItem x:Name="addTab" Header="+" ToolTip="Open a new trace file" >
                 </TabItem>
