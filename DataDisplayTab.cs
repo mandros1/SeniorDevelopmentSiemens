@@ -295,7 +295,7 @@ namespace SiemensPerformance
               
                     processData = generator.globalZero2DList;
                   
-                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0 WHERE process_name= '" + (string)processNameCB.SelectedItem + "' AND process_Id = '" + (string)processIdCB.SelectedItem + "' ";
+                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0";
 
                 columnNames = generator.globalZeroVariables;
                 selection = 2;
@@ -304,7 +304,7 @@ namespace SiemensPerformance
                
                     processData = generator.globalTotal2DList;
             
-                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal WHERE process_name= '" + (string)processNameCB.SelectedItem + "' AND process_Id = '" + (string)processIdCB.SelectedItem + "' ";
+                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal";
 
                 columnNames = generator.globalTotalVariables;
 				selection = 3;
@@ -329,8 +329,16 @@ namespace SiemensPerformance
                     }
                 }
                 else {
-                    if (whereOperator.Equals("==")) test1 += " AND " + " " + whereColumn + " = " + whereVal + " ";
-                    else test1 += " AND " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                    if (!String.Equals((string)filterCB.SelectedItem, "Process"))
+                    {
+                        if (whereOperator.Equals("==")) test1 += " WHERE " + " " + whereColumn + " = " + whereVal + " ";
+                        else test1 += " WHERE " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                    }
+                    else
+                    {
+                        if (whereOperator.Equals("==")) test1 += " AND " + " " + whereColumn + " = " + whereVal + " ";
+                        else test1 += " AND " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                    }
 
                     if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
                     {

@@ -188,8 +188,8 @@ namespace SiemensPerformance
             else
             {
                 //Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
-                //sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data;";
-                return null;
+                sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data;";
+                //return null;
             }
 
 
