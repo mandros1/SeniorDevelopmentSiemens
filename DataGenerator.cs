@@ -452,7 +452,8 @@ namespace SiemensPerformance
 
                     foreach (var item in enumerate)
                     {
-                        if( item != "ErrorLine") { 
+                        if (item != "ErrorLine")
+                        {
                             singleList.Add(item);
                         }
                     }
@@ -460,20 +461,27 @@ namespace SiemensPerformance
                     {
                         // for processess
                         processes2DList.Add(singleList.Skip(1).ToArray());
-                    } else if (singleList.Count == 34)
+                    }
+                    else if (singleList.Count == 34)
                     {
                         // for global 0
                         globalZero2DList.Add(singleList.Skip(1).ToArray());
-                    } else if (singleList.Count == 23)
+                    }
+                    else if (singleList.Count == 23)
                     {
                         // for global total
                         globalTotal2DList.Add(singleList.Skip(1).ToArray());
                     }
                     counter++;
                 }
-                dataInsert.insertMRI_Data(processes2DList);
-                dataInsert.insertGlobal0(globalZero2DList);
-                dataInsert.insertGlobalTotal(globalTotal2DList);
+                List<String[]> count = getDataFromQueryDb("Count(*), Count(*) from mri_data WHERE FileName = '" + this.fileName.Split('.')[0] + "'");
+                //Console.WriteLine(count[0]);
+                if (Int32.Parse(count[0][0]) == 0)
+                {
+                    dataInsert.insertMRI_Data(processes2DList);
+                    dataInsert.insertGlobal0(globalZero2DList);
+                    dataInsert.insertGlobalTotal(globalTotal2DList);
+                }
 
             }
             catch (Exception e)
