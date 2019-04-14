@@ -223,7 +223,7 @@ namespace SiemensPerformance
         public void insertMRI_Data(List<string[]> mri_data)
         {
             conn = DBConnect.conn;
-            //fileName = DataDisplayTab.utfFileName.Split('.')[0];
+            fileName = DataDisplayTab.utfFileName.Split('.')[0];
             StringBuilder insertCommand = new StringBuilder("USE mri; SET GLOBAL max_allowed_packet=1024*1024*1024; INSERT INTO mri_data(TimeStamp, FileName, Process_Name, Process_Id,WSP,WSPPeak,HC,HCPeak,TC,TCPeak,CPU,CPUPeak,GDIC,GDICPeak,USRC,USRCPeak,PRIV,PRIVPeak,VIRT,VIRTPeak,PFS,PFSPeak) VALUES ");
             List<string> Rows = new List<string>();
             DataTable globalTotalTable = new DataTable();

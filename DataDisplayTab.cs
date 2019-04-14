@@ -91,7 +91,7 @@ namespace SiemensPerformance
             if (ofd.ShowDialog() == true)
             {
                 string ext = Path.GetExtension(ofd.FileName);
-                
+                utfFileName = System.IO.Path.GetFileName(ofd.FileName);
                 if (ext == ".utr")
                 {
                     generator.getJsonString(ofd);

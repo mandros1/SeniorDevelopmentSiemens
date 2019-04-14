@@ -465,18 +465,6 @@ namespace SiemensPerformance
                     }
                     counter++;
                 }
-                //dataInsert.insertMRI_Data(processes2DList);
-
-                foreach (var array in globalTotal2DList)
-                {
-                    Console.WriteLine();
-
-                    foreach (var item in array)
-                    {
-                        Console.Write(" ");
-                        Console.Write(item);
-                    }
-                }
                 dataInsert.insertMRI_Data(processes2DList);
                 dataInsert.insertGlobal0(globalZero2DList);
                 dataInsert.insertGlobalTotal(globalTotal2DList);
