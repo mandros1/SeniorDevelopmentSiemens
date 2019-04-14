@@ -176,16 +176,21 @@ namespace SiemensPerformance
 
             if (!String.IsNullOrEmpty(processName) && String.IsNullOrEmpty(processId) && processName != "None")
             {
-                Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
-                sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "';";
+                //Console.WriteLine("Process name is {0}, but it's ID is null\nReturning the list filtered by process name only", processName);
+                //sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "';";
+                return null;
             }
             else if (!String.IsNullOrEmpty(processName) && !String.IsNullOrEmpty(processId))
             {
-                Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
+                //Console.WriteLine("Process name is {0}, process ID is {1}\nReturning the list filtered by process name and ID", processName, processId);
                 sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + processName + "' AND process_Id = '" + processId + "';";
             }
-            Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
-            sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data;";
+            else
+            {
+                //Console.WriteLine("Both process name and it's ID are null\nReturning the whole list");
+                //sql = "USE mri; SELECT  *, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data;";
+                return null;
+            }
 
 
             try
@@ -228,8 +233,8 @@ namespace SiemensPerformance
                             //Remove first and last element from array
                             everything = everything.Skip(1).ToArray();
                             //everything = everything.Skip(3).ToArray();
-                            //everything = everything.Take(everything.Count() - 1).ToArray();
-                          
+                            everything = everything.Take(everything.Count() - 1).ToArray();
+                            all.Add(everything);
                         }
 
                     };

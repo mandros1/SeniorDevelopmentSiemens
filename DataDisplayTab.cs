@@ -80,7 +80,7 @@ namespace SiemensPerformance
 
         public DataDisplayTab(int dbInt)
         {
-            Console.WriteLine(dbInt);
+            //Console.WriteLine(dbInt);
             dbConnection = dbInt;
             //Open File
             OpenFileDialog ofd = new OpenFileDialog();
@@ -88,33 +88,39 @@ namespace SiemensPerformance
             ofd.Filter = "Text files (*.utr)|*.utr|Json files (*.json)|*.json";
 
             //Get Data
-            if (ofd.ShowDialog() == true)
+            try
             {
-                string ext = Path.GetExtension(ofd.FileName);
-                utfFileName = System.IO.Path.GetFileName(ofd.FileName);
-                if (ext == ".utr")
+                if (ofd.ShowDialog() == true)
                 {
-                    generator.getJsonString(ofd);
-                    if (dbConnection != 1)
+                    string ext = Path.GetExtension(ofd.FileName);
+                    utfFileName = System.IO.Path.GetFileName(ofd.FileName);
+                    if (ext == ".utr")
                     {
-                        //TODO: insert into DB
+                        generator.getJsonString(ofd);
+                        if (dbConnection != 1)
+                        {
+                            //TODO: insert into DB
+                        }
                     }
+                    else if (ext == ".json")
+                    {
+                        generator.importResultFile(ofd);
+                        if (dbConnection != 1)
+                        {
+                            //TODO: insert into DB
+                        }
+                        import = true;
+                    }
+                    displayable = true;
                 }
-                else if (ext == ".json")
+                else
                 {
-                    generator.importResultFile(ofd);
-                    if (dbConnection != 1)
-                    {
-                        //TODO: insert into DB
-                    }
-                    import = true;
+                    displayable = false;
+                    return;
                 }
-                displayable = true;
-            }
-            else
+            }catch(Exception e)
             {
-                displayable = false;
-                return;
+
             }
 
             TabControl tc = new TabControl();
