@@ -426,7 +426,8 @@ namespace SiemensPerformance
             globalTotal2DList = new List<string[]>();
             globalZero2DList = new List<string[]>();
             this.fileName = dialog.SafeFileName;
-          
+            string line;
+            DataInsert dataInsert = new DataInsert();
             /*
             DataInsert dataInsert = new DataInsert();
             var time_array = new List<string>();
@@ -449,21 +450,37 @@ namespace SiemensPerformance
                             singleList.Add(item);
                         }
                     }
-                    if (singleList.Count == 22 && singleList[0] == "Process:")
+                    if (singleList.Count == 22)
                     {
                         // for processess
                         processes2DList.Add(singleList.Skip(1).ToArray());
-                    } else if (singleList.Count == 34 && singleList[0] == "Global: ")
+                    } else if (singleList.Count == 34)
                     {
                         // for global 0
                         globalZero2DList.Add(singleList.Skip(1).ToArray());
-                    } else if (singleList.Count == 23 && singleList[0] == "Global: ")
+                    } else if (singleList.Count == 23)
                     {
                         // for global total
                         globalTotal2DList.Add(singleList.Skip(1).ToArray());
                     }
                     counter++;
                 }
+                //dataInsert.insertMRI_Data(processes2DList);
+
+                foreach (var array in globalTotal2DList)
+                {
+                    Console.WriteLine();
+
+                    foreach (var item in array)
+                    {
+                        Console.Write(" ");
+                        Console.Write(item);
+                    }
+                }
+                dataInsert.insertMRI_Data(processes2DList);
+                dataInsert.insertGlobal0(globalZero2DList);
+                dataInsert.insertGlobalTotal(globalTotal2DList);
+
             }
             catch (Exception e)
             {
