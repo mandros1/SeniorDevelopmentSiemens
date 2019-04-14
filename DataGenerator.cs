@@ -328,9 +328,10 @@ namespace SiemensPerformance
 
             conn.Close();
 
-            processes2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
+            //processes2DList = all.ToList<String[]>(); //all.Where(x => x[2] == processName).ToList();
             Console.WriteLine("Done.");
-            return processes2DList;
+            return all.ToList<String[]>();
+            //return processes2DList;
 
         }
 

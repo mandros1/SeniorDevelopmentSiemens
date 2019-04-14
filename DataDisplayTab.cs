@@ -388,8 +388,8 @@ namespace SiemensPerformance
                 }
                 else
                 {
-                    processData = generator.getProcessDataFromDB(null, null);
-                    reusableDataTable = ConvertListToDataTable(reusableDataTable, processData, generator.processVariables);
+                    List<String[]> processData2 = generator.getProcessDataFromDB(null, null);
+                    reusableDataTable = ConvertListToDataTable(reusableDataTable, processData2, generator.processVariables);
                     processGrid.ItemsSource = reusableDataTable.DefaultView;
                 }
                 
@@ -402,8 +402,11 @@ namespace SiemensPerformance
                 else
                 {
                     // TODO: get the globalZero2D list over the DB
+                    List<String[]> processData2 = generator.getDataFromQueryDb("*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0");
+                    //reusableDataTable = ConvertListToDataTable(reusableDataTable, processData2, generator.globalZeroVariables);
+                   // globalZeroGrid.ItemsSource = reusableDataTable.DefaultView;
                 }
-                globalZeroGrid.ItemsSource = reusableDataTable.DefaultView;
+                //globalZeroGrid.ItemsSource = reusableDataTable.DefaultView;
             } else if (stringData == "Reset Global_Total Table")
             {
                 if (dbConnection == 1)
@@ -413,8 +416,11 @@ namespace SiemensPerformance
                 else
                 {
                     // TODO: get the globalTotal2D list over the DB
+                    processData = generator.getDataFromQueryDb("*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal");
+                    //reusableDataTable = ConvertListToDataTable(reusableDataTable, processData, generator.globalTotalVariables);
+                    //globalTotalGrid.ItemsSource = reusableDataTable.DefaultView;
                 }
-                globalTotalGrid.ItemsSource = reusableDataTable.DefaultView;
+                //globalTotalGrid.ItemsSource = reusableDataTable.DefaultView;
             }
         }
 
