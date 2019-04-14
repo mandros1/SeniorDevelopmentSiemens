@@ -284,29 +284,21 @@ namespace SiemensPerformance
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
             {
-                if (dbConnection == 1)
-                {
+              
                     processData = generator.globalZero2DList;
-                }
-                else
-                {   
-                    // TODO: get data from the global0
+                  
                     test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0";
-                }
+                
                 columnNames = generator.globalZeroVariables;
                 selection = 2;
             }
             if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
             {
-                if (dbConnection == 1)
-                {
+               
                     processData = generator.globalTotal2DList;
-                }
-                else
-                {
-                    // TODO: get data from the globaltotal
+            
                     test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal";
-                }
+                
                 columnNames = generator.globalTotalVariables;
 				selection = 3;
             }
