@@ -281,30 +281,31 @@ namespace SiemensPerformance
                 {
                     processData = generator.getProcessData((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
                 }
-                else {
-                    processData = generator.getProcessDataFromDB((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
-                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data";
+                else
+                {
+                    if (!String.Equals((string)finalSelectCB.SelectedItem, "WHERE")) { 
+                        processData = generator.getProcessDataFromDB((string)processNameCB.SelectedItem, (string)processIdCB.SelectedItem);
+                    }
+                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM mri_data WHERE process_name= '" + (string)processNameCB.SelectedItem + "' AND process_Id = '" + (string)processIdCB.SelectedItem + "' ";
                 }
                 columnNames = generator.processVariables;
                 selection = 1;
-            }
-            if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
+            }else if (String.Equals((string)filterCB.SelectedItem, "Global(0)"))
             {
               
                     processData = generator.globalZero2DList;
                   
-                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0";
-                
+                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM global0 WHERE process_name= '" + (string)processNameCB.SelectedItem + "' AND process_Id = '" + (string)processIdCB.SelectedItem + "' ";
+
                 columnNames = generator.globalZeroVariables;
                 selection = 2;
-            }
-            if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
+            }else if (String.Equals((string)filterCB.SelectedItem, "Global(_Total)"))
             {
                
                     processData = generator.globalTotal2DList;
             
-                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal";
-                
+                    test1 = "*, DATE_FORMAT(TimeStamp, '%Y/%m/%d-%H:%i:%s.%f') AS date FROM globaltotal WHERE process_name= '" + (string)processNameCB.SelectedItem + "' AND process_Id = '" + (string)processIdCB.SelectedItem + "' ";
+
                 columnNames = generator.globalTotalVariables;
 				selection = 3;
             }
@@ -328,16 +329,14 @@ namespace SiemensPerformance
                     }
                 }
                 else {
-                    if (whereOperator.Equals("==")) test1 += " WHERE " + " " + whereColumn + " = " + whereVal + " ";
-                    else test1 += " WHERE " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
+                    if (whereOperator.Equals("==")) test1 += " AND " + " " + whereColumn + " = " + whereVal + " ";
+                    else test1 += " AND " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";
 
                     if (String.Equals((string)finalWhereCB.SelectedItem, "AND"))
                     {
                         whereColumn = (string)andSelectNameCB.SelectedItem;
                         whereOperator = (string)andOperatorsCB.SelectedItem;
                         whereVal = andValue.Text;
-                        
-                        // get processData using the database
 
                         if (whereOperator.Equals("==")) test1 += " AND " + " " + whereColumn + " = " + whereVal + " ";
                         else test1 += " AND " + " " + whereColumn + " " + whereOperator + " " + whereVal + " ";

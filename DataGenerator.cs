@@ -261,7 +261,7 @@ namespace SiemensPerformance
         /// <returns></returns>
         public List<string[]> getDataFromQueryDb(string query)
         {
-           
+            Console.WriteLine(query);
             List<string[]> all = new List<string[]>();
 
             try
@@ -310,7 +310,7 @@ namespace SiemensPerformance
                             //Remove first and last element from array
                             everything = everything.Skip(1).ToArray();
                             //everything = everything.Skip(2).ToArray();
-                           // everything = everything.Take(everything.Count() - 1).ToArray();
+                            everything = everything.Take(everything.Count() - 1).ToArray();
                             //Console.WriteLine( everything.Length);
                            
                             all.Add(everything);
