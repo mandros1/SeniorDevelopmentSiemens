@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiemensPerformance", "SiemensPerformance.csproj", "{7CCE3236-6151-4CF0-A719-A3F4F22B6D27}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SiemensPerformanceInstaller", "SiemensPerformanceInstaller\SiemensPerformanceInstaller.vdproj", "{01FB07F0-1128-4FA9-931A-17D1334C6DC2}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Siemens Performance Visualizer", "SiemensPerformanceInstaller\SiemensPerformanceInstaller.vdproj", "{01FB07F0-1128-4FA9-931A-17D1334C6DC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
